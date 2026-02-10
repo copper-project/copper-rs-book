@@ -1,0 +1,14 @@
+[book]
+authors = ["Nicolas Rodriguez"]
+language = "en"
+src = "src"
+title = "Learning Copper RS"
+
+[build]
+build-dir = "output"
+
+[output.html]
+default-theme = "navy"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/NRdrgz/copper-rs"
+site-url = "/"

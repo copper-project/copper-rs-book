@@ -1,0 +1,23 @@
+# Rust build artifacts
+**/target/
+
+# Cargo lock files for binary projects (optional, keep if you want reproducible builds)
+# Cargo.lock
+
+# Copper log files
+*.copper
+**/logs/
+
+# mdBook build output
+book/output/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
