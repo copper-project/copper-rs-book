@@ -43,6 +43,12 @@ This starts a local development server (default: `http://localhost:3000`) and op
 book in your browser. Any edits to the Markdown source files in `book/src/` will
 automatically trigger a rebuild and refresh.
 
+## Read online
+
+This book is automatically deployed to GitHub Pages on every push to `main`:
+
+**[https://nrdrgz.github.io/copper-rs-book/](https://nrdrgz.github.io/copper-rs-book/)**
+
 ## Future chapters to be written:
 - Bridge to ROS
 - Export logging to other formats
