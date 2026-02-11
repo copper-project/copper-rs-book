@@ -45,4 +45,4 @@ This book is automatically deployed to GitHub Pages on every push to `main`:
 
 ## Acknowlegment
 
-Huge thanks to @nrdrgz for pushing this initiative!
+Huge thanks to [nrdrgz](https://github.com/NRdrgz) for pushing this initiative!
