@@ -8,7 +8,7 @@ methods that make them work.
 ### `type Resources<'r>` and `impl Freezable`
 
 We'll cover these in detail in the
-[Advanced Task Features](./ch15-advanced-tasks.md) chapter. For now, notice that both are
+[Advanced Task Features](./ch19-advanced-tasks.md) chapter. For now, notice that both are
 defined as empty -- `type Resources<'r> = ()` and `impl Freezable for MyTask {}` -- which
 is all you need for a simple project.
 

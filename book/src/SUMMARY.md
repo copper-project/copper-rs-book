@@ -35,7 +35,12 @@
 
 # Let's get organized
 
+- [From Project to Workspace](./ch15-workspace.md)
+- [Modular Configuration](./ch16-modular-config.md)
+- [Reusing Community Components](./ch17-ecosystem.md)
+- [Automating Tasks with Just](./ch18-justfile.md)
 
 # Going Further
 
-
+- [Advanced Task Features](./ch19-advanced-tasks.md)
+- [Useful Resources](./ch20-resources.md)

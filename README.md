@@ -8,6 +8,8 @@ As of today, this project is purely personal and does not involve the Copper RS 
 any missing or faulty information is my own responsibility.  
 I've originally built this book first and foremost for myself. I believe that the best way to properly understand a concept is to be able to clearly and simply explain it.
 
+This book has been written with the help of AI, for the sake of speed, proper grammar and formatting, but each and every line has been reviewed by a human. I am personally using this book to learn.
+
 ## Prerequisites
 
 - [Rust](https://rust-lang.org/tools/install/)
@@ -41,14 +43,7 @@ This starts a local development server (default: `http://localhost:3000`) and op
 book in your browser. Any edits to the Markdown source files in `book/src/` will
 automatically trigger a rebuild and refresh.
 
-## Future chapters to be done:
-- Advanced tasks (Freezable and Resources)
-- Build full scafolding from template
-- Use an already built packages
-- Useful resources in the doc
-- Automation with Just
-- Missions
-- Modularity
+## Future chapters to be written:
 - Bridge to ROS
 - Export logging to other formats
 - Bridge to Foxglove
