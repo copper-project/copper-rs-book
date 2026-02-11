@@ -6,32 +6,51 @@ Thanks for your interest in improving the Copper Book! Contributions of all kind
 
 - [Rust](https://rust-lang.org/tools/install/)
 - [mdBook](https://rust-lang.github.io/mdBook/)
+- [just](https://github.com/casey/just) (command runner)
 
-Install mdBook:
+Install the tools:
 
 ```bash
-cargo install mdbook
+cargo install mdbook just
 ```
 
 ## Building locally
 
+Run `just` to see all available commands:
+
+```bash
+just
+```
+
 Build the book:
 
 ```bash
-cd book
-mdbook build
+just build
 ```
 
-The HTML output is generated in `book/output/`.
-
-To serve the book locally with live-reload:
+Serve locally with live-reload:
 
 ```bash
-cd book
-mdbook serve --open
+just serve
 ```
 
-This starts a local development server (default: `http://localhost:3000`) and opens the book in your browser. Any edits to the Markdown source files in `book/src/` will automatically trigger a rebuild and refresh.
+This starts a local server (default: `http://localhost:3000`) and opens the book in your browser. Edits to files in `book/src/` trigger an automatic rebuild.
+
+## Inserting a new chapter
+
+To insert a chapter and automatically renumber everything (files, SUMMARY.md, cross-references):
+
+```bash
+just insert-chapter <number> <slug> [title]
+```
+
+For example, to insert a new chapter 6:
+
+```bash
+just insert-chapter 6 my-new-topic "My New Topic"
+```
+
+This creates `book/src/ch06-my-new-topic.md` and bumps all subsequent chapters up by one.
 
 ## How to contribute
 
