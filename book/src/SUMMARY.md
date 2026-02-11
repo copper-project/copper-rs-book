@@ -40,6 +40,8 @@
 - [Reusing Community Components](./ch17-ecosystem.md)
 - [Automating Tasks with Just](./ch18-justfile.md)
 
+---
+
 # Going Further
 
 - [Advanced Task Features](./ch19-advanced-tasks.md)

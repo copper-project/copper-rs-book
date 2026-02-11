@@ -161,6 +161,4 @@ not a silent runtime misconfiguration.
 
 The configuration file we've seen here is minimal on purpose. Real-world Copper projects
 can use additional top-level sections for monitoring, logging tuning, rate limiting,
-missions, and modular composition. We'll cover all of these in
-[Advanced Configuration](./ch14-advanced-config.md) once you're comfortable with the
-basics.
+missions, and modular composition. We'll cover these throughout the book as we go.

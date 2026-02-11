@@ -32,11 +32,9 @@ field you can put in `copperconfig.ron`.
 ## The examples/ directory
 
 The repository ships with a large collection of working examples. Each one is a complete,
-buildable project that demonstrates a specific feature or use case:
-
-Each example is a complete, buildable project with its own `copperconfig.ron`, task
-implementations, and `main.rs`. When you want to learn a new feature, reading the
-corresponding example is often the fastest way to understand how it works in practice.
+buildable project with its own `copperconfig.ron`, task implementations, and `main.rs`.
+When you want to learn a new feature, reading the corresponding example is often the
+fastest way to understand how it works in practice.
 
 Browse them at
 [github.com/copper-project/copper-rs/tree/master/examples](https://github.com/copper-project/copper-rs/tree/master/examples),

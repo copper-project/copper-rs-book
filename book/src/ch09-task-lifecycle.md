@@ -159,4 +159,4 @@ start from the beginning.
 For stateless tasks (like our simple `MySource`, `MyTask`, `MySink`), the empty
 `impl Freezable` is fine -- there's nothing to snapshot. We'll cover how to implement
 `freeze` and `thaw` for stateful tasks in the
-[Advanced Task Features](./ch15-advanced-tasks.md) chapter.
+[Advanced Task Features](./ch19-advanced-tasks.md) chapter.

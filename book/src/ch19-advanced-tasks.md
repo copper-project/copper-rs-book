@@ -22,11 +22,8 @@ pub struct MyController {
 With `Reflect` derived, a monitoring UI could display `kp`, `ki`, and
 `accumulated_error` as live values while the robot is running.
 
-When the `reflect` feature is disabled (which is the default in production builds), the
-derive is a no-op -- it compiles but generates no code, so there is zero runtime cost.
-
-**In practice**: always add `#[derive(Reflect)]` to your task structs. It costs nothing in
-production and enables tooling when you need it.
+**In practice**: always add `#[derive(Reflect)]` to your task structs. It enables
+monitoring and simulation tooling when you need it.
 
 ## `Freezable` -- State Serialization
 
