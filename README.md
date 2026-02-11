@@ -41,7 +41,7 @@ automatically trigger a rebuild and refresh.
 
 This book is automatically deployed to GitHub Pages on every push to `main`:
 
-**[https://nrdrgz.github.io/copper-rs-book/](https://copper-project.github.io/copper-rs-book/)**
+**[https://copper-project.github.io/copper-rs-book/](https://copper-project.github.io/copper-rs-book/)**
 
 ## Acknowlegment
 
