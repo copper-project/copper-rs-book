@@ -29,10 +29,13 @@
 - [Controlling the Loop Frequency](./ch11-frequency.md)
 - [Adding the Console Monitor](./ch12-monitoring.md)
 - [Logging and Replaying Data](./ch13-logging-replay.md)
+- [Using Missions](./ch14-missions.md)
 
 ---
 
+# Let's get organized
+
+
 # Going Further
 
-- [Advanced Task Features](./ch15-advanced-tasks.md)
-- [Advanced Configuration](./ch14-advanced-config.md)
+
