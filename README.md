@@ -40,3 +40,15 @@ mdbook serve --open
 This starts a local development server (default: `http://localhost:3000`) and opens the
 book in your browser. Any edits to the Markdown source files in `book/src/` will
 automatically trigger a rebuild and refresh.
+
+## Future chapters to be done:
+- Advanced tasks (Freezable and Resources)
+- Build full scafolding from template
+- Use an already built packages
+- Useful resources in the doc
+- Automation with Just
+- Missions
+- Modularity
+- Bridge to ROS
+- Export logging to other formats
+- Bridge to Foxglove

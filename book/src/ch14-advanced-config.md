@@ -7,63 +7,6 @@ behavior, missions, and modular composition.
 
 This chapter gives an overview of each.
 
-## Monitoring
-
-The optional `monitor` section selects a monitoring component that observes every cycle of
-the runtime. The most common choice is the console monitor, which prints live task status
-to the terminal:
-
-```ron
-monitor: (
-    type: "cu_consolemon::CuConsoleMon",
-    config: { "verbosity": 2 },
-),
-```
-
-The `type` field references a Rust type that implements the `CuMonitor` trait, and
-`config` passes key-value parameters to its constructor -- just like task `config` blocks.
-
-## Logging
-
-The `logging` section tunes Copper's unified structured logger. These options mirror the
-`LoggingConfig` struct defined in `cu29-runtime`:
-
-| Field | Description | Default |
-|---|---|---|
-| `enable_task_logging` | Controls per-task message logging | `true` |
-| `slab_size_mib` | Size of each memory-mapped slab in MiB | -- |
-| `section_size_mib` | Pre-allocated size per log section in MiB | -- |
-| `keyframe_interval` | Number of CopperLists between two state snapshots (keyframes) | `100` |
-
-Example:
-
-```ron
-logging: (
-    slab_size_mib: 1024,
-    section_size_mib: 100,
-),
-```
-
-The runtime validates that `section_size_mib` does not exceed `slab_size_mib`.
-
-> **Tip**: If your log files are growing too large, reduce the slab size or disable logging
-> on high-frequency tasks using the per-task `logging: (enabled: false)` option described
-> in the [Task Graph](./ch05-task-graph.md) chapter.
-
-## Runtime settings
-
-Runtime behavior can be adjusted with the `runtime` section. Currently the main option is
-`rate_target_hz`, which acts as a rate limiter for CopperList execution:
-
-```ron
-runtime: (
-    rate_target_hz: 2,
-),
-```
-
-This tells the runtime to target 2 full cycles per second. Without it, the runtime runs
-as fast as possible.
-
 ## Missions
 
 Configurations can define multiple **missions**, each representing an alternative variant

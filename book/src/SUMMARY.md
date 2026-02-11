@@ -28,6 +28,7 @@
 
 - [Controlling the Loop Frequency](./ch11-frequency.md)
 - [Adding the Console Monitor](./ch12-monitoring.md)
+- [Logging and Replaying Data](./ch13-logging-replay.md)
 
 ---
 
