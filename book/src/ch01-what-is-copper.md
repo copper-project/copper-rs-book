@@ -1,4 +1,4 @@
-# What is Copper RS?
+# What is copper-rs?
 
 Copper is a **deterministic robotics runtime** written in Rust. Think of it as a "game engine for robots": describe your system declaratively and Copper will create a custom scheduler and run it deterministically from cloud simulation down to embedded controllers.
 

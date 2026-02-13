@@ -6,8 +6,8 @@
 
 # Getting Started
 
-- [What is Copper RS?](./ch01-what-is-copper.md)
-- [Copper RS vs ROS](./ch02-copper-vs-ros.md)
+- [What is copper-rs?](./ch01-what-is-copper.md)
+- [copper-rs vs ROS](./ch02-copper-vs-ros.md)
 - [Setting Up Your Environment](./ch03-setup.md)
 
 ---

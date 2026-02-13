@@ -1,7 +1,7 @@
 # Useful Resources
 
 Throughout this book, we've been learning Copper by building projects step by step. But the
-Copper RS repository itself is a goldmine of resources that go far beyond what we've
+copper-rs repository itself is a goldmine of resources that go far beyond what we've
 covered. This chapter is a guided tour of where to find documentation, examples, and tools
 in the [copper-rs repository](https://github.com/copper-project/copper-rs).
 

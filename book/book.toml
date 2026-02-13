@@ -2,7 +2,7 @@
 authors = ["Nicolas Rodriguez"]
 language = "en"
 src = "src"
-title = "Learning Copper RS"
+title = "Learning copper-rs"
 
 [build]
 build-dir = "output"
