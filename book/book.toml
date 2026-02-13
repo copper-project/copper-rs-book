@@ -12,3 +12,4 @@ default-theme = "navy"
 preferred-dark-theme = "navy"
 git-repository-url = "https://github.com/NRdrgz/copper-rs-book"
 site-url = "/copper-rs-book/"
+additional-css = ["theme/brand.css"]

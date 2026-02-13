@@ -1,8 +1,4 @@
-# Learning copper-rs
-
-<p align="center">
-  <img src="./images/copper-logo.png" alt="copper-rs logo" width="96" />
-</p>
+# Introduction
 
 Welcome to **Learning copper-rs**, a hands-on guide to building robots with the
 [Copper](https://github.com/copper-project/copper-rs) deterministic robotics operating system.
