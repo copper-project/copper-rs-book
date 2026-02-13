@@ -11,7 +11,7 @@ generate one and understand its layout.
 
 ## Generating a workspace
 
-From the `templates/` directory inside the Copper RS repository, run:
+From the `templates/` directory inside the copper-rs repository, run:
 
 ```bash
 cargo +stable generate \

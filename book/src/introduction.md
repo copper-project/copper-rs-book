@@ -1,9 +1,9 @@
-# Learning Copper RS
+# Introduction
 
-Welcome to **Learning Copper RS**, a hands-on guide to building robots with the
+Welcome to **Learning copper-rs**, a hands-on guide to building robots with the
 [Copper](https://github.com/copper-project/copper-rs) deterministic robotics operating system.
 
-Most people learn Rust with the amazing [Rust Book](https://rust-book.cs.brown.edu/), so we built it for [Copper RS](https://github.com/copper-project/copper-rs).
+Most people learn Rust with the amazing [Rust Book](https://rust-book.cs.brown.edu/), so we built it for [copper-rs](https://github.com/copper-project/copper-rs).
 
 This book has been written with the help of AI, for the sake of speed, proper grammar and formatting, but each and every line has been reviewed by a human.
 

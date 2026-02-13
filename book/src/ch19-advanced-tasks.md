@@ -207,7 +207,7 @@ important when you:
 - Want the same task to work across different boards without code changes
 - Want to swap real hardware for mocks in testing
 
-The `examples/cu_resources_test/` in the Copper RS repository is a complete working example
+The `examples/cu_resources_test/` in the copper-rs repository is a complete working example
 that demonstrates bundles, shared resources, owned resources, and mission-specific resource
 bindings.
 

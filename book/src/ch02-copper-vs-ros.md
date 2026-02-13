@@ -1,4 +1,4 @@
-# Copper RS vs ROS
+# copper-rs vs ROS
 
 If you're coming from ROS or ROS 2, this chapter maps the concepts you already know to
 their Copper equivalents. The mental model is similar. Both are component-based
@@ -6,7 +6,7 @@ frameworks with message passing, but the execution model is fundamentally differ
 
 ## Concept mapping
 
-| ROS 2 | Copper RS | Notes |
+| ROS 2 | copper-rs | Notes |
 |---|---|---|
 | Node | Task | A unit of computation |
 | Publisher | `CuSrcTask` | Produces data (sensor driver) |

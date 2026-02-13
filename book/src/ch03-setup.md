@@ -26,7 +26,7 @@ cargo install cargo-generate
 
 ## Generate our first simple Copper project
 
-Clone the Copper RS repository and use the built-in template tool:
+Clone the copper-rs repository and use the built-in template tool:
 
 ```bash
 git clone https://github.com/copper-project/copper-rs

@@ -255,5 +255,5 @@ tasks and connections that Copper validates at compile time.
 - [Configuration reference](https://copper-project.github.io/copper-rs/Copper-Configuration-file-Reference/)
   for the full RON schema.
 - `examples/modular_config_example/` in the
-  [Copper RS repository](https://github.com/copper-project/copper-rs) for a working
+  [copper-rs repository](https://github.com/copper-project/copper-rs) for a working
   example.

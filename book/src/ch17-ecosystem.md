@@ -1,7 +1,7 @@
 # Reusing Community Components
 
 One of the biggest advantages of building your robot with Copper is that you don't have to
-write everything from scratch. The Copper RS repository ships with a growing collection of
+write everything from scratch. The copper-rs repository ships with a growing collection of
 **ready-made components** -- sensor drivers, algorithms, bridges, and shared message
 types -- that you can drop into your project.
 
@@ -9,7 +9,7 @@ In this chapter, we'll explore what's available and how to use it.
 
 ## The components directory
 
-The Copper RS repository organizes its components by role:
+The copper-rs repository organizes its components by role:
 
 ```text
 components/
@@ -30,7 +30,7 @@ code needed.
 
 The ecosystem is actively growing. Browse the
 [components directory](https://github.com/copper-project/copper-rs/tree/master/components)
-in the Copper RS repository to see what's currently available -- you'll find LiDAR drivers,
+in the copper-rs repository to see what's currently available -- you'll find LiDAR drivers,
 IMU drivers, camera capture, PID controllers, AprilTag detection, Zenoh and ROS 2 bridges,
 and more.
 

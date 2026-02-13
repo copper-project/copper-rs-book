@@ -1,6 +1,10 @@
 # copper-rs-book
 
-Most people learn Rust with the amazing [Rust Book](https://rust-book.cs.brown.edu/), so we built it for [Copper RS](https://github.com/copper-project/copper-rs).
+<p align="center">
+  <img src="book/src/images/copper-logo.png" alt="copper-rs logo" width="96" />
+</p>
+
+Most people learn Rust with the amazing [Rust Book](https://rust-book.cs.brown.edu/), so we built it for [copper-rs](https://github.com/copper-project/copper-rs).
 
 This book has been written with the help of AI, for the sake of speed, proper grammar and formatting, but each and every line has been reviewed by a human.
 
