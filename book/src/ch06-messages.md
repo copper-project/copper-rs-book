@@ -51,6 +51,61 @@ type Output<'m> = output_msg!(i32);
 This is great for prototyping. As your robot grows, you'll likely define richer message
 types with multiple fields.
 
+## Using units directly in payloads
+
+Copper exposes the `cu29-units` wrappers (through `cu29::units`) so your payload fields can
+carry units directly instead of raw `f32` values.
+
+```rust
+use bincode::{Decode, Encode};
+use cu29::prelude::*;
+use cu29::units::si::f32::{Length, Time, Velocity};
+use cu29::units::si::length::{inch, meter};
+use cu29::units::si::time::second;
+use cu29::units::si::velocity::{kilometer_per_hour, meter_per_second};
+use serde::{Deserialize, Serialize};
+
+#[derive(Default, Debug, Clone, Encode, Decode, Serialize, Deserialize, Reflect)]
+pub struct WheelSample {
+    pub distance: Length,
+    pub dt: Time,
+    pub speed: Velocity,
+}
+
+impl WheelSample {
+    pub fn from_raw(distance_m: f32, dt_s: f32) -> Self {
+        let distance = Length::new::<meter>(distance_m);
+        let dt = Time::new::<second>(dt_s);
+
+        // m / s -> m/s
+        let speed: Velocity = (distance.into_uom() / dt.into_uom()).into(); // this is type safe
+
+        Self {
+            distance,
+            dt,
+            speed,
+        }
+    }
+
+    pub fn distance_in_inches(&self) -> f32 {
+        self.distance.get::<inch>()
+    }
+
+    pub fn speed_mps(&self) -> f32 {
+        self.speed.get::<meter_per_second>()
+    }
+
+    pub fn speed_kph(&self) -> f32 {
+        self.speed.get::<kilometer_per_hour>()
+    }
+}
+```
+
+This gives you unit-safe fields in messages, unit-safe math when building messages, and explicit
+conversions when consuming them. Wrapper types support same-dimension arithmetic (`+`, `-`) and
+scalar scale (`* f32`, `/ f32`) directly; for cross-dimension operations (like `Length / Time`),
+compute with the underlying `uom` quantity and convert back with `.into()` (or `from_uom`).
+
 ## Designing good payloads
 
 A few tips for payload design:
@@ -81,3 +136,6 @@ pub struct ImuPayload {
 ```
 
 In the next chapter, we'll see how tasks produce and consume these messages.
+
+For more advanced unit algebra, dimensions, and available units, see the underlying
+[`uom` crate docs](https://docs.rs/uom/latest/uom/).
