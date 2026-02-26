@@ -337,11 +337,11 @@ ros2 launch my_robot robot.launch.py use_sim:=true
 This works, but the logic lives in Python launch files that are completely separate from
 your node code. Errors (wrong topic names, missing remappings) only show up at runtime.
 
-In Copper, everything is in one `copperconfig.ron`:
+In Copper, all missions live in `copperconfig.ron`:
 
 ```text
 Copper:
-  copperconfig.ron    ← all missions, tasks, and connections in one place
+  copperconfig.ron    ← missions, tasks, connections
   cargo run           ← default mission
   cargo run -- direct ← alternative mission
 ```
@@ -350,12 +350,10 @@ Key differences:
 
 | | ROS 2 | Copper |
 |---|---|---|
-| **Where** | Python launch files + YAML params | Single `copperconfig.ron` |
+| **Where** | Python launch files + YAML params | `copperconfig.ron` |
 | **Validation** | Runtime (nodes may fail to connect) | Compile time (macro checks the graph) |
 | **Granularity** | Per-node conditionals | Per-task and per-connection tagging |
 | **Switching** | Launch arguments | Builder selection in `main.rs` |
-| **All variants visible** | Spread across files and conditionals | One file, all missions side by side |
+| **All variants visible** | Spread across files and conditionals | One file, all missions visible |
 
-The biggest advantage is **visibility**: you can look at one file and see every mission,
-every task, and exactly which tasks are active in which missions. There's no need to
-mentally simulate a launch file's conditional logic to figure out what will actually run.
+The main advantage: one file shows every mission and which tasks run in each.
