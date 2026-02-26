@@ -56,6 +56,12 @@ Conceptually:
   ROS-compatible) topic and injects received messages into the task graph. Data flows
   *in* to Copper.
 
+A single bridge can be **both** a sink and a source: it may have Tx channels (sending
+commands or data out) and Rx channels (receiving sensor or status data in). Many
+hardware drivers are implemented this way — for example, the **cu_feetech** bridge
+talks to Dynamixel-style servos over serial (e.g. the SO101 arm) and exposes both
+joint commands (Tx) and joint state feedback (Rx) in the same component.
+
 In hardware and middleware jargon, **Tx** (transmit) is the direction out of Copper — the
 bridge sink sends data to the external system. **Rx** (receive) is the direction in —
 the bridge source receives data from the external system and feeds it into the graph.
@@ -101,6 +107,8 @@ The copper-rs repository provides bridge components under `components/bridges/`:
   nodes understand. When your ROS 2 stack uses the Zenoh RMW, those nodes see Copper's
   traffic as normal ROS 2 topics. You don't need to run a separate "bridge process" --
   Copper publishes and subscribes directly.
+- **cu_feetech bridge** -- Connects to Dynamixel-style servos over serial (e.g. the
+  SO101 arm): it is both a sink (joint commands out) and a source (joint state feedback in).
 
 For concrete examples, see the [bridges directory on GitHub](https://github.com/copper-project/copper-rs/tree/master/components/bridges) (e.g. `cu_zenoh_bridge`, `cu_zenoh_ros_sink`, and the workspace template's `cu_example_shared_bridge`).
 

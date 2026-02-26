@@ -46,6 +46,6 @@
 
 - [Advanced Task Features](./ch19-advanced-tasks.md)
 - [Exporting Data to Other Formats](./ch20-export-formats.md)
-- [Useful Resources](./ch21-resources.md)
-- [Bridges](./ch22-bridges.md)
-- [Bridging with ROS](./ch23-bridging-with-ros.md)
+- [Bridges](./ch21-bridges.md)
+- [Bridging with ROS](./ch22-bridging-with-ros.md)
+- [Useful Resources](./ch23-resources.md)

@@ -12,9 +12,9 @@ round-trip: **ROS → Copper → ROS**.
   ┌──────────────┐               ┌─────────────────────────────────────────┐
   │ Publisher    │   /counter    │ ROS 2 bridge (cu_ros2_bridge)           │
   │ Int32 1,2,3… │──────────────▶│ Rx: /counter ──▶ Format task (int→str)  │
-  │ at 1 Hz      │               │                    │                   │
-  └──────────────┘               │ Tx: /from_copper ◀─┘                   │
-                                  └─────────────────────────────────────────┘
+  │ at 1 Hz      │               │                    │                    │
+  └──────────────┘               │ Tx: /from_copper ◀─┘                    │
+                                 └─────────────────────────────────────────┘
                                                                   │
   ┌──────────────┐               "Received from ROS: N, Publishing to ROS"
   │ Subscriber   │   /from_copper
@@ -27,8 +27,7 @@ You will need:
 - A Copper workspace or project with the **cu_ros2_bridge** component (see the
   [copper-rs bridges](https://github.com/copper-project/copper-rs/tree/master/components/bridges/cu_ros2_bridge)).
 - A ROS 2 environment. For Copper and ROS 2 to interoperate on the same topics, your
-  ROS 2 stack should use the Zenoh RMW (`rmw_zenoh`); see the copper-rs and Zenoh
-  documentation for setup.
+  ROS 2 stack should use the Zenoh RMW (`rmw_zenoh`). Make sure that you have a Zenoh router (`ros2 run rmw_zenoh_cpp rmw_zenohd`)
 
 We'll assume a workspace layout similar to [From Project to Workspace](./ch15-workspace.md),
 with an app and the bridge components as dependencies.
@@ -127,10 +126,11 @@ pub mod bridges {
 produces the string we send out on the Tx channel. In `tasks.rs`:
 
 ```rust
-use cu29::prelude::*;
-
 #[derive(Reflect)]
-pub struct RosFormatTask {}
+pub struct RosFormatTask {
+    /// Last formatted message, so we republish it when there is no new ROS message this cycle.
+    last_msg: String,
+}
 
 impl Freezable for RosFormatTask {}
 
@@ -143,7 +143,9 @@ impl CuTask for RosFormatTask {
     where
         Self: Sized,
     {
-        Ok(Self {})
+        Ok(Self {
+            last_msg: String::new(),
+        })
     }
 
     fn process(
@@ -152,13 +154,19 @@ impl CuTask for RosFormatTask {
         input: &Self::Input<'_>,
         output: &mut Self::Output<'_>,
     ) -> CuResult<()> {
-        let n = input.payload().copied().unwrap_or(0);
-        let msg = format!("Received from ROS: {}, Publishing to ROS", n);
-        output.set_payload(msg);
+        if let Some(&n) = input.payload() {
+            self.last_msg = format!("Received from ROS: {}, Publishing to ROS", n);
+        }
+        output.set_payload(self.last_msg.clone());
         Ok(())
     }
 }
 ```
+
+When the Copper control loop runs faster than the ROS publisher (e.g. Copper at 10 Hz,
+ROS at 1 Hz), many cycles will have no new message on the Rx channel. The task keeps the
+last formatted string in `last_msg` and republishes it on those cycles, so the bridge
+keeps sending the last value to ROS instead of going silent until the next ROS message.
 
 ## Step 4: Wire the graph in copperconfig.ron
 
@@ -180,7 +188,8 @@ Declare the **single bridge** (with one Rx and one Tx channel) and the format ta
             config: {
                 "domain_id": 0,
                 "namespace": "copper",
-                "node": "roundtrip_node",
+                "node": "counter_node",
+                "zenoh_config_json": r#"{"mode": "client", "connect": {"endpoints": ["tcp/127.0.0.1:7447"]}}"#,
             },
             channels: [
                 Rx(id: "counter", route: "/counter"),
@@ -200,6 +209,7 @@ Declare the **single bridge** (with one Rx and one Tx channel) and the format ta
             msg: "String",
         ),
     ],
+    runtime: (rate_target_hz: 1)
 )
 ```
 
@@ -211,8 +221,8 @@ options (e.g. `zenoh_config_file`) are documented in the
 
 ## Step 5: Run Copper and see the string on ROS
 
-1. Start your ROS 2 counter node (or `ros2 topic pub`) so `/counter` is publishing.
-2. Run your Copper application (e.g. `cargo run` or `just run` from your workspace).
+1. Start your ROS 2 counter node so `/counter` is publishing.
+2. Run your Copper application (e.g. `cargo run` from your workspace).
 3. In another terminal, with the same ROS 2 environment sourced, run:
 
 ```bash
@@ -221,6 +231,17 @@ ros2 topic echo /from_copper
 
 You should see messages with the string "Received from ROS: 0, Publishing to ROS",
 "Received from ROS: 1, Publishing to ROS", and so on, at about 1 Hz.
+
+```shell
+$ ros2 topic echo /from_copper
+data: 'Received from ROS: 35, Publishing to ROS'
+---
+data: 'Received from ROS: 36, Publishing to ROS'
+---
+data: 'Received from ROS: 37, Publishing to ROS'
+---
+data: 'Received from ROS: 38, Publishing to ROS'
+```
 
 ## Summary
 
