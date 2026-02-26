@@ -24,15 +24,18 @@ Bridges are regular Copper tasks: they implement `CuSrcTask`, `CuTask`, or `CuSi
 and you wire them in `copperconfig.ron` like any other component. The only difference is
 that they also perform I/O with an external system (network, IPC, etc.).
 
-## Zenoh as the bridge layer
+## Zenoh and other transports
 
-Copper's bridges use [Zenoh](https://zenoh.io/) as the **middleware** between Copper and
-the rest of the world. Zenoh is a pub/sub and storage protocol that can run over shared
-memory, UDP, TCP, or other transports. It is lightweight and has first-class support for
-**ROS 2 compatibility**: Copper can publish and subscribe to data that ROS 2 nodes see as
-normal DDS topics when they use the `rmw_zenoh` RMW implementation.
+Bridges can use different transports. The **cu_feetech** bridge, for example, talks to
+Dynamixel-style servos over serial and does not use Zenoh. For network-based integration —
+pub/sub, ROS 2, or talking to other processes — many of Copper's bridge components use
+[Zenoh](https://zenoh.io/) as the **middleware** between Copper and the rest of the world.
+Zenoh is a pub/sub and storage protocol that can run over shared memory, UDP, TCP, or
+other transports. It is lightweight and has first-class support for **ROS 2 compatibility**:
+Copper can publish and subscribe to data that ROS 2 nodes see as normal DDS topics when
+they use the `rmw_zenoh` RMW implementation.
 
-Conceptually:
+Conceptually, for bridges that use Zenoh:
 
 ```text
   Copper task graph                    Zenoh                    External world
