@@ -42,6 +42,14 @@
 
 ---
 
+# Performance and Stack Tuning
+
+- [Performance Basics](./ch22-runtime-model-and-tuning-knobs.md)
+- [Reading Performance Metrics](./ch23-reading-performance-metrics.md)
+- [Troubleshooting Performance](./ch24-troubleshooting-performance.md)
+
+---
+
 # Going Further
 
 - [Advanced Task Features](./ch19-advanced-tasks.md)

@@ -1,6 +1,6 @@
-# Default recipe: list available commands
+# Default recipe: serve the book locally
 default:
-    @just --list
+    cd book && mdbook serve --open
 
 # Build the book
 build:
