@@ -42,17 +42,17 @@
 
 ---
 
-# Performance and Stack Tuning
-
-- [Performance Basics](./ch22-runtime-model-and-tuning-knobs.md)
-- [Reading Performance Metrics](./ch23-reading-performance-metrics.md)
-- [Troubleshooting Performance](./ch24-troubleshooting-performance.md)
-
----
-
 # Going Further
 
 - [Advanced Task Features](./ch19-advanced-tasks.md)
 - [Exporting Data to Other Formats](./ch20-export-formats.md)
 - [Useful Resources](./ch21-resources.md)
 - [Python Support](./ch22-python.md)
+
+---
+
+# Performance and Stack Tuning
+
+- [Performance Basics](./ch23-performance-basics.md)
+- [Reading Performance Metrics](./ch24-reading-performance-metrics.md)
+- [Troubleshooting Performance](./ch25-troubleshooting-performance.md)

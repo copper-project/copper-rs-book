@@ -5,7 +5,7 @@ This chapter should serve two different readers:
 - If you already know how Copper executes a cycle and you just want the knobs, jump to
   [Tuning Knob Reference](#tuning-knob-reference).
 - If you are still building the mental model, read straight through, then continue to
-  [Troubleshooting Performance](./ch24-troubleshooting-performance.md).
+  [Troubleshooting Performance](./ch25-troubleshooting-performance.md).
 
 ## Start with one simple idea
 
@@ -90,8 +90,8 @@ So "it collapses after a while" is often a logging and writeback story, not a ta
 
 Once this mental model is clear, do not keep guessing. Look at the numbers:
 
-- [Reading Performance Metrics](./ch23-reading-performance-metrics.md)
-- [Troubleshooting Performance](./ch24-troubleshooting-performance.md)
+- [Reading Performance Metrics](./ch24-reading-performance-metrics.md)
+- [Troubleshooting Performance](./ch25-troubleshooting-performance.md)
 
 The normal flow should be:
 

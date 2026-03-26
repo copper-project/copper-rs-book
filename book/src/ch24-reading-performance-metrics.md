@@ -107,4 +107,4 @@ The most useful fields for tuning are:
 
 Then use the decision tree:
 
-- [Troubleshooting Performance](./ch24-troubleshooting-performance.md)
+- [Troubleshooting Performance](./ch25-troubleshooting-performance.md)
