@@ -98,15 +98,21 @@ Beyond `id` and `type`, each task entry supports several optional fields:
   ),
   ```
 
-- **`background`** -- When set to `true`, the task runs on a **background thread** instead
-  of the critical path. Useful for tasks that do heavy or blocking work (network I/O, disk
-  writes) that shouldn't affect the deterministic scheduling of other tasks.
+- **`background`** -- Optional background execution policy for regular single-input tasks
+  with outputs. `true` keeps the legacy behavior and is equivalent to `"next"`.
+  Available modes:
+  `true` / `"next"`: launch the current input once the previous background run is released.
+  `"previous"`: keep one pending untreated input while another run is in flight.
+  `"closest"`: like `"previous"`, but it may wait one cycle for a predicted fresher input.
+  These tasks still run on a **background thread** instead of the critical path, which is
+  useful for heavy or blocking work (network I/O, disk writes) that shouldn't affect the
+  deterministic scheduling of other tasks.
 
   ```ron
   (
       id: "telemetry",
       type: "tasks::TelemetryUploader",
-      background: true,
+      background: "previous",
   ),
   ```
 
