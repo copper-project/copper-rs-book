@@ -47,3 +47,4 @@
 - [Advanced Task Features](./ch19-advanced-tasks.md)
 - [Exporting Data to Other Formats](./ch20-export-formats.md)
 - [Useful Resources](./ch21-resources.md)
+- [Python Support](./ch22-python.md)
