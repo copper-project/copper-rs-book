@@ -232,7 +232,7 @@ After enabling it, measure the cost. If the throughput penalty is too large:
 
 ## Background One Task
 
-Use this when **one isolated task** is too slow, but it does not need to block the whole loop.
+Use this when **one isolated source or task** is too slow, but it does not need to block the whole loop.
 
 ```ron
 (
@@ -244,7 +244,7 @@ Use this when **one isolated task** is too slow, but it does not need to block t
 
 What it means semantically:
 
-- Copper runs that task on the background threadpool
+- Copper runs that source or task on the background threadpool
 - while it is still busy, `process()` returns `None`
 - downstream tasks therefore see missing output for some cycles
 
@@ -268,7 +268,7 @@ Why:
 
 - the controller path usually needs one coherent output per cycle
 
-Copper will ensure a `threadpool` resource bundle exists when background tasks are present.
+Copper will ensure a `threadpool` resource bundle exists when background sources or tasks are present.
 If you need a specific sizing, provide that bundle explicitly instead of relying on the
 default.
 

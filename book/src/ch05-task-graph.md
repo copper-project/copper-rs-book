@@ -61,11 +61,15 @@ Each entry in the `tasks` array declares one task:
 (
     id: "src",                    // Unique string identifier
     type: "tasks::MySource",      // Rust type that implements the task
+    kind: source,                 // Optional but recommended: source | task | sink
 ),
 ```
 
 - **`id`** -- A unique name for this task instance. Used to reference it in connections.
 - **`type`** -- The fully qualified path to the Rust struct (relative to your crate root).
+- **`kind`** -- Declares whether the Rust type implements `CuSrcTask`, `CuTask`, or
+  `CuSinkTask`. Use `source`, `task`, or `sink`. Copper can still infer this for legacy
+  configs when the graph shape is unambiguous, but explicit `kind` is the preferred form.
 
 ### Optional task fields
 
@@ -98,9 +102,10 @@ Beyond `id` and `type`, each task entry supports several optional fields:
   ),
   ```
 
-- **`background`** -- When set to `true`, the task runs on a **background thread** instead
-  of the critical path. Useful for tasks that do heavy or blocking work (network I/O, disk
-  writes) that shouldn't affect the deterministic scheduling of other tasks.
+- **`background`** -- When set to `true`, a source or compatible task runs on a
+  **background thread** instead of the critical path. Useful for stages that do heavy or
+  blocking work (network I/O, disk writes) that shouldn't affect the deterministic
+  scheduling of other tasks.
 
   ```ron
   (
@@ -149,6 +154,10 @@ Each entry in `cnx` wires one task's output to another's input:
       missions: ["outdoor", "mapping"],
   ),
   ```
+
+If a source or regular task intentionally exposes an output that is unused in a given
+graph, point that connection at `dst: "__nc__"`. This keeps the output message type
+explicit without adding a dummy sink.
 
 ### How this compares to ROS
 
