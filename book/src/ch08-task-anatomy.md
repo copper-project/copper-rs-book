@@ -131,6 +131,18 @@ let value = input.payload().unwrap();
 `output.set_payload(value)` writes your data into a buffer that was **pre-allocated at
 startup**.
 
+For values that should persist on the consumer side until explicitly replaced, Copper also
+has a generic latched-state pattern:
+
+- `CuLatchedStateUpdate<T>::NoChange` -- keep the cached value
+- `CuLatchedStateUpdate<T>::Set(value)` -- replace the cached value
+- `CuLatchedStateUpdate<T>::Clear` -- remove the cached value
+
+Downstream tasks can store that state in `CuLatchedState<T>` and apply updates as they
+arrive. This is a good fit for calibration bundles, static transforms, lookup tables, and
+other low-rate metadata that should not be rebuilt every cycle. The full producer and
+consumer pattern is covered in [Defining Messages](./ch06-messages.md#latched-state-updates).
+
 #### The clock: `&RobotClock`
 
 Every `process()` receives a `clock` parameter. This is Copper's **only clock** -- a
