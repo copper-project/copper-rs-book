@@ -51,6 +51,75 @@ type Output<'m> = output_msg!(i32);
 This is great for prototyping. As your robot grows, you'll likely define richer message
 types with multiple fields.
 
+## Latched state updates
+
+Not every payload is a fresh sample. Some values are low-rate state: camera calibration,
+static transforms, lookup tables, map metadata, and similar data that usually stays the
+same for many cycles.
+
+Re-sending the full value every cycle is wasteful, but making it implicit would hurt
+determinism and replay. Copper therefore models this explicitly:
+
+- `CuLatchedStateUpdate<T>` is the message that flows across the connection
+- `CuLatchedState<T>` is the consumer-side cache stored in your task state
+
+The update variants are:
+
+- `NoChange` -- keep the previously latched value
+- `Set(value)` -- replace the previously latched value
+- `Clear` -- remove the previously latched value
+
+The important mental model is that Copper does not automatically "remember the last
+message" for you. The state transition is the message. Each downstream task that needs the
+value keeps its own `CuLatchedState<T>` and applies updates as they arrive.
+
+### Producer side
+
+A source or task that discovers calibration data might publish it once with `Set(...)`,
+then emit `NoChange` on later cycles until something changes:
+
+```rust
+type Output<'m> = output_msg!(CuLatchedStateUpdate<CameraCalibration>);
+
+fn process(&mut self, _clock: &RobotClock, output: &mut Self::Output<'_>) -> CuResult<()> {
+    if let Some(calibration) = self.pending_calibration.take() {
+        output.set_payload(CuLatchedStateUpdate::Set(calibration));
+    } else {
+        output.set_payload(CuLatchedStateUpdate::NoChange);
+    }
+    Ok(())
+}
+```
+
+If the cached value becomes invalid, emit `CuLatchedStateUpdate::Clear`.
+
+### Consumer side
+
+The consumer stores the latest latched value in its own task state:
+
+```rust
+pub struct DepthProjector {
+    calibration: CuLatchedState<CameraCalibration>,
+}
+
+fn process(&mut self, _clock: &RobotClock, input: &Self::Input<'_>,
+           output: &mut Self::Output<'_>) -> CuResult<()> {
+    if let Some(update) = input.payload() {
+        self.calibration.update(update);
+    }
+
+    let Some(calibration) = self.calibration.get() else {
+        return Ok(());
+    };
+
+    output.set_payload(project_depth_with(calibration));
+    Ok(())
+}
+```
+
+This pattern keeps the common case cheap, because `NoChange` is just a tiny explicit
+update, while still making the state evolution visible in logs and deterministic replay.
+
 ## Using units directly in payloads
 
 Copper exposes the `cu29-units` wrappers (through `cu29::units`) so your payload fields can
