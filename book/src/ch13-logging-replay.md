@@ -1,7 +1,7 @@
 # Logging and Replaying Data
 
 Every time you've run our project so far, Copper has been quietly recording everything.
-Look at `main.rs` -- the call to `basic_copper_setup()` initializes a **unified logger**
+Look at `main.rs` -- the generated app builder's `.with_log_path(...)` call initializes a **unified logger**
 that writes to `logs/my-project.copper`. Every cycle, the runtime serializes every message
 exchanged between tasks (the **CopperList**) and writes it to that file.
 
@@ -259,7 +259,7 @@ hardware or a log file.
 
 Copper's logger is designed for **zero-impact logging** on the critical path. Here's how:
 
-1. **Pre-allocated memory slabs** -- At startup, `basic_copper_setup()` allocates a large
+1. **Pre-allocated memory slabs** -- At startup, `.with_log_path(...)` allocates a large
    contiguous block of memory (controlled by `PREALLOCATED_STORAGE_SIZE` -- 100 MB in our
    project). CopperLists are written into this pre-allocated buffer without any dynamic
    allocation.
@@ -350,4 +350,3 @@ to decide what to *exclude* (via `logging: (enabled: false)`) if storage is a co
 This "record everything by default" approach is what makes Copper's deterministic replay
 possible. Since every message and every timestamp is captured automatically, you can always
 go back and reproduce any moment of your robot's execution.
-

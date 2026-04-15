@@ -70,7 +70,6 @@ resolver = "2"
 
 [workspace.dependencies]
 cu29 = { path = "../../core/cu29" }
-cu29-helpers = { path = "../../core/cu29_helpers" }
 cu29-export = { path = "../../core/cu29_export" }
 bincode = { package = "cu-bincode", version = "2.0", default-features = false, features = ["derive", "alloc"] }
 serde = { version = "*", features = ["derive"] }
