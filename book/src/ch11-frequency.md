@@ -106,6 +106,12 @@ This means:
 - If your tasks are too slow for the target, the loop runs at whatever rate it can sustain.
 - Without the `runtime` section, the loop runs flat-out with no pause between cycles.
 
+For host-side applications that need tighter cadence at higher rates, Copper also ships an
+optional `high-precision-limiter` crate feature. That mode keeps the same
+`runtime.rate_target_hz` config, but the std runtime switches from pure sleep-based waiting
+to a hybrid sleep-then-spin limiter with absolute deadlines. It burns more CPU near each
+tick, so it is meant for metronomic loops, not for the default "save cycles" use case.
+
 ## Difference with ROS
 
 In ROS, each node controls its own frequency. A camera node publishes at 30 Hz, an IMU
@@ -134,4 +140,3 @@ of your system to run at different rates (e.g., a fast inner control loop and a 
 planner), you'd use separate task graphs or implement logic inside a task to skip cycles.
 But for most applications, a single frequency for the whole pipeline is simpler and avoids
 the synchronization headaches that come with multiple independent timers.
-
