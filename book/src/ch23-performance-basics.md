@@ -109,7 +109,7 @@ This is the fast path for readers who already know what kind of bottleneck they 
 | `async-cl-io` | Moves CopperList serialization and logging to a dedicated thread | Task latencies are fine, but end-of-CL overhead is too high |
 | `parallel-rt` | Pipelines multiple CopperLists across generated process stages | Several CPU-bound stages are back to back and the global rate is too low |
 | `mmap-fsync` | Forces file `sync_all()` on section flush | The system runs fine for a while, then collapses under dirty-page / writeback pressure |
-| `background: true` | Runs one task on the background threadpool and returns `None` while it is still busy | One isolated task is too slow, but it does not need to block every cycle |
+| `background: true` | Runs one compatible source or task on the background threadpool and returns `None` while it is still busy | One isolated stage is too slow, but it does not need to block every cycle |
 | Task-local thread pool / parallel `for` | Parallelizes the internals of one task | One hot task has obvious internal data parallelism |
 | `logging: (enabled: false)` or `enable_task_logging: false` | Reduces logged bytes | Bandwidth and serialized size are too high |
 | `logging.copperlist_count` | Increases the number of preallocated in-flight CopperLists | Async or parallel modes stall because they run out of CopperList slots |
@@ -141,8 +141,9 @@ cargo run --features mmap-fsync
 `parallel-rt` is a **runtime-level pipeline**. Multiple CopperLists can be in flight at the
 same time, and each generated process stage keeps FIFO order for determinism.
 
-`background: true` is a **task-level escape hatch**. One task moves to the background
-threadpool and may return `None` for some cycles while its previous run is still finishing.
+`background: true` is a **stage-level escape hatch**. One source or task moves to the
+background threadpool and may return `None` for some cycles while its previous run is still
+finishing.
 
 ### `parallel-rt` is not the same as task-local parallelism
 
@@ -155,8 +156,8 @@ adding runtime-level parallelism around it.
 
 ## Background tasks and the threadpool bundle
 
-If a task is marked with `background: true`, Copper ensures a `threadpool` resource bundle is
+If a source or task is marked with `background: true`, Copper ensures a `threadpool` resource bundle is
 available. If you do not provide one explicitly, the runtime creates a default one.
 
-This makes background tasks easy to turn on, but it does not mean they are always the right
+This makes background stages easy to turn on, but it does not mean they are always the right
 choice. They work best when skipping or sampling intermediate cycles is acceptable.
