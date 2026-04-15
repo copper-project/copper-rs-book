@@ -145,8 +145,7 @@ Update `main.rs` to select a mission:
 pub mod tasks;
 
 use cu29::prelude::*;
-use cu29_helpers::basic_copper_setup;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -155,9 +154,9 @@ const PREALLOCATED_STORAGE_SIZE: Option<usize> = Some(1024 * 1024 * 100);
 #[copper_runtime(config = "copperconfig.ron")]
 struct MyProjectApplication {}
 
-// Import the per-mission builders
-use normal::MyProjectApplicationBuilder as NormalBuilder;
-use direct::MyProjectApplicationBuilder as DirectBuilder;
+// Import the per-mission application types
+use normal::MyProjectApplication as NormalApp;
+use direct::MyProjectApplication as DirectApp;
 
 fn main() {
     // Pick the mission from the first command-line argument (default: "normal")
@@ -171,28 +170,26 @@ fn main() {
             std::fs::create_dir_all(parent).expect("Failed to create logs directory");
         }
     }
-    let copper_ctx = basic_copper_setup(
-        &PathBuf::from(&logger_path),
-        PREALLOCATED_STORAGE_SIZE,
-        true,
-        None,
-    )
-    .expect("Failed to setup logger.");
+    let clock = RobotClock::default();
     debug!("Logger created at {}.", logger_path);
 
     match mission.as_str() {
         "normal" => {
             debug!("Starting mission: normal");
-            let mut app = NormalBuilder::new()
-                .with_context(&copper_ctx)
+            let mut app = NormalApp::builder()
+                .with_clock(clock.clone())
+                .with_log_path(logger_path, PREALLOCATED_STORAGE_SIZE)
+                .expect("Failed to setup logger.")
                 .build()
                 .expect("Failed to create application.");
             app.run().expect("Failed to run application.");
         }
         "direct" => {
             debug!("Starting mission: direct");
-            let mut app = DirectBuilder::new()
-                .with_context(&copper_ctx)
+            let mut app = DirectApp::builder()
+                .with_clock(clock.clone())
+                .with_log_path(logger_path, PREALLOCATED_STORAGE_SIZE)
+                .expect("Failed to setup logger.")
                 .build()
                 .expect("Failed to create application.");
             app.run().expect("Failed to run application.");

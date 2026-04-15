@@ -14,7 +14,6 @@ Add `cu-consolemon` to your `Cargo.toml`:
 ```toml
 [dependencies]
 cu29 = { git = "https://github.com/copper-project/copper-rs" }
-cu29-helpers = { git = "https://github.com/copper-project/copper-rs" }
 cu-consolemon = { git = "https://github.com/copper-project/copper-rs" }
 bincode = { package = "cu-bincode", version = "2.0", default-features = false,
             features = ["derive", "alloc"] }
@@ -156,5 +155,4 @@ A scrollable view of all `debug!()` log output from your tasks -- the same messa
 see without the monitor, but captured inside the TUI. You can scroll through the history
 with `hjkl` or arrow keys. The bottom bar also shows keyboard shortcuts: `r` to reset
 latency statistics, `q` to quit.
-
 

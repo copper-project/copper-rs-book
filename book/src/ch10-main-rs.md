@@ -10,8 +10,7 @@ are mostly boilerplate that you write once and rarely touch.
 pub mod tasks;
 
 use cu29::prelude::*;
-use cu29_helpers::basic_copper_setup;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -27,24 +26,17 @@ fn main() {
             std::fs::create_dir_all(parent).expect("Failed to create logs directory");
         }
     }
-    let copper_ctx = basic_copper_setup(
-        &PathBuf::from(&logger_path),
-        PREALLOCATED_STORAGE_SIZE,
-        true,
-        None,
-    )
-    .expect("Failed to setup logger.");
     debug!("Logger created at {}.", logger_path);
     debug!("Creating application... ");
-    let mut application = MyProjectApplicationBuilder::new()
-        .with_context(&copper_ctx)
+    let mut application = MyProjectApplication::builder()
+        .with_log_path(logger_path, PREALLOCATED_STORAGE_SIZE)
+        .expect("Failed to setup logger.")
         .build()
         .expect("Failed to create application.");
-    let clock = copper_ctx.clock.clone();
-    debug!("Running... starting clock: {}.", clock.now());
+    debug!("Running... starting clock: {}.", application.clock().now());
 
     application.run().expect("Failed to run application.");
-    debug!("End of program: {}.", clock.now());
+    debug!("End of program: {}.", application.clock().now());
     sleep(Duration::from_secs(1));
 }
 ```
@@ -63,11 +55,11 @@ generated code is injected by the macro.
 **`PREALLOCATED_STORAGE_SIZE`** -- How much memory (in bytes) to pre-allocate for the
 structured log. 100 MB is a reasonable default.
 
-**`basic_copper_setup()`** -- Initializes the unified logger, the robot clock, and returns
-a `copper_ctx` that holds references to both. The parameters are: log file path,
-pre-allocated size, whether to also print to console, and an optional custom monitor.
+**`MyProjectApplication::builder()`** -- Creates the generated application builder.
+You provide the pieces you want to override, such as the clock, config override, or
+resource factory.
 
-**`MyProjectApplicationBuilder::new().with_context(&copper_ctx).build()`** -- Wires
+**`.with_log_path(...).build()`** -- Wires
 everything together: creates each task by calling their `new()` constructors,
 pre-allocates all message buffers, and sets up the scheduler.
 
@@ -75,8 +67,9 @@ pre-allocates all message buffers, and sets up the scheduler.
 all tasks, then enters the cycle loop (`preprocess` -> `process` -> `postprocess` for
 each task, in topological order), and continues until you stop the application (Ctrl+C).
 
-**`copper_ctx.clock.clone()`** -- Note that we clone the clock **after** passing
-`copper_ctx` to the builder, to avoid a partial-move error.
+**`application.clock()`** -- Returns the runtime clock handle. The builder creates a
+default clock unless you override it with `.with_clock(...)`, which is mainly useful in
+tests or simulation.
 
 ## build.rs -- log index setup
 
