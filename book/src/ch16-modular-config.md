@@ -220,6 +220,58 @@ includes: [
 ]
 ```
 
+## Instance-specific overrides for swarms
+
+When several robots share the same subsystem code but need different calibration data, keep
+the base subsystem graph static and use a multi-Copper umbrella file with a conventional
+instance override tree:
+
+```ron
+(
+    subsystems: [
+        (id: "robot", config: "robot_base.ron"),
+    ],
+    interconnects: [],
+    instance_overrides_root: "instances",
+)
+```
+
+Copper will then probe:
+
+```text
+instances/<instance_id>/<subsystem_id>.ron
+```
+
+So instance `17` for subsystem `robot` resolves:
+
+```text
+instances/17/robot.ron
+```
+
+That file applies only config overlays, not topology changes:
+
+```ron
+(
+    set: [
+        (
+            path: "tasks/imu/config",
+            value: {
+                "gyro_bias": [0.012, -0.004, 0.008],
+            },
+        ),
+    ],
+)
+```
+
+Supported paths are intentionally small:
+
+- `tasks/<id>/config`
+- `resources/<id>/config`
+- `bridges/<id>/config`
+
+This keeps the graph static while letting each robot carry its own calibration or hardware
+parameters in git. See `examples/cu_instance_overrides_demo/` for a minimal example.
+
 ## Difference with ROS
 
 In ROS 2, configuration reuse is handled through **launch file composition** and
