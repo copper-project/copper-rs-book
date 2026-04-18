@@ -23,7 +23,7 @@ Here are the most useful pages:
 | [Build and Deploy](https://copper-project.github.io/copper-rs/Build-and-Deploy-a-Copper-Application) | Building for different targets and deploying |
 | [Supported Platforms](https://copper-project.github.io/copper-rs/Supported-Platforms) | What hardware and OS combinations are supported |
 | [Baremetal Development](https://copper-project.github.io/copper-rs/Baremetal-Development) | Running Copper on microcontrollers without an OS |
-| [Available Components](https://copper-project.github.io/copper-rs/Available-Components) | Catalog of drivers, algorithms, and bridges |
+| [Copper Component Catalog](https://cdn.copper-robotics.com/catalog/index.html) | Live catalog of drivers, algorithms, and bridges |
 | [FAQ](https://copper-project.github.io/copper-rs/FAQ) | Common questions and answers |
 
 Bookmark the configuration reference in particular -- it's the definitive source for every
