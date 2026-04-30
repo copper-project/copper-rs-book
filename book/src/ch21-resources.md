@@ -47,17 +47,18 @@ cargo run -p cu_missions
 ## Project templates
 
 We used `cu_project` (Chapter 3) and `cu_full` (Chapter 15) to scaffold our projects, but
-the templates directory has more to offer:
+the bundled template tree has more to offer:
 
 ```text
-templates/
+support/cargo_cunew/templates/
 ├── cu_project/     # Simple single-crate project
 ├── cu_full/        # Multi-crate workspace with components
 └── README.md       # Detailed usage guide
 ```
 
-The `templates/README.md` documents all available `cargo generate` options, including how
-to use the `cunew` alias and the `just gen-workspace` / `just gen-project` shortcuts.
+The `support/cargo_cunew/templates/README.md` guide documents both `cargo cunew` and the
+direct `cargo generate` developer path, including the `just gen-workspace` / `just gen-project`
+shortcuts for template work inside the repo.
 
 ## Docker images
 

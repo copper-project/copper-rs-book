@@ -1,6 +1,7 @@
 # Setting Up Your Environment
 
-Before we can build a Copper project, we need Rust and the Copper project template.
+Before we can build a Copper project, we need Rust 1.95 or newer and the Copper project
+bootstrap tool.
 
 ## Install Rust
 
@@ -10,34 +11,27 @@ Follow the official installation guide at <https://rust-lang.org/tools/install/>
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-After installation, make sure `cargo` is available:
+After installation, make sure `cargo` is available and recent enough:
 
 ```bash
 cargo --version
+rustc --version
 ```
 
-## Install cargo-generate
+## Install cargo-cunew
 
-`cargo-generate` lets you scaffold a new Copper project from the official template:
+`cargo-cunew` scaffolds a new Copper project from the official Copper templates:
 
 ```bash
-cargo install cargo-generate
+cargo install cargo-cunew
 ```
 
 ## Generate our first simple Copper project
 
-Clone the copper-rs repository and use the built-in template tool:
+Generate a new project directly:
 
 ```bash
-git clone https://github.com/copper-project/copper-rs
-cd copper-rs/templates
-
-cargo +stable generate \
-    --path cu_project \
-    --name my_project \
-    --destination . \
-    --define copper_source=local \
-    --define copper_root_path=../..
+cargo cunew my_project
 ```
 
 This generates a complete, ready-to-compile Copper project at the path you specify.
