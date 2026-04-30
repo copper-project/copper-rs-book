@@ -23,7 +23,7 @@ Here are the most useful pages:
 | [Build and Deploy](https://copper-project.github.io/copper-rs/Build-and-Deploy-a-Copper-Application) | Building for different targets and deploying |
 | [Supported Platforms](https://copper-project.github.io/copper-rs/Supported-Platforms) | What hardware and OS combinations are supported |
 | [Baremetal Development](https://copper-project.github.io/copper-rs/Baremetal-Development) | Running Copper on microcontrollers without an OS |
-| [Available Components](https://copper-project.github.io/copper-rs/Available-Components) | Catalog of drivers, algorithms, and bridges |
+| [Copper Component Catalog](https://cdn.copper-robotics.com/catalog/index.html) | Live catalog of drivers, algorithms, and bridges |
 | [FAQ](https://copper-project.github.io/copper-rs/FAQ) | Common questions and answers |
 
 Bookmark the configuration reference in particular -- it's the definitive source for every
@@ -47,17 +47,18 @@ cargo run -p cu_missions
 ## Project templates
 
 We used `cu_project` (Chapter 3) and `cu_full` (Chapter 15) to scaffold our projects, but
-the templates directory has more to offer:
+the bundled template tree has more to offer:
 
 ```text
-templates/
+support/cargo_cunew/templates/
 ├── cu_project/     # Simple single-crate project
 ├── cu_full/        # Multi-crate workspace with components
 └── README.md       # Detailed usage guide
 ```
 
-The `templates/README.md` documents all available `cargo generate` options, including how
-to use the `cunew` alias and the `just gen-workspace` / `just gen-project` shortcuts.
+The `support/cargo_cunew/templates/README.md` guide documents both `cargo cunew` and the
+direct `cargo generate` developer path, including the `just gen-workspace` / `just gen-project`
+shortcuts for template work inside the repo.
 
 ## Docker images
 

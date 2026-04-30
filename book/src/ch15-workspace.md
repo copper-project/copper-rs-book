@@ -11,15 +11,10 @@ generate one and understand its layout.
 
 ## Generating a workspace
 
-From the `templates/` directory inside the copper-rs repository, run:
+Use `cargo-cunew` with the workspace template:
 
 ```bash
-cargo +stable generate \
-    --path cu_full \
-    --name my_workspace \
-    --destination . \
-    --define copper_source=local \
-    --define copper_root_path=../..
+cargo cunew --template workspace my_workspace
 ```
 
 This creates a `my_workspace/` directory with a full workspace layout.
@@ -72,7 +67,7 @@ resolver = "2"
 cu29 = { path = "../../core/cu29" }
 cu29-export = { path = "../../core/cu29_export" }
 bincode = { package = "cu-bincode", version = "2.0", default-features = false, features = ["derive", "alloc"] }
-serde = { version = "*", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
 ```
 
 Every crate in the workspace references these shared dependencies with
