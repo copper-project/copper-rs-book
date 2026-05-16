@@ -257,15 +257,10 @@ logreader = ["dep:cu29-export"]
 logreader-mcap = ["logreader", "cu29-export/mcap"]
 ```
 
-And make sure `cu29-export` has the `mcap` feature available:
+And make sure your existing `cu29-export` dependency enables the `"mcap"` feature.
 
-```toml
-[dependencies]
-cu29-export = { version = "0.8", optional = true, features = ["mcap"] }
-```
-
-> **Note:** The exact version and dependency syntax may vary. Check the latest Copper
-> documentation for the current setup.
+> **Note:** If your project already depends on `cu29-export` via `git`, a local `path`, or
+> crates.io, keep that same source and Copper release and just add the `"mcap"` feature.
 
 ### Implementing `PayloadSchemas`
 

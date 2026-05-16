@@ -8,10 +8,12 @@ my_project/
 ├── build.rs              # Build script (sets up logging index)
 ├── Cargo.toml            # Dependencies and project metadata
 ├── copperconfig.ron      # Task graph definition
+├── justfile              # Helper commands for logs, replay, and DAG rendering
 └── src/
     ├── main.rs           # Runtime entry point
     ├── tasks.rs          # Your task implementations
-    └── logreader.rs      # (optional) Log export utility
+    ├── logreader.rs      # Log export utility
+    └── resim.rs          # Replay / remote-debug entry point
 ```
 
 ## Which files do I actually work on?
@@ -30,6 +32,8 @@ The rest is scaffolding that you set up once and rarely change:
 | `main.rs` | Boilerplate: create logger, build runtime, call `run()` | Rarely |
 | `build.rs` | Sets an env var for Copper's logging macros | Never |
 | `logreader.rs` | CLI tool to decode and export Copper's binary logs | Rarely |
+| `resim.rs` | Replay target for deterministic re-simulation and remote debug | Rarely |
+| `justfile` | Shortcuts for common commands like `just log` and `just dag` | Occasionally |
 | `Cargo.toml` | Dependencies | When adding new hardware driver crates |
 
 ## The mental model

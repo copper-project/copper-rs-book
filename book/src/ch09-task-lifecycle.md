@@ -48,13 +48,13 @@ to run your control loop on slightly stale data than to miss a deadline. Your `p
 should handle this gracefully:
 
 ```rust
-fn preprocess(&mut self, _clock: &RobotClock) -> CuResult<()> {
+fn preprocess(&mut self, _ctx: &CuContext) -> CuResult<()> {
     // Heavy work on the best-effort thread -- might be slow
     self.decoded_image = Some(decode_jpeg(&self.raw_buffer));
     Ok(())
 }
 
-fn process(&mut self, _clock: &RobotClock, input: &Self::Input<'_>,
+fn process(&mut self, _ctx: &CuContext, input: &Self::Input<'_>,
            output: &mut Self::Output<'_>) -> CuResult<()> {
     // Use whatever is ready. If preprocess was late, decoded_image
     // still holds the previous cycle's result (or None on first cycle).
@@ -110,17 +110,17 @@ impl CuTask for MyTask {
     }
 
     // Required: core logic
-    fn process(&mut self, _clock: &RobotClock, input: &Self::Input<'_>,
+    fn process(&mut self, _ctx: &CuContext, input: &Self::Input<'_>,
                output: &mut Self::Output<'_>) -> CuResult<()> {
         // your core logic
         Ok(())
     }
 
     // Optionally implement any of these:
-    // fn start(&mut self, clock: &RobotClock) -> CuResult<()> { ... }
-    // fn stop(&mut self, clock: &RobotClock) -> CuResult<()> { ... }
-    // fn preprocess(&mut self, clock: &RobotClock) -> CuResult<()> { ... }
-    // fn postprocess(&mut self, clock: &RobotClock) -> CuResult<()> { ... }
+    // fn start(&mut self, ctx: &CuContext) -> CuResult<()> { ... }
+    // fn stop(&mut self, ctx: &CuContext) -> CuResult<()> { ... }
+    // fn preprocess(&mut self, ctx: &CuContext) -> CuResult<()> { ... }
+    // fn postprocess(&mut self, ctx: &CuContext) -> CuResult<()> { ... }
 }
 ```
 

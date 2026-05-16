@@ -35,7 +35,7 @@ type Input<'m> = input_msg!(SensorA, SensorB);
 In `process()`, the `input` parameter becomes a tuple that you can destructure:
 
 ```rust
-fn process(&mut self, _clock: &RobotClock, input: &Self::Input<'_>, ...) -> CuResult<()> {
+fn process(&mut self, _ctx: &CuContext, input: &Self::Input<'_>, ...) -> CuResult<()> {
     let (sensor_a_msg, sensor_b_msg) = *input;
     // Use sensor_a_msg.payload() and sensor_b_msg.payload()
     Ok(())
@@ -86,8 +86,12 @@ You can read the values in `new()`:
 ```rust
 fn new(config: Option<&ComponentConfig>, _resources: Self::Resources<'_>) -> CuResult<Self> {
     let cfg = config.ok_or("MotorDriver requires a config block")?;
-    let pin: u8 = cfg.get("pin").unwrap().clone().into();
-    let max_speed: f64 = cfg.get("max_speed").unwrap().clone().into();
+    let pin: u8 = cfg
+        .get::<u8>("pin")?
+        .ok_or_else(|| CuError::from("MotorDriver missing `pin`"))?;
+    let max_speed: f64 = cfg
+        .get::<f64>("max_speed")?
+        .ok_or_else(|| CuError::from("MotorDriver missing `max_speed`"))?;
     Ok(Self { pin, max_speed })
 }
 ```
@@ -101,14 +105,14 @@ depends on the trait:
 
 | Trait | Signature |
 |---|---|
-| `CuSrcTask` | `process(&mut self, clock, output)` |
-| `CuTask` | `process(&mut self, clock, input, output)` |
-| `CuSinkTask` | `process(&mut self, clock, input)` |
+| `CuSrcTask` | `process(&mut self, ctx, output)` |
+| `CuTask` | `process(&mut self, ctx, input, output)` |
+| `CuSinkTask` | `process(&mut self, ctx, input)` |
 
 In our simple example, the source ignores most parameters and just writes a value:
 
 ```rust
-fn process(&mut self, _clock: &RobotClock, output: &mut Self::Output<'_>) -> CuResult<()> {
+fn process(&mut self, _ctx: &CuContext, output: &mut Self::Output<'_>) -> CuResult<()> {
     output.set_payload(MyPayload { value: 42 });
     Ok(())
 }
@@ -143,23 +147,26 @@ arrive. This is a good fit for calibration bundles, static transforms, lookup ta
 other low-rate metadata that should not be rebuilt every cycle. The full producer and
 consumer pattern is covered in [Defining Messages](./ch06-messages.md#latched-state-updates).
 
-#### The clock: `&RobotClock`
+#### The context: `&CuContext`
 
-Every `process()` receives a `clock` parameter. This is Copper's **only clock** -- a
-monotonic clock that starts at zero when your program launches and ticks forward in
-nanoseconds. There is no UTC or wall-clock in Copper; tasks should never call
-`std::time::SystemTime::now()` or `std::time::Instant::now()`.
+Every lifecycle callback receives a `ctx` parameter of type `&CuContext`. It dereferences
+to Copper's monotonic `RobotClock`, so `ctx.now()` gives you the current Copper time, and
+it also carries runtime metadata such as `ctx.cl_id()`, `ctx.instance_id()`, and the
+currently executing task ID.
 
-`clock.now()` returns a `CuTime` (a `u64` of nanoseconds since startup). In our simple
-project we prefix the parameter with `_` because we don't use it. But on a real robot
-you'd use it like this:
+`ctx.now()` returns a `CuTime` (a `u64` of nanoseconds since startup). There is no UTC or
+wall-clock in Copper; tasks should never call `std::time::SystemTime::now()` or
+`std::time::Instant::now()`.
+
+In our simple project we prefix the parameter with `_` because we don't use it. But on a
+real robot you'd use it like this:
 
 **Timestamp your output** (typical for source tasks):
 
 ```rust
-fn process(&mut self, clock: &RobotClock, output: &mut Self::Output<'_>) -> CuResult<()> {
+fn process(&mut self, ctx: &CuContext, output: &mut Self::Output<'_>) -> CuResult<()> {
     output.set_payload(MyPayload { value: read_sensor() });
-    output.tov = Tov::Time(clock.now());
+    output.tov = Tov::Time(ctx.now());
     Ok(())
 }
 ```
@@ -167,8 +174,8 @@ fn process(&mut self, clock: &RobotClock, output: &mut Self::Output<'_>) -> CuRe
 **Compute a time delta** (e.g., for a PID controller):
 
 ```rust
-fn process(&mut self, clock: &RobotClock, input: &Self::Input<'_>, output: &mut Self::Output<'_>) -> CuResult<()> {
-    let now = clock.now();
+fn process(&mut self, ctx: &CuContext, input: &Self::Input<'_>, output: &mut Self::Output<'_>) -> CuResult<()> {
+    let now = ctx.now();
     let dt = now - self.last_time;  // CuDuration in nanoseconds
     self.last_time = now;
 
@@ -182,9 +189,9 @@ fn process(&mut self, clock: &RobotClock, input: &Self::Input<'_>, output: &mut 
 **Detect a timeout**:
 
 ```rust
-fn process(&mut self, clock: &RobotClock, input: &Self::Input<'_>) -> CuResult<()> {
+fn process(&mut self, ctx: &CuContext, input: &Self::Input<'_>) -> CuResult<()> {
     if input.payload().is_none() {
-        let elapsed = clock.now() - self.last_seen;
+        let elapsed = ctx.now() - self.last_seen;
         if elapsed > CuDuration::from_millis(100) {
             debug!("Sensor timeout! No data for {}ms", elapsed.as_millis());
         }
@@ -196,8 +203,8 @@ fn process(&mut self, clock: &RobotClock, input: &Self::Input<'_>) -> CuResult<(
 **Why not use the system clock?** Because Copper supports **deterministic replay**. When
 you replay a recorded run, the runtime feeds your tasks the exact same clock values from
 the original recording. If you used `std::time`, the replay would have different
-timestamps and your tasks would behave differently. With `RobotClock`, same clock + same
-inputs = same outputs, every time.
+timestamps and your tasks would behave differently. With `CuContext` (and its underlying
+`RobotClock`), same clock + same inputs = same outputs, every time.
 
 ### The golden rule of `process()`
 

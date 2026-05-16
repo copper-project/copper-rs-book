@@ -48,8 +48,11 @@ my_project/
 ├── build.rs              # Build script (required by Copper logging)
 ├── Cargo.toml            # Dependencies
 ├── copperconfig.ron      # Task graph definition
+├── justfile              # Helper commands (logreader, replay, DAG rendering)
 └── src/
     ├── main.rs           # Runtime entry point
+    ├── logreader.rs      # Offline log export utility
+    ├── resim.rs          # Replay / remote-debug entry point
     └── tasks.rs          # Your task implementations
 ```
 

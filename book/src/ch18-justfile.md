@@ -41,11 +41,14 @@ Here's the `justfile` that comes with the `cu_full` workspace template:
 
 ```just
 # Render the execution DAG from the app config.
-rcfg:
+dag:
   #!/usr/bin/env bash
   set -euo pipefail
   APP_DIR="${APP_DIR:-cu_example_app}"
-  ../../target/debug/cu29-rendercfg apps/"${APP_DIR}"/copperconfig.ron --open
+  cu29-rendercfg apps/"${APP_DIR}"/copperconfig.ron --open
+
+# Compatibility alias for older docs.
+rcfg: dag
 
 # Extract the structured log via the log reader.
 log:
@@ -107,7 +110,7 @@ Now it's just:
 just cl
 ```
 
-### `just rcfg` -- Render the task graph
+### `just dag` -- Render the task graph
 
 This is the new one. Copper includes a tool called `cu29-rendercfg` that reads your
 `copperconfig.ron` and generates a visual diagram of the task graph -- an SVG showing
@@ -118,7 +121,7 @@ Let's try it on our workspace.
 Then, from the `my_workspace/` directory:
 
 ```bash
-just rcfg
+just dag
 ```
 
 This renders the DAG from `apps/cu_example_app/copperconfig.ron` and opens it in your
@@ -142,11 +145,14 @@ override the target with environment variables:
 ```bash
 APP_DIR=my_other_app just log
 APP_DIR=my_other_app just cl
-APP_DIR=my_other_app just rcfg
+APP_DIR=my_other_app just dag
 ```
 
 The `APP_DIR` variable controls which app directory to look in, and `APP_NAME` (which
 defaults to `APP_DIR`) controls the binary and package name passed to `cargo`.
+
+`just rcfg` still works as a compatibility alias, but `just dag` is the current primary
+name in the generated template.
 
 ## Adding your own recipes
 
