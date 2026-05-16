@@ -45,20 +45,18 @@ In your application's `Cargo.toml`:
 ```toml
 [dependencies]
 cu-pid = { path = "../../components/tasks/cu_pid" }
+cu-sensor-payloads = { path = "../../components/payloads/cu_sensor_payloads" }
 ```
 
-Or if the component is published on crates.io:
-
-```toml
-[dependencies]
-cu-pid = "0.12"
-```
+Or if the component is published on crates.io, use the same Copper release for both crates
+that the rest of your project already uses.
 
 In a workspace, you'd add it to the workspace-level `Cargo.toml` first:
 
 ```toml
 [workspace.dependencies]
 cu-pid = { path = "../../components/tasks/cu_pid" }
+cu-sensor-payloads = { path = "../../components/payloads/cu_sensor_payloads" }
 ```
 
 Then reference it in the app's `Cargo.toml`:
@@ -66,16 +64,26 @@ Then reference it in the app's `Cargo.toml`:
 ```toml
 [dependencies]
 cu-pid = { workspace = true }
+cu-sensor-payloads = { workspace = true }
 ```
 
 ### 2. Reference it in copperconfig.ron
 
-Add the task to your configuration using the crate's type path:
+Some reusable Copper tasks are generic. `cu-pid` is one of them, so the usual pattern is
+to define a small local alias in your app code first:
+
+```rust
+use cu_pid::GenericPIDTask;
+
+pub type PidTask = GenericPIDTask<cu_sensor_payloads::ImuPayload>;
+```
+
+Then add the task to your configuration using that alias:
 
 ```ron
 (
     id: "pid",
-    type: "cu_pid::PIDTask",
+    type: "tasks::PidTask",
     config: {
         "kp": 1.0,
         "ki": 0.1,
@@ -84,8 +92,9 @@ Add the task to your configuration using the crate's type path:
 ),
 ```
 
-The `type` field uses the crate name and the task struct name. The `config` section passes
-parameters that the task reads in its `new()` constructor.
+The `config` section passes parameters that the task reads in its `new()` constructor. If
+a component exposes a concrete, non-generic task type, you can reference the crate path
+directly; for generic tasks like `cu-pid`, a local alias keeps the RON type path simple.
 
 ### 3. Wire it up
 
@@ -96,18 +105,18 @@ cnx: [
     (
         src: "imu",
         dst: "pid",
-        msg: "cu_sensor_payloads::ImuData",
+        msg: "cu_sensor_payloads::ImuPayload",
     ),
     (
         src: "pid",
         dst: "motor",
-        msg: "cu_pid::PIDOutput",
+        msg: "cu_pid::PIDControlOutputPayload",
     ),
 ],
 ```
 
-That's it. No wrapper code, no adapter layer. The component is a Copper task like any
-other -- it just happens to live in a separate crate.
+That's it. Beyond the small alias for generic components, there is no adapter layer. The
+component is a Copper task like any other -- it just happens to live in a separate crate.
 
 ## Using shared payload types
 
@@ -121,7 +130,7 @@ without any conversion.
 
 This is the component ecosystem's contract: drivers produce standard payload types, and
 algorithms consume them. Swap a Bosch IMU for an InvenSense IMU, and the downstream
-pipeline doesn't change -- both produce the same `ImuData` type.
+pipeline doesn't change -- both produce the same `ImuPayload` type.
 
 ## Writing your own reusable components
 
@@ -156,6 +165,5 @@ type in `copperconfig.ron`. The wiring is resolved at compile time.
 
 The biggest difference is the **compile-time guarantee**. In ROS, you can wire two nodes
 together with mismatched message types and only find out when you run the system. In
-Copper, if your PID controller expects `ImuData` and your driver produces `CameraFrame`,
-the compiler tells you immediately.
-
+Copper, if your PID controller expects `ImuPayload` and your driver produces
+`CameraFrame`, the compiler tells you immediately.

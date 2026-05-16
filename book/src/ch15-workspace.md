@@ -33,6 +33,7 @@ my_workspace/
 │       └── src/
 │           ├── main.rs
 │           ├── logreader.rs
+│           ├── resim.rs
 │           ├── messages.rs
 │           └── tasks/
 │               ├── mod.rs
@@ -79,7 +80,7 @@ When you add a new application or component, you add it to the `members` list.
 ## The apps/ directory
 
 This is where your **application crates** live. Each app is a standalone binary that owns
-its own runtime configuration, log storage, and logreader.
+its own runtime configuration, log storage, logreader, and replay target.
 
 The example app (`cu_example_app`) looks very similar to the `my_project` we built in
 earlier chapters, but with two key differences.

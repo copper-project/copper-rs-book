@@ -38,7 +38,7 @@ impl CuSrcTask for MySource {
         Ok(Self {})
     }
 
-    fn process(&mut self, _clock: &RobotClock, output: &mut Self::Output<'_>) -> CuResult<()> {
+    fn process(&mut self, _ctx: &CuContext, output: &mut Self::Output<'_>) -> CuResult<()> {
         output.set_payload(MyPayload { value: 42 });
         Ok(())
     }
@@ -64,7 +64,7 @@ impl CuTask for MyTask {
 
     fn process(
         &mut self,
-        _clock: &RobotClock,
+        _ctx: &CuContext,
         input: &Self::Input<'_>,
         output: &mut Self::Output<'_>,
     ) -> CuResult<()> {
@@ -91,7 +91,7 @@ impl CuSinkTask for MySink {
         Ok(Self {})
     }
 
-    fn process(&mut self, _clock: &RobotClock, input: &Self::Input<'_>) -> CuResult<()> {
+    fn process(&mut self, _ctx: &CuContext, input: &Self::Input<'_>) -> CuResult<()> {
         debug!("Sink Received message: {}", input.payload().unwrap().value);
         Ok(())
     }
@@ -109,7 +109,7 @@ use serde::{Deserialize, Serialize};
 ```
 
 - **`cu29::prelude::*`** -- Brings in everything you need from Copper: task traits,
-  `RobotClock`, `ComponentConfig`, `CuResult`, `Freezable`, `Reflect`, the `input_msg!` /
+  `CuContext`, `ComponentConfig`, `CuResult`, `Freezable`, `Reflect`, the `input_msg!` /
   `output_msg!` macros, and the `debug!` logging macro.
 - **`bincode`** and **`serde`** -- For the serialization derives on `MyPayload` (covered in
   the [Defining Messages](./ch06-messages.md) chapter).
@@ -158,7 +158,7 @@ impl CuSrcTask for MySource {
         Ok(Self {})
     }
 
-    fn process(&mut self, _clock: &RobotClock, output: &mut Self::Output<'_>) -> CuResult<()> {
+    fn process(&mut self, _ctx: &CuContext, output: &mut Self::Output<'_>) -> CuResult<()> {
         output.set_payload(MyPayload { value: 42 });
         Ok(())
     }
@@ -196,7 +196,7 @@ impl CuTask for MyTask {
 
     fn process(
         &mut self,
-        _clock: &RobotClock,
+        _ctx: &CuContext,
         input: &Self::Input<'_>,
         output: &mut Self::Output<'_>,
     ) -> CuResult<()> {
@@ -235,7 +235,7 @@ impl CuSinkTask for MySink {
         Ok(Self {})
     }
 
-    fn process(&mut self, _clock: &RobotClock, input: &Self::Input<'_>) -> CuResult<()> {
+    fn process(&mut self, _ctx: &CuContext, input: &Self::Input<'_>) -> CuResult<()> {
         debug!("Sink Received message: {}", input.payload().unwrap().value);
         Ok(())
     }

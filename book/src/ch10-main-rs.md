@@ -1,8 +1,9 @@
 # The Remaining Files and Running
 
 We've covered `copperconfig.ron` and `tasks.rs` -- the two files you'll edit most. Now
-let's look at the three remaining files: `main.rs`, `build.rs`, and `Cargo.toml`. These
-are mostly boilerplate that you write once and rarely touch.
+let's look at `main.rs`, `build.rs`, and the relevant `Cargo.toml` bits. These are mostly
+boilerplate that you write once and rarely touch. We'll come back to `logreader.rs` in
+Chapter 13 and replay via `resim.rs` later.
 
 ## main.rs -- the entry point
 

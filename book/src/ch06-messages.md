@@ -81,7 +81,7 @@ then emit `NoChange` on later cycles until something changes:
 ```rust
 type Output<'m> = output_msg!(CuLatchedStateUpdate<CameraCalibration>);
 
-fn process(&mut self, _clock: &RobotClock, output: &mut Self::Output<'_>) -> CuResult<()> {
+fn process(&mut self, _ctx: &CuContext, output: &mut Self::Output<'_>) -> CuResult<()> {
     if let Some(calibration) = self.pending_calibration.take() {
         output.set_payload(CuLatchedStateUpdate::Set(calibration));
     } else {
@@ -102,7 +102,7 @@ pub struct DepthProjector {
     calibration: CuLatchedState<CameraCalibration>,
 }
 
-fn process(&mut self, _clock: &RobotClock, input: &Self::Input<'_>,
+fn process(&mut self, _ctx: &CuContext, input: &Self::Input<'_>,
            output: &mut Self::Output<'_>) -> CuResult<()> {
     if let Some(update) = input.payload() {
         self.calibration.update(update);

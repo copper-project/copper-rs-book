@@ -9,18 +9,12 @@ standard deviation, min, max, and more.
 
 ## Step 1: Add the dependency
 
-Add `cu-consolemon` to your `Cargo.toml`:
+Add `cu-consolemon` to your `Cargo.toml` next to your existing Copper dependencies.
+The only new dependency is `cu-consolemon`.
 
-```toml
-[dependencies]
-cu29 = { git = "https://github.com/copper-project/copper-rs" }
-cu-consolemon = { git = "https://github.com/copper-project/copper-rs" }
-bincode = { package = "cu-bincode", version = "2.0", default-features = false,
-            features = ["derive", "alloc"] }
-serde = { version = "1", features = ["derive"] }
-```
-
-The only new line is `cu-consolemon`.
+If your project already uses Copper through `git` or local `path` dependencies, keep that
+same source style and add `cu-consolemon` from the same Copper release. If you use
+crates.io, use the same published Copper release as your existing `cu29` dependency.
 
 ## Step 2: Enable it in copperconfig.ron
 
@@ -155,4 +149,3 @@ A scrollable view of all `debug!()` log output from your tasks -- the same messa
 see without the monitor, but captured inside the TUI. You can scroll through the history
 with `hjkl` or arrow keys. The bottom bar also shows keyboard shortcuts: `r` to reset
 latency statistics, `q` to quit.
-

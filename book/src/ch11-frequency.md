@@ -13,8 +13,8 @@ Let's modify `MySource` in `tasks.rs` to print the time at each cycle. Replace t
 `process()` method:
 
 ```rust
-fn process(&mut self, clock: &RobotClock, output: &mut Self::Output<'_>) -> CuResult<()> {
-    debug!("Source at {}µs", clock.now().as_micros());
+fn process(&mut self, ctx: &CuContext, output: &mut Self::Output<'_>) -> CuResult<()> {
+    debug!("Source at {}µs", ctx.now().as_micros());
     output.set_payload(MyPayload { value: 42 });
     Ok(())
 }

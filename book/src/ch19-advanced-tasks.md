@@ -173,7 +173,7 @@ pull the bound resources from the runtime's resource manager:
 ```rust
 impl CuSrcTask for ImuDriver {
     type Resources<'r> = ImuResources<'r>;
-    type Output<'m> = output_msg!(ImuData);
+    type Output<'m> = output_msg!(ImuPayload);
 
     fn new(
         config: Option<&ComponentConfig>,
