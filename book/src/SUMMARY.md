@@ -45,14 +45,15 @@
 # Going Further
 
 - [Advanced Task Features](./ch19-advanced-tasks.md)
-- [Exporting Data to Other Formats](./ch20-export-formats.md)
-- [Useful Resources](./ch21-resources.md)
-- [Python Support](./ch22-python.md)
+- [Writing a Bridge](./ch20-bridges.md)
+- [Exporting Data to Other Formats](./ch21-export-formats.md)
+- [Useful Resources](./ch22-resources.md)
+- [Python Support](./ch23-python.md)
 
 ---
 
 # Performance and Stack Tuning
 
-- [Performance Basics](./ch23-performance-basics.md)
-- [Reading Performance Metrics](./ch24-reading-performance-metrics.md)
-- [Troubleshooting Performance](./ch25-troubleshooting-performance.md)
+- [Performance Basics](./ch24-performance-basics.md)
+- [Reading Performance Metrics](./ch25-reading-performance-metrics.md)
+- [Troubleshooting Performance](./ch26-troubleshooting-performance.md)

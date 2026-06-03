@@ -5,7 +5,7 @@ This chapter is meant to be navigated. Start at the first question and follow th
 Before you start:
 
 - use the LAT, BW, and MEM tabs from [Adding the Console Monitor](./ch12-monitoring.md)
-- if you need offline evidence, generate `stats.json` with [`log-stats`](./ch20-export-formats.md#log-statistics)
+- if you need offline evidence, generate `stats.json` with [`log-stats`](./ch21-export-formats.md#log-statistics)
 
 ## Start Here
 

@@ -7,7 +7,7 @@ built in:
 - offline, from `log-stats`
 
 If you have not added the monitor yet, start with [Adding the Console Monitor](./ch12-monitoring.md).
-If you want offline stats from a log, see [Exporting Data to Other Formats](./ch20-export-formats.md).
+If you want offline stats from a log, see [Exporting Data to Other Formats](./ch21-export-formats.md).
 
 ## Live signals
 
@@ -107,4 +107,4 @@ The most useful fields for tuning are:
 
 Then use the decision tree:
 
-- [Troubleshooting Performance](./ch25-troubleshooting-performance.md)
+- [Troubleshooting Performance](./ch26-troubleshooting-performance.md)
