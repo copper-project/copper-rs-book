@@ -1,6 +1,6 @@
 # From Project to Workspace
 
-In Chapter 3, we generated a single-crate project with `cu_project`. That flat structure
+In [Setting Up Your Environment](./setup.md), we generated a single-crate project with `cu_project`. That flat structure
 is perfect for getting started, but as your robot grows -- more sensors, more algorithms,
 shared components across multiple robots -- a single crate with everything in `tasks.rs`
 becomes hard to manage.
@@ -191,7 +191,7 @@ The directory is organized by category:
 The template generates these directories with placeholder `.keep` files. They're empty,
 waiting for you to add your own components as your project grows. We'll cover how to
 create shared components and how to reuse existing ones from the Copper ecosystem in the
-[Reusing Community Components](./ch17-ecosystem.md) chapter.
+[Reusing Community Components](./ecosystem.md) chapter.
 
 ## Where do message types go?
 
@@ -209,7 +209,7 @@ you'd create a crate under `components/payloads/` and have both apps depend on i
 **Ecosystem messages** are already defined in Copper's built-in payload crates (like
 `cu-sensor-payloads` for common sensor types). You don't write these -- you just depend on
 them. We'll explore them in the
-[Reusing Community Components](./ch17-ecosystem.md) chapter.
+[Reusing Community Components](./ecosystem.md) chapter.
 
 Here's the rule of thumb:
 

@@ -78,7 +78,7 @@ Three recipes, each wrapping a command we'd otherwise have to type (or remember)
 
 ### `just log` -- Extract text logs
 
-Remember in [Chapter 13](./ch13-logging-replay.md) when we ran this?
+Remember in [Logging and Replaying Data](./logging-replay.md) when we ran this?
 
 ```bash
 cargo run --features logreader --bin my-project-logreader -- \
@@ -96,7 +96,7 @@ and reconstructs the human-readable output using the compile-time string index.
 
 ### `just cl` -- Extract CopperLists
 
-Also from Chapter 13, extracting CopperList data (the message payloads from every cycle)
+Also from [Logging and Replaying Data](./logging-replay.md), extracting CopperList data (the message payloads from every cycle)
 was:
 
 ```bash

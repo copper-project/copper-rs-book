@@ -6,54 +6,54 @@
 
 # Getting Started
 
-- [What is copper-rs?](./ch01-what-is-copper.md)
-- [copper-rs vs ROS](./ch02-copper-vs-ros.md)
-- [Setting Up Your Environment](./ch03-setup.md)
+- [What is copper-rs?](./what-is-copper.md)
+- [copper-rs vs ROS](./copper-vs-ros.md)
+- [Setting Up Your Environment](./setup.md)
 
 ---
 
 # Your First Copper Project
 
-- [Project Structure Overview](./ch04-project-structure.md)
-- [The Task Graph: copperconfig.ron](./ch05-task-graph.md)
-- [Defining Messages](./ch06-messages.md)
-- [Writing Tasks: tasks.rs](./ch07-task-traits.md)
-- [Task Anatomy: Types and Methods](./ch08-task-anatomy.md)
-- [Task Lifecycle](./ch09-task-lifecycle.md)
-- [The Remaining Files and Running](./ch10-main-rs.md)
+- [Project Structure Overview](./project-structure.md)
+- [The Task Graph: copperconfig.ron](./task-graph.md)
+- [Defining Messages](./messages.md)
+- [Writing Tasks: tasks.rs](./task-traits.md)
+- [Task Anatomy: Types and Methods](./task-anatomy.md)
+- [Task Lifecycle](./task-lifecycle.md)
+- [The Remaining Files and Running](./main-rs.md)
 
 ---
 
 # Modify Our First Copper Project
 
-- [Controlling the Loop Frequency](./ch11-frequency.md)
-- [Adding the Console Monitor](./ch12-monitoring.md)
-- [Logging and Replaying Data](./ch13-logging-replay.md)
-- [Using Missions](./ch14-missions.md)
+- [Controlling the Loop Frequency](./frequency.md)
+- [Adding the Console Monitor](./monitoring.md)
+- [Logging and Replaying Data](./logging-replay.md)
+- [Using Missions](./missions.md)
 
 ---
 
 # Let's get organized
 
-- [From Project to Workspace](./ch15-workspace.md)
-- [Modular Configuration](./ch16-modular-config.md)
-- [Reusing Community Components](./ch17-ecosystem.md)
-- [Automating Tasks with Just](./ch18-justfile.md)
+- [From Project to Workspace](./workspace.md)
+- [Modular Configuration](./modular-config.md)
+- [Reusing Community Components](./ecosystem.md)
+- [Automating Tasks with Just](./justfile.md)
 
 ---
 
 # Going Further
 
-- [Advanced Task Features](./ch19-advanced-tasks.md)
-- [Writing a Bridge](./ch20-bridges.md)
-- [Exporting Data to Other Formats](./ch21-export-formats.md)
-- [Useful Resources](./ch22-resources.md)
-- [Python Support](./ch23-python.md)
+- [Advanced Task Features](./advanced-tasks.md)
+- [Writing a Bridge](./bridges.md)
+- [Exporting Data to Other Formats](./export-formats.md)
+- [Useful Resources](./resources.md)
+- [Python Support](./python.md)
 
 ---
 
 # Performance and Stack Tuning
 
-- [Performance Basics](./ch24-performance-basics.md)
-- [Reading Performance Metrics](./ch25-reading-performance-metrics.md)
-- [Troubleshooting Performance](./ch26-troubleshooting-performance.md)
+- [Performance Basics](./performance-basics.md)
+- [Reading Performance Metrics](./reading-performance-metrics.md)
+- [Troubleshooting Performance](./troubleshooting-performance.md)

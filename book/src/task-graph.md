@@ -77,7 +77,7 @@ Beyond `id` and `type`, each task entry supports several optional fields:
 
 - **`config`** -- A key-value map of parameters passed to the task's `new()` constructor
   as an `Option<&ComponentConfig>`. We'll see how to read them in the
-  [Task Anatomy](./ch08-task-anatomy.md) chapter.
+  [Task Anatomy](./task-anatomy.md) chapter.
 
   ```ron
   (

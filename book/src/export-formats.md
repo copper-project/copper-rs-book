@@ -1,6 +1,6 @@
 # Exporting Data to Other Formats
 
-In the [logging chapter](./ch13-logging-replay.md), we learned how Copper records everything
+In the [logging chapter](./logging-replay.md), we learned how Copper records everything
 into `.copper` files and how the log reader can extract text logs and CopperList data as
 JSON. But JSON is just the beginning. Real-world workflows often need data in other
 formats -- CSV for spreadsheets and data science tools, MCAP for visualization in
@@ -11,7 +11,7 @@ every export format and diagnostic tool available in `cu29-export`.
 
 ## A quick refresher
 
-Recall from Chapter 13 that your project ships with a log reader binary at
+Recall from [Logging and Replaying Data](./logging-replay.md) that your project ships with a log reader binary at
 `src/logreader.rs`:
 
 ```rust
@@ -32,7 +32,7 @@ This program uses the `gen_cumsgs!` macro to generate a `CuStampedDataSet` type 
 how to decode your project's specific messages. Every subcommand we'll use in this chapter
 goes through this same binary -- you just pass different arguments.
 
-Make sure you have a `.copper` log file from a previous run (see Chapter 13 if you need to
+Make sure you have a `.copper` log file from a previous run (see [Logging and Replaying Data](./logging-replay.md) if you need to
 generate one):
 
 ```bash
