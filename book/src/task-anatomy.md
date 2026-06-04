@@ -8,7 +8,7 @@ methods that make them work.
 ### `type Resources<'r>` and `impl Freezable`
 
 We'll cover these in detail in the
-[Advanced Task Features](./ch19-advanced-tasks.md) chapter. For now, notice that both are
+[Advanced Task Features](./advanced-tasks.md) chapter. For now, notice that both are
 defined as empty -- `type Resources<'r> = ()` and `impl Freezable for MyTask {}` -- which
 is all you need for a simple project.
 
@@ -145,7 +145,7 @@ has a generic latched-state pattern:
 Downstream tasks can store that state in `CuLatchedState<T>` and apply updates as they
 arrive. This is a good fit for calibration bundles, static transforms, lookup tables, and
 other low-rate metadata that should not be rebuilt every cycle. The full producer and
-consumer pattern is covered in [Defining Messages](./ch06-messages.md#latched-state-updates).
+consumer pattern is covered in [Defining Messages](./messages.md#latched-state-updates).
 
 #### The context: `&CuContext`
 

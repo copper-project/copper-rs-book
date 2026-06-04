@@ -36,21 +36,15 @@ just serve
 
 This starts a local server (default: `http://localhost:3000`) and opens the book in your browser. Edits to files in `book/src/` trigger an automatic rebuild.
 
-## Inserting a new chapter
+## Adding a chapter
 
-To insert a chapter and automatically renumber everything (files, SUMMARY.md, cross-references):
+Chapters are ordered by their position in `book/src/SUMMARY.md`, not by their
+filename, so there is nothing to renumber. To add a chapter:
 
-```bash
-just insert-chapter <number> <slug> [title]
-```
+1. Create a slug-named file in `book/src/`, e.g. `book/src/my-new-topic.md`.
+2. Add a line linking to it in `book/src/SUMMARY.md` at the position you want.
 
-For example, to insert a new chapter 6:
-
-```bash
-just insert-chapter 6 my-new-topic "My New Topic"
-```
-
-This creates `book/src/ch06-my-new-topic.md` and bumps all subsequent chapters up by one.
+mdBook generates the chapter numbers automatically from the order in `SUMMARY.md`.
 
 ## How to contribute
 

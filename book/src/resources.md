@@ -46,7 +46,7 @@ cargo run -p cu_missions
 
 ## Project templates
 
-We used `cu_project` (Chapter 3) and `cu_full` (Chapter 15) to scaffold our projects, but
+We used `cu_project` (see [Setting Up Your Environment](./setup.md)) and `cu_full` (see [From Project to Workspace](./workspace.md)) to scaffold our projects, but
 the bundled template tree has more to offer:
 
 ```text

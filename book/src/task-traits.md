@@ -112,7 +112,7 @@ use serde::{Deserialize, Serialize};
   `CuContext`, `ComponentConfig`, `CuResult`, `Freezable`, `Reflect`, the `input_msg!` /
   `output_msg!` macros, and the `debug!` logging macro.
 - **`bincode`** and **`serde`** -- For the serialization derives on `MyPayload` (covered in
-  the [Defining Messages](./ch06-messages.md) chapter).
+  the [Defining Messages](./messages.md) chapter).
 
 ## The message type
 
