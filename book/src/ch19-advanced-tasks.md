@@ -195,7 +195,7 @@ configuration, the same task code works on different platforms without changes.
 
 Resources can also be **shared**. A shared bus (like I2C) can be bound to multiple tasks.
 The resource manager handles the ownership semantics: exclusive resources are moved to a
-single task, shared resources are behind an `Arc` and can be borrowed by many.
+single task, shared resources are behind an `Arc` and each consumer receives a cloned handle.
 
 ### When do you need resources?
 
