@@ -46,6 +46,7 @@
 
 - [Advanced Task Features](./advanced-tasks.md)
 - [Writing a Bridge](./bridges.md)
+- [Interfacing a Simulator](./simulators.md)
 - [Exporting Data to Other Formats](./export-formats.md)
 - [Useful Resources](./resources.md)
 - [Python Support](./python.md)
