@@ -166,7 +166,7 @@ Use this when:
 - you want interactive visualization
 - you want one Copper tick per simulator tick, or one Copper tick every N simulator ticks
 
-The Bevy examples in `../extra-examples` use this style:
+The Bevy examples in the main Copper repository's `extra-examples/` folder use this style:
 
 | Example | What it demonstrates |
 |---|---|
