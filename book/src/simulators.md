@@ -130,10 +130,11 @@ When adapting a simulator, these are the Copper pieces to grep for in existing e
 
 The most useful files to read are:
 
-```bash
-rg "sim_mode|SimStep|SimOverride|CuTaskCallbackState|run_one_iteration|RobotClock::mock" ../extra-examples/examples/cu_rp_balancebot/src
-rg "sim_mode|SimStep|SimOverride|CuTaskCallbackState|run_one_iteration|RobotClock::mock" ../extra-examples/examples/cu_flight_controller/src
-```
+~~~bash
+# From a checkout of the main Copper repository:
+rg "sim_mode|SimStep|SimOverride|CuTaskCallbackState|run_one_iteration|RobotClock::mock" extra-examples/examples/cu_rp_balancebot/src
+rg "sim_mode|SimStep|SimOverride|CuTaskCallbackState|run_one_iteration|RobotClock::mock" extra-examples/examples/cu_flight_controller/src
+~~~
 
 The first line in the tick function is not incidental:
 
