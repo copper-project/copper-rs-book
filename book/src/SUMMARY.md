@@ -58,3 +58,4 @@
 - [Performance Basics](./performance-basics.md)
 - [Reading Performance Metrics](./reading-performance-metrics.md)
 - [Troubleshooting Performance](./troubleshooting-performance.md)
+- [Thread Pools, Affinity, and Real-Time Scheduling](./thread-pools.md)
