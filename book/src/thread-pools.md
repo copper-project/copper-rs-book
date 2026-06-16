@@ -122,9 +122,11 @@ call.
 
 ### `rt`
 
-The pool named `rt` drives the [`parallel-rt`](./performance-basics.md) execution engine.
-`parallel-rt` spawns one worker per generated process stage; defining an `rt` pool lets you
-pin and prioritize those workers exactly like any other pool:
+`rt` is short for **real-time**, the same `rt` as in the `parallel-rt` feature and the
+`rt-scheduling` feature -- it is not a name you picked, but a reserved id the runtime looks
+for. The pool named `rt` drives the [`parallel-rt`](./performance-basics.md) execution
+engine. `parallel-rt` spawns one worker per generated process stage; defining an `rt` pool
+lets you pin and prioritize those workers exactly like any other pool:
 
 ```ron
 runtime: (
