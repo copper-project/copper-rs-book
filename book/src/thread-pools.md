@@ -61,9 +61,11 @@ map directly onto the POSIX scheduling policies.
 > of the system. Use them for genuinely time-critical work, and pin them.
 
 Real-time policies are **Linux-only** and usually require the `CAP_SYS_NICE` capability (run
-as root, grant the capability, or raise the limit in `/etc/security/limits.conf`). On other
-platforms only `Fair` and `Nice` apply; requesting `Fifo` / `RoundRobin` fails according to
-the pool's `on_error` setting.
+as root, grant the capability, or raise the limit in `/etc/security/limits.conf`). Negative
+niceness (`Nice(-1)` and below) needs the same capability -- without it the request falls
+back per the pool's `on_error`. On non-Linux hosts only `Fair` is applied directly; `Nice`,
+`Fifo`, and `RoundRobin` all fail according to the pool's `on_error`. CPU affinity is
+cross-platform regardless.
 
 ## CPU affinity
 
@@ -93,8 +95,9 @@ Two pool names have special meaning.
 ### `background`
 
 When a source or task is marked `background: true`, it runs on the pool named `background`.
-If you do not declare one, Copper creates a default `background` pool for you. Declare it
-explicitly when you want to size it or pin it:
+If you do not declare one, Copper creates a default `background` pool for you: 2 worker
+threads, no affinity, `Fair` scheduling. Declare it explicitly when you want to size it or
+pin it:
 
 ```ron
 runtime: (
@@ -115,8 +118,12 @@ A task can also opt into a **different** pool with the object form of `backgroun
 ```
 
 This runs `detector` on the `vision` pool instead of `background` -- useful when you want a
-class of heavy tasks scheduled separately from the rest of your background work. See
-[The Task Graph](./task-graph.md) for the `background` field, and
+class of heavy tasks scheduled separately from the rest of your background work. The pool
+name is resolved at build time: referencing a pool that isn't declared in
+`runtime.thread_pools`, or pointing a background task at the reserved `rt` pool, is a
+compile-time error.
+
+See [The Task Graph](./task-graph.md) for the `background` field, and
 [Performance Basics](./performance-basics.md) for when backgrounding a stage is the right
 call.
 
@@ -136,9 +143,12 @@ runtime: (
 ),
 ```
 
-The `rt` pool is consumed directly by the engine: its `affinity` and `policy` are applied
-to the stage workers (Spread across the stage index), so unlike other pools you do not bind
-tasks to it and you cannot use it as a `background` target.
+The `rt` pool is consumed directly by the engine: only its `affinity` and `policy` are
+applied to the stage workers (Spread across the stage index). `parallel-rt` spawns one
+worker per generated process stage, so the `threads:` field has no effect on the `rt` pool
+-- size `affinity` to match the stage count if you want exact one-core-per-stage pinning.
+Unlike other pools, you do not bind tasks to it and you cannot use it as a `background`
+target.
 
 ## When it cannot be applied: `on_error`
 
@@ -176,6 +186,21 @@ requested thread counts -- but `affinity` and `policy` are ignored and a warning
 This lets you keep one config that runs unprivileged in development and pins to real-time on
 the target by flipping a feature flag. CPU affinity is cross-platform; the real-time
 policies are Linux-only.
+
+## Determinism and replay
+
+Pool configuration is **performance-only**. Affinity and policy change when and where work
+runs, never what each task computes or in what order results commit to a copperlist. By
+design, swapping in or out an `rt` pool produces a bit-identical normalized CopperList
+stream in both sync and `parallel-rt` modes, and the runtime matrix integration tests guard
+this as a regression.
+
+The practical consequence is that an offline replay or `resim` run on a different machine
+keeps producing the same output as the live capture, even when the pool config cannot be
+honored: with the default `on_error: Warn` the runtime logs and falls back to default
+scheduling, and the stream is unchanged. If you need to *force* neutralization (for
+example, to suppress warnings on a CI host that cannot pin, or to pick cores at runtime),
+mutate `config.runtime.thread_pools` before building the app.
 
 ## Good fit / Bad fit
 
