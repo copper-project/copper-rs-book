@@ -111,9 +111,8 @@ The `type Resources<'r>` associated type declares what **hardware or system reso
 task needs. Resources represent physical endpoints -- serial ports, GPIO controllers, SPI
 buses, cameras -- or shared services bound through a resource bundle.
 
-> Worker thread pools used to be declared as a resource. They now live in the `runtime`
-> section of the config -- see
-> [Thread Pools, Affinity, and Real-Time Scheduling](./thread-pools.md).
+> Worker thread pools are configured separately, in the `runtime` section of the config
+> -- see [Thread Pools, Affinity, and Real-Time Scheduling](./thread-pools.md).
 
 ### No resources
 

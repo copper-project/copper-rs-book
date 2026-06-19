@@ -40,10 +40,6 @@ Each pool has:
 - **`on_error`** (optional) -- what to do if the affinity or policy cannot be applied.
   Defaults to `Warn`.
 
-> Earlier versions of Copper configured background threads through a `threadpool`
-> **resource bundle**. That still works -- an existing `threadpool` resource is migrated
-> automatically into a `background` pool -- but `runtime.thread_pools` is the way forward.
-
 ## Scheduling policies
 
 The `policy` controls how the OS scheduler treats the pool's worker threads. On Linux these
@@ -88,6 +84,34 @@ out of the critical path.
 
 If you omit `affinity`, the OS is free to run the workers on any core.
 
+### Choosing cores
+
+Copper does not auto-detect kernel work or CPU topology -- the `affinity` list is taken at
+face value. Two things on Linux are worth checking before you pick cores for a
+latency-critical pool:
+
+- **Where the kernel handles IRQs.** Hardware interrupts (NIC, NVMe, USB, timers) run on
+  whichever CPUs the kernel binds them to, and a busy IRQ adds jitter to that core.
+  `cat /proc/interrupts` shows per-CPU interrupt counts;
+  `cat /proc/irq/<n>/smp_affinity_list` shows the affinity of a specific IRQ. By default
+  most distros either pin IRQs to CPU 0 or let `irqbalance` spread them; either way, the
+  conservative move is to keep your real-time `affinity` off the cores that show large
+  counts in `/proc/interrupts`. For full isolation, the standard tool is the kernel command
+  line (`isolcpus=`, `nohz_full=`, `rcu_nocbs=`), which removes the listed cores from the
+  general scheduler entirely.
+- **Hyperthread siblings.** Two logical CPUs that share one physical core compete for the
+  same execution units, so pinning a real-time pool across a sibling pair gives almost no
+  isolation from background work landing on the other sibling. `lscpu -e` shows the
+  `CORE`/`CPU` mapping; `/sys/devices/system/cpu/cpuN/topology/thread_siblings_list` gives
+  the pair directly. The conservative move is to pick one logical CPU per physical core for
+  the `rt` pool and leave the siblings to `background` or to the OS.
+
+The explicit list is intentionally the lowest-level knob -- a list of logical CPU ids the
+OS understands -- and there are no higher-level selectors (`BigCores`, `NumaNode`, "avoid
+IRQs", "avoid siblings") yet. Future versions can layer those on top without changing the
+list form, so the recommendation today is to inspect your target machine with the tools
+above and write the list explicitly.
+
 ## Reserved pools: `background` and `rt`
 
 Two pool names have special meaning.
@@ -129,11 +153,11 @@ call.
 
 ### `rt`
 
-`rt` is short for **real-time**, the same `rt` as in the `parallel-rt` feature and the
-`rt-scheduling` feature -- it is not a name you picked, but a reserved id the runtime looks
-for. The pool named `rt` drives the [`parallel-rt`](./performance-basics.md) execution
-engine. `parallel-rt` spawns one worker per generated process stage; defining an `rt` pool
-lets you pin and prioritize those workers exactly like any other pool:
+The `rt` in `parallel-rt` stands for **runtime** -- the generated execution engine that
+runs the task graph -- not "real-time". The pool named `rt` is the one the runtime looks
+for to drive the [`parallel-rt`](./performance-basics.md) engine: it spawns one worker per
+generated process stage, and the `rt` pool lets you pin and prioritize those workers
+exactly like any other pool:
 
 ```ron
 runtime: (
@@ -152,9 +176,11 @@ target.
 
 ## When it cannot be applied: `on_error`
 
-Setting CPU affinity or a real-time priority can fail -- most commonly a `Fifo` priority
-without `CAP_SYS_NICE`, or affinity to a core that does not exist. `on_error` chooses what
-happens:
+Setting CPU affinity or a real-time priority can fail. The common cases are platform-
+specific: on **Linux**, a `Fifo` / `RoundRobin` priority (or `Nice` below 0) without
+`CAP_SYS_NICE`; on **Windows**, any non-`Fair` policy at all, since the POSIX real-time
+policies are not implemented there; and on either OS, an `affinity` entry that names a
+core the machine does not have. `on_error` chooses what happens:
 
 - **`Warn`** (default) -- log a warning and fall back to default scheduling. The pool still
   runs; it just does not get the requested affinity/priority. This keeps unprivileged
