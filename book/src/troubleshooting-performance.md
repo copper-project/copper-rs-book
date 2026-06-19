@@ -244,7 +244,7 @@ Use this when **one isolated source or task** is too slow, but it does not need 
 
 What it means semantically:
 
-- Copper runs that source or task on the background threadpool
+- Copper runs that source or task on the `background` thread pool
 - while it is still busy, `process()` returns `None`
 - downstream tasks therefore see missing output for some cycles
 
@@ -268,9 +268,9 @@ Why:
 
 - the controller path usually needs one coherent output per cycle
 
-Copper will ensure a `threadpool` resource bundle exists when background sources or tasks are present.
-If you need a specific sizing, provide that bundle explicitly instead of relying on the
-default.
+If you do not declare a `background` pool, Copper creates a default one. To size it, pin it
+to specific cores, or run this stage on a separate pool, see
+[Thread Pools, Affinity, and Real-Time Scheduling](./thread-pools.md).
 
 ## Parallelize Inside One Task
 
@@ -285,7 +285,7 @@ Typical cases:
 Preferred approach:
 
 - keep the DAG simple
-- add a thread pool in resources or use a controlled parallel loop inside the task
+- use a controlled parallel loop inside the task, or a [declared thread pool](./thread-pools.md)
 - measure the task again in the LAT tab
 
 Good fit:
