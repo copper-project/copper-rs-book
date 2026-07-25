@@ -279,6 +279,15 @@ Application replay binaries normally use `cu29::replay::ReplayCli`, or flatten
 - `schema.get_type` and `schema.get_outputs` for debugger-driven rendering
 - `logs.strings` and `logs.list` for structured logs
 
+Each replay server grants one active debug-session lease. While the debugger is otherwise
+idle, it sends `health.ping` with the active `session_id` every second. Any session-scoped
+request also renews the lease. After 3 seconds without session activity, the server
+automatically closes the session so the debugger can reconnect after a crash or lost
+connection. A second `session.open` returns `SessionBusy` while the lease is active.
+
+To inspect two logs or maintain two independent timeline cursors concurrently, launch two
+replay-server processes with different `--debug-base` and `--replay-log-base` values.
+
 Handle-backed payloads stay lazy. A normal response contains only a compact `CuHandle`
 descriptor. When a CBOR request explicitly sets `include_handle_contents: true`, selected
 handle buffers are returned out of line in the response's `attachments` array. This lets
