@@ -255,6 +255,71 @@ The key insight is that all downstream tasks don't know the difference -- they r
 the same `MyPayload` messages with the same timestamps, whether they come from live
 hardware or a log file.
 
+## Remote debug and Time Traveler
+
+When exported CopperLists are not enough, a replay binary can expose the log through
+Copper's remote debug API. A debugger such as Time Traveler can then seek or step through
+the timeline, replay batches, inspect task state, query message schemas, and read
+structured logs from the same session.
+
+Replay targets use three standard arguments:
+
+```text
+--debug-base <zenoh-prefix>
+--log-base <recorded-log>
+--replay-log-base <replay-output>
+```
+
+Application replay binaries normally use `cu29::replay::ReplayCli`, or flatten
+`ReplayArgs` into a larger CLI. The most useful remote methods are:
+
+- `nav.seek`, `nav.step`, and `nav.replay` for navigation
+- `timeline.get_cl` and `timeline.list` for recorded messages and timing
+- `state.inspect`, `state.read`, and `state.search` for task state
+- `schema.get_type` and `schema.get_outputs` for debugger-driven rendering
+- `logs.strings` and `logs.list` for structured logs
+
+Each replay server grants one active debug-session lease. While the debugger is otherwise
+idle, it sends `health.ping` with the active `session_id` every second. Any session-scoped
+request also renews the lease. After 3 seconds without session activity, the server
+automatically closes the session so the debugger can reconnect after a crash or lost
+connection. A second `session.open` returns `SessionBusy` while the lease is active.
+
+To inspect two logs or maintain two independent timeline cursors concurrently, launch two
+replay-server processes with different `--debug-base` and `--replay-log-base` values.
+
+Handle-backed payloads stay lazy. A normal response contains only a compact `CuHandle`
+descriptor. When a CBOR request explicitly sets `include_handle_contents: true`, selected
+handle buffers are returned out of line in the response's `attachments` array. This lets
+an inspector load a camera frame or point cloud on demand without copying every large
+buffer while it scrubs the timeline.
+
+The debug value format preserves values that JSON alone cannot represent faithfully,
+including 128-bit integers, non-finite floats, and maps with non-string keys. Schema
+queries describe enums, maps, and fixed-capacity `CuArrayVec` values, and
+`schema.get_outputs` supports paging output slots and their field catalogs separately.
+
+### Linux shared-memory setup
+
+On Linux, the default local remote-debug transport uses a 1 GiB Zenoh shared-memory pool
+and requires replies of 256 KiB or larger to use SHM. Both the Copper process and the
+debugger need sufficient `RLIMIT_MEMLOCK`, and `/dev/shm` must have room for the pool.
+Configure the launching shell before starting either process:
+
+```bash
+sudo prlimit --pid $$ --memlock=2147483648:2147483648
+ulimit -l 2097152
+df -h /dev/shm
+```
+
+The `ulimit -l` value is in KiB. For systemd use `LimitMEMLOCK=2G`; for Docker configure
+both `--ulimit memlock=2147483648:2147483648` and `--shm-size=2g`.
+
+Copper checks these resources at startup and refuses to silently copy a large reply over
+the Unix socket when SHM allocation fails. Tests can use a smaller explicit
+`RemoteDebugShmConfig` on both server and client. Non-Linux platforms retain the previous
+4 MiB pool and 3 KiB threshold without Linux-specific preflight.
+
 ## How the unified logger works under the hood
 
 Copper's logger is designed for **zero-impact logging** on the critical path. Here's how:
