@@ -115,6 +115,11 @@ Beyond `id` and `type`, each task entry supports several optional fields:
   ),
   ```
 
+  To run a task on a specific thread pool instead of the default `background` one, use the
+  object form `background: (pool: "name")`. See
+  [Thread Pools, Affinity, and Real-Time Scheduling](./thread-pools.md) for declaring pools
+  with custom sizing, CPU affinity, and real-time priority.
+
 - **`logging`** -- Controls whether Copper's unified logger records the output messages of
   this task. Set `enabled: false` to reduce log size for high-frequency or uninteresting
   tasks.
