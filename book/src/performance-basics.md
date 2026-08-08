@@ -33,6 +33,19 @@ At a high level, one cycle looks like this:
 That last part is important. Even when the task path is fast, the cycle is not really over
 until Copper has dealt with the finished CopperList.
 
+Before interpreting timing, inspect what was actually generated:
+
+```bash
+just plan
+```
+
+`just dag` shows the data-flow topology, while `just plan` shows the exact per-CopperList
+process order. Serial appears as one main CopperList worker; `parallel-rt` appears as staggered
+generated-stage workers. In both projections, background gateways point into the same named-pool
+worker lanes, making pool capacity and possible cross-CopperList overlap visible. Equal-width
+columns are ordinal positions, not a time axis; use recorded performance data for duration and
+utilization claims.
+
 ## Two places where time is spent
 
 When a user says "my loop is too slow", the time is usually being lost in one of two places:
@@ -141,13 +154,24 @@ cargo run --features mmap-fsync
 `parallel-rt` is a **runtime-level pipeline**. Multiple CopperLists can be in flight at the
 same time, and each generated process stage keeps FIFO order for determinism.
 
+The `just plan` parallel projection shows one worker for every generated non-refine stage.
+Configured `rt.threads` is reported as pool metadata but does not hide stages: the current
+executor creates a stage worker for each generated stage. The staggered formations align stages
+that can execute on different CopperLists. Up to six CopperList rows are shown directly; larger
+compiled depths are reported and use the same continuing diagonal. Repeated configured resource
+targets are marked as potential contention, including timing-dependent overlaps outside the
+nominal diagonal. Affinity placement follows the configured core list; without affinity, the
+worker is annotated as OS scheduled.
+
 `background: true` is a **stage-level escape hatch**. One source or task moves to the
 background threadpool and may return `None` for some cycles while its previous run is still
-finishing.
+finishing. The plan draws that wrapper as a gateway and connects it to the named pool's actual
+worker lanes; a task permits at most one outstanding background job, while tasks sharing a pool
+can queue when there are fewer pool threads than jobs.
 
 ### `parallel-rt` is not the same as task-local parallelism
 
-`parallel-rt` parallelizes the **DAG across CopperLists**.
+`parallel-rt` pipelines the **generated stage order across CopperLists**.
 
 Task-local parallelism parallelizes the **inside of one task**.
 

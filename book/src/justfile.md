@@ -50,6 +50,44 @@ dag:
 # Compatibility alias for older docs.
 rcfg: dag
 
+# Render the generated process schedule, optionally with recorded timing.
+[positional-arguments]
+plan *options:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  mission=""
+  features=""
+  log=""
+  for option in "$@"; do
+    case "$option" in
+      mission=*) mission="${option#mission=}" ;;
+      features=*) features="${option#features=}" ;;
+      log=*) log="${option#log=}" ;;
+      *) echo "Unknown plan option: $option" >&2; exit 2 ;;
+    esac
+  done
+  APP_DIR="${APP_DIR:-cu_example_app}"
+  APP_NAME="${APP_NAME:-${APP_DIR}}"
+  args=(apps/"${APP_DIR:-cu_example_app}"/copperconfig.ron --open \
+    --output apps/"${APP_DIR:-cu_example_app}"/plan.svg)
+  [[ -z "$mission" ]] || args+=(--mission "$mission")
+  [[ -z "$features" ]] || args+=(--features "$features")
+  if [[ -n "$log" ]]; then
+    stats="apps/${APP_DIR}/target/cu29_plan_logstats.json"
+    mkdir -p "$(dirname "$stats")"
+    logreader_args=(-p "$APP_NAME" --features=logreader \
+      --bin "${APP_NAME}-logreader" -- "$log" log-stats \
+      --config "apps/${APP_DIR}/copperconfig.ron" --output "$stats")
+    [[ -z "$mission" ]] || logreader_args+=(--mission "$mission")
+    cargo run "${logreader_args[@]}"
+    args+=(--logstats "$stats")
+  fi
+  cu29-plan "${args[@]}"
+
+# Add observed timing from the default log.
+plan-log:
+  just plan log=apps/cu_example_app/logs/cu_example_app.copper
+
 # Extract the structured log via the log reader.
 log:
   #!/usr/bin/env bash
@@ -72,7 +110,7 @@ cl:
     apps/"${APP_DIR}"/logs/"${APP_NAME}".copper extract-copperlists
 ```
 
-Three recipes, each wrapping a command we'd otherwise have to type (or remember) by hand.
+These recipes wrap commands we'd otherwise have to type (or remember) by hand.
 
 ## The recipes
 
@@ -137,6 +175,39 @@ For our simple three-task pipeline, the diagram is straightforward. But as your 
 grows to 10, 20, or 50 tasks with complex wiring, this visualization becomes invaluable
 for understanding the data flow at a glance.
 
+### `just plan` -- Render the generated process schedule
+
+`just plan` answers a different question from `just dag`: it renders the exact process
+schedule generated for each CopperList. Both projections use the same scheduler lanes: serial has
+one main CopperList worker, while `parallel-rt` staggers CopperLists across generated stage workers.
+Background gateways point into aligned named-pool worker lanes in both views; their open-ended bars
+show jobs that may remain active across later CopperLists. Large configured depths show a readable
+six-CopperList window (`CL n` through `CL n+5`) while preserving the real depth in the header.
+Repeated configured resource targets are highlighted, including background jobs and skew outside
+the nominal diagonal. Equal-width columns represent ordinal order, not elapsed time.
+
+All missions are stacked by default. Select a mission or resolve conditional config fragments
+with recipe arguments:
+
+```bash
+just plan mission=autonomous
+just plan features=camera,mock
+just plan log=apps/cu_example_app/logs/cu_example_app.copper
+just plan-log
+```
+
+Resource bindings on cards are annotations, not claims that the scheduler reserves or locks
+those resources.
+
+With `log=...`, the typed logreader appends typical and slowest CopperList timelines. Recorded
+task durations are packed back-to-back as proportional, hoverable segments; carried-forward slots
+outside the current execution cluster are excluded so stale timestamps do not flatten the chart.
+`just plan-log` selects the project's default log, logreader, required features, and recorded mission
+automatically.
+The bars are recorded `process_time` intervals. Overlapping intervals sharing a declared resource
+are potential contention, not proof of lock waiting. Serialization is not timestamped, so residual
+gaps remain unclassified and may also include rate limiting, scheduling, and I/O.
+
 ## Targeting a different app
 
 All three recipes default to `cu_example_app`. If your workspace has multiple applications,
@@ -146,6 +217,7 @@ override the target with environment variables:
 APP_DIR=my_other_app just log
 APP_DIR=my_other_app just cl
 APP_DIR=my_other_app just dag
+APP_DIR=my_other_app just plan
 ```
 
 The `APP_DIR` variable controls which app directory to look in, and `APP_NAME` (which
