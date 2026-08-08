@@ -35,82 +35,12 @@ Verify with:
 just --version
 ```
 
-## The workspace justfile
+## The workspace recipes
 
-Here's the `justfile` that comes with the `cu_full` workspace template:
-
-```just
-# Render the execution DAG from the app config.
-dag:
-  #!/usr/bin/env bash
-  set -euo pipefail
-  APP_DIR="${APP_DIR:-cu_example_app}"
-  cu29-rendercfg apps/"${APP_DIR}"/copperconfig.ron --open
-
-# Compatibility alias for older docs.
-rcfg: dag
-
-# Render the generated process schedule, optionally with recorded timing.
-[positional-arguments]
-plan *options:
-  #!/usr/bin/env bash
-  set -euo pipefail
-  mission=""
-  features=""
-  log=""
-  for option in "$@"; do
-    case "$option" in
-      mission=*) mission="${option#mission=}" ;;
-      features=*) features="${option#features=}" ;;
-      log=*) log="${option#log=}" ;;
-      *) echo "Unknown plan option: $option" >&2; exit 2 ;;
-    esac
-  done
-  APP_DIR="${APP_DIR:-cu_example_app}"
-  APP_NAME="${APP_NAME:-${APP_DIR}}"
-  args=(apps/"${APP_DIR:-cu_example_app}"/copperconfig.ron --open \
-    --output apps/"${APP_DIR:-cu_example_app}"/plan.svg)
-  [[ -z "$mission" ]] || args+=(--mission "$mission")
-  [[ -z "$features" ]] || args+=(--features "$features")
-  if [[ -n "$log" ]]; then
-    stats="apps/${APP_DIR}/target/cu29_plan_logstats.json"
-    mkdir -p "$(dirname "$stats")"
-    logreader_args=(-p "$APP_NAME" --features=logreader \
-      --bin "${APP_NAME}-logreader" -- "$log" log-stats \
-      --config "apps/${APP_DIR}/copperconfig.ron" --output "$stats")
-    [[ -z "$mission" ]] || logreader_args+=(--mission "$mission")
-    cargo run "${logreader_args[@]}"
-    args+=(--logstats "$stats")
-  fi
-  cu29-plan "${args[@]}"
-
-# Add observed timing from the default log.
-plan-log:
-  just plan log=apps/cu_example_app/logs/cu_example_app.copper
-
-# Extract the structured log via the log reader.
-log:
-  #!/usr/bin/env bash
-  set -euo pipefail
-  APP_DIR="${APP_DIR:-cu_example_app}"
-  APP_NAME="${APP_NAME:-${APP_DIR}}"
-  RUST_BACKTRACE=1 cargo run -p "${APP_NAME}" --features=logreader \
-    --bin "${APP_NAME}-logreader" \
-    apps/"${APP_DIR}"/logs/"${APP_NAME}".copper \
-    extract-text-log target/debug/cu29_log_index
-
-# Extract CopperLists from the log output.
-cl:
-  #!/usr/bin/env bash
-  set -euo pipefail
-  APP_DIR="${APP_DIR:-cu_example_app}"
-  APP_NAME="${APP_NAME:-${APP_DIR}}"
-  RUST_BACKTRACE=1 cargo run -p "${APP_NAME}" --features=logreader \
-    --bin "${APP_NAME}-logreader" \
-    apps/"${APP_DIR}"/logs/"${APP_NAME}".copper extract-copperlists
-```
-
-These recipes wrap commands we'd otherwise have to type (or remember) by hand.
+The `cu_full` workspace template includes recipes for inspecting logs, extracting
+CopperLists, and visualizing both the task graph and generated process schedule. Run
+`just --list` in the workspace to see the recipes available in your version of the
+template.
 
 ## The recipes
 
@@ -210,7 +140,7 @@ gaps remain unclassified and may also include rate limiting, scheduling, and I/O
 
 ## Targeting a different app
 
-All three recipes default to `cu_example_app`. If your workspace has multiple applications,
+These recipes default to `cu_example_app`. If your workspace has multiple applications,
 override the target with environment variables:
 
 ```bash
