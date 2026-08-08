@@ -159,6 +159,45 @@ If a source or regular task intentionally exposes an output that is unused in a 
 graph, point that connection at `dst: "__nc__"`. This keeps the output message type
 explicit without adding a dummy sink.
 
+## Compile-time constants
+
+Robot geometry and other values that define the compiled application can live in the
+top-level `constants` array. Numeric constants can select a Rust storage type or an SI
+quantity and unit:
+
+```ron
+constants: [
+    (id: "MAX_DETECTIONS", storage: usize, value: 64),
+    (
+        id: "CAMERA_TRANSLATION",
+        module: "frames::camera",
+        quantity: length,
+        value: [0.18, 0.0, 0.31],
+    ),
+]
+```
+
+This generates `constants::MAX_DETECTIONS` and
+`frames::camera::CAMERA_TRANSLATION`. Values with a physical quantity are normalized to
+the coherent SI unit during compilation.
+
+For a struct with a const constructor, provide an explicit Rust `type` and `expression`
+instead of `value`:
+
+```ron
+(
+    id: "WORLD_TO_ROBOT",
+    module: "transforms",
+    type: "cu_transform::TypedTransform3D<f32, cu_transform::WorldFrame, cu_transform::RobotFrame>",
+    expression: "cu_transform::TypedTransform3D::<f32, cu_transform::WorldFrame, cu_transform::RobotFrame>::from_translation_euler_xyz(crate::frames::robot::TRANSLATION, crate::frames::robot::ROTATION)",
+)
+```
+
+Expressions may reference other generated constants and compose values through const
+methods. Rust checks the declared type and rejects non-const operations. Use fully qualified
+dependency paths and `crate::...` paths because the expression is compiled in its generated
+module. See `examples/cu_config_constants` for typed transforms and include merging.
+
 ### How this compares to ROS
 
 In ROS 2, you'd create publishers and subscribers on named topics, and they'd find each
