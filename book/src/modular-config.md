@@ -30,6 +30,53 @@ specifies a path to another RON file and an optional set of parameters:
 When Copper processes this configuration, it reads `sensor.ron`, substitutes the
 parameters, and merges the resulting tasks and connections into the main configuration.
 
+## Selecting graph fragments with Cargo features
+
+Use `when` on an include when a Cargo feature also enables an optional component crate:
+
+```ron
+includes: [
+    (path: "graph/base.ron"),
+    (
+        path: "graph/jetson_mipi.ron",
+        when: Feature("jetson-mipi"),
+    ),
+]
+```
+
+The complete included fragment is removed when the feature is off. Copper skips the file
+before reading, validation, and code generation, so task types and message types from an
+unavailable target crate never become Rust references.
+
+The available predicates compose without putting conditions on individual graph elements:
+
+```ron
+when: Not(Feature("camera"))
+when: All([Feature("camera"), Feature("recording")])
+when: Any([Feature("mipi"), Feature("usb-camera")])
+```
+
+Forward the consuming crate's active features from its build script:
+
+```toml
+[features]
+default = []
+jetson-mipi = ["dep:cu-gstreamer"]
+
+[build-dependencies]
+cu29-build = "1.0"
+```
+
+```rust
+// build.rs
+fn main() {
+    cu29_build::emit_cargo_features();
+}
+```
+
+The optional dependency may also live in a target-specific dependency table. See
+`examples/cu_feature_gated_camera` for the complete Linux/aarch64 camera example.
+
 ## Parameter substitution with `{{param}}`
 
 Inside an included file, parameters are referenced using double curly braces:
@@ -295,10 +342,10 @@ Copper's approach is similar in spirit but different in execution:
 | **Validation** | Runtime | Compile time |
 | **Nesting** | Launch files can include other launch files | RON files can include other RON files |
 
-The main advantage of Copper's approach is simplicity: it's just text substitution in a
-declarative format. No Python logic, no conditionals, no `if/else` chains. The included
-file is a template, the parameters fill in the blanks, and the result is a flat list of
-tasks and connections that Copper validates at compile time.
+The main advantage of Copper's approach is simplicity: parameterization remains text
+substitution, while the only conditional composition is a small typed predicate on whole
+includes. There is no Python logic or per-task `if/else` chain. The result is a flat list
+of tasks and connections that Copper validates at compile time.
 
 ## Further reading
 
