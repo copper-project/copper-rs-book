@@ -197,6 +197,14 @@ Resources can also be **shared**. A shared bus (like I2C) can be bound to multip
 The resource manager handles the ownership semantics: exclusive resources are moved to a
 single task, shared resources are behind an `Arc` and can be borrowed by many.
 
+The same pattern applies to GPU services. With the `cu29/cuda` feature, a bundle can own a
+shared CUDA context and `CuCudaPool`, while tasks pass
+`CuHandle<CudaSliceWrapper<T>>` through the graph. Keep CUDA streams task-local unless a
+component explicitly defines shared-stream ordering. CUDA handles are process-local, so
+their producing nodes should use `logging: (handle_content: none)`; they cannot currently
+be reconstructed during replay. `CuHandle::storage_id` can confirm that two stages saw the
+same pooled allocation rather than a replacement copy.
+
 ### When do you need resources?
 
 For the projects in this book, `type Resources<'r> = ()` is all you need. Resources become
