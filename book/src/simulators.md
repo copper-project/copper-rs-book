@@ -114,6 +114,10 @@ tasks.
 In practice, simulated sensors write to `output`, simulated actuators read from `input`,
 and the estimation/control/planning tasks return `ExecuteByRuntime`.
 
+For a multi-output source, the `Process` callback receives the same complete output tuple
+declared by the real `CuSrcTask`. Fill each simulated port in place, then return
+`ExecutedBySim`; downstream tasks consume those messages through the normal Copper graph.
+
 ## Types to look for
 
 When adapting a simulator, these are the Copper pieces to grep for in existing examples:
@@ -171,7 +175,7 @@ The Bevy examples in the main Copper repository's `extra-examples/` folder use t
 | Example | What it demonstrates |
 |---|---|
 | `examples/cu_rp_balancebot` | Bevy owns the physics tick. The simulation callback fills encoder/ADC-style task outputs from the world and applies motor output back into the world. |
-| `examples/cu_flight_controller` | Bevy owns the flight simulation. Copper runs the flight-control graph while simulated hardware endpoints provide IMU, barometer, magnetometer, GNSS, RC, battery, and motor behavior. |
+| `examples/cu_flight_controller` | Bevy owns the flight simulation. Copper runs the flight-control and compute graphs while callbacks preempt hardware endpoints, including the multi-output ZED source, and downstream tasks consume their normal Copper messages. |
 
 These examples are useful even if you are not using Bevy. Look for the simulator callback
 layer: that is the part to copy conceptually.
