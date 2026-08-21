@@ -299,6 +299,10 @@ including 128-bit integers, non-finite floats, and maps with non-string keys. Sc
 queries describe enums, maps, and fixed-capacity `CuArrayVec` values, and
 `schema.get_outputs` supports paging output slots and their field catalogs separately.
 
+Replay seeks from the nearest keyframe at or before the requested position. Keyframes
+remain deterministic even when background work or `parallel-rt` stages are active, and
+capturing one does not stop or drain the live graph.
+
 ### Linux shared-memory setup
 
 On Linux, the default local remote-debug transport uses a 1 GiB Zenoh shared-memory pool

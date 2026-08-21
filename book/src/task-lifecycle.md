@@ -140,8 +140,9 @@ That's what `freeze` and `thaw` solve. The `Freezable` trait gives each task two
   to create "keyframes."
 - **`thaw()`** -- Restore the task's state from a saved snapshot.
 
-These are **not** part of the per-cycle loop. They run at a much lower rate and are
-independent of the critical path:
+Keyframes are captured periodically without stopping or draining the graph. `freeze()`
+runs at the component's normal point in the execution wave, so implementations should be
+side-effect-free and must not allocate on the real-time path:
 
 ```text
          ┌─── cycle ───┐  ┌─── cycle ───┐        ┌─── cycle ───┐
@@ -155,6 +156,9 @@ Think of it like a video codec: `process()` runs every frame, while `freeze()` s
 keyframe at a low rate. During replay, the runtime jumps to the nearest keyframe before
 minute 7, restores every task's state via `thaw()`, and replays from there -- no need to
 start from the beginning.
+
+This remains deterministic when `parallel-rt` stages or background tasks are active;
+recording a keyframe does not wait for those workers to become idle.
 
 For stateless tasks (like our simple `MySource`, `MyTask`, `MySink`), the empty
 `impl Freezable` is fine -- there's nothing to snapshot. We'll cover how to implement
