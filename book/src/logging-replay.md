@@ -376,6 +376,19 @@ logging: (
 ),
 ```
 
+Task-state keyframes can be disabled independently of CopperList and structured logging:
+
+```ron
+logging: (
+    enable_keyframe_logging: false,
+),
+```
+
+This is a compile-time application property. The generated runtime omits keyframe capture
+code when it is disabled, which is useful for applications whose background workers may
+still be active at a CopperList boundary. Replay then has message history but no task-state
+snapshots to restore.
+
 ## Difference with ROS
 
 In ROS, data recording is a separate tool: `rosbag2`. You start a `ros2 bag record`

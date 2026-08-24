@@ -322,6 +322,18 @@ logging: (
 ),
 ```
 
+If CopperLists are still needed but task-state snapshots are not, disable keyframes only:
+
+```ron
+logging: (
+    enable_keyframe_logging: false,
+),
+```
+
+This compiles keyframe capture out of the generated runtime while retaining CopperList and
+structured logs. It also avoids attempting to freeze background work at a CopperList
+boundary; the tradeoff is that replay cannot restore task state from keyframes.
+
 Good fit:
 
 ```text
