@@ -270,6 +270,24 @@ Replay targets use three standard arguments:
 --replay-log-base <replay-output>
 ```
 
+Replay and remote-debug servers should be optimized. A normal Cargo dev build is
+unoptimized and can make seeking, stepping, payload decoding, and state inspection much
+slower. Copper's generated projects therefore define this profile:
+
+```toml
+[profile.debug-optimized]
+inherits = "dev"
+opt-level = 3
+debug = 2
+debug-assertions = true
+```
+
+The generated `just resim` and `just resim-debug` recipes select it with
+`--profile debug-optimized`. This keeps Copper `debug!()` structured log entries, debug
+assertions, and debugger information while optimizing the replay server. Use the same
+profile for hand-written replay recipes rather than running the server with Cargo's
+unoptimized dev profile.
+
 Application replay binaries normally use `cu29::replay::ReplayCli`, or flatten
 `ReplayArgs` into a larger CLI. The most useful remote methods are:
 
