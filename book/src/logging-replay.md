@@ -24,6 +24,17 @@ This is different from most robotics frameworks where logging is opt-in and you 
 explicitly record topics. In Copper, **every message is logged by default**. The runtime
 does this automatically as part of its execution loop -- no extra code needed.
 
+The generated CopperList encoder stores this common metadata in a lossless compressed
+block. It uses compact presence maps for optional fields, exact nanosecond timestamp
+deltas, and within-CopperList references for repeated status and origin values. This
+changes only the binary representation: the log reader, exporters, and replay code still
+restore the same typed CopperList fields.
+
+Compression is the generated default, including for `no_std` applications. If profiling
+shows that an application is CPU-bound and log bandwidth is inexpensive, enable the
+`cu29/flat-copperlist-encoding` Cargo feature for both the writer and its typed log reader
+to use the previous flat representation.
+
 ## Step 1: Generate a log file
 
 Make sure your project is in the state from the previous chapters, with the 1 Hz rate
