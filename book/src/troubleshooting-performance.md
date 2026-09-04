@@ -96,8 +96,11 @@ Use this when the **task path is fine**, but the **end of the CopperList is too 
 What it does:
 
 - keeps the DAG execution on the main loop
-- queues the completed CopperList to a dedicated serializer thread
+- hands completed CopperLists and keyframes to bounded, nonblocking output workers
 - recycles the slot later when serialization finishes
+- reserves one CopperList slot for the next iteration
+- drops the whole completed CopperList, including local logging, when the handoff is saturated
+- skips a scheduled keyframe before freezing task state when both keyframe handoff slots are busy
 
 Minimal feature forwarding:
 
@@ -129,7 +132,17 @@ The hot spot is inside huge_cpu_task itself. Moving CL serialization off-thread 
 Two checks after enabling it:
 
 - if the benefit is small, your real bottleneck is elsewhere
-- if the serializer now waits for free CopperLists, raise `logging.copperlist_count`
+- watch **Dropped CopperLists** in the monitor's BW tab (backed by
+  `CopperListIoStats::dropped_copperlists_total`); any increase means the output worker did not keep up
+- watch **Dropped keyframes** in the same tab; an increase means Copper skipped keyframe generation
+  because the bounded keyframe handoff was still full
+- raise `logging.copperlist_count` to absorb short bursts, but fix or reduce output I/O if drops continue
+
+When no downstream consumer requests keyframes, generated runtimes emit no freeze calls or
+keyframe log stream and create no keyframe capture buffers or worker.
+
+The logreader's `fsck` report also lists persisted CopperList ID holes. This is an offline check of
+the artifact itself and does not depend on the live monitor counter being available.
 
 ## Enable `parallel-rt`
 
@@ -341,8 +354,8 @@ The practical rule is simple:
 
 ## Increase CopperList Slots
 
-Use this when async or parallel execution is underfilled because there are not enough
-preallocated CopperLists available.
+Use this when async output drops short bursts, or parallel execution is underfilled because there
+are not enough preallocated CopperLists available.
 
 ```ron
 logging: (
@@ -356,7 +369,7 @@ Good fit:
 
 ```text
 async-cl-io or parallel-rt is enabled, but the runtime still behaves as if only a tiny number
-of CopperLists can be active.
+of CopperLists can be active. With async-cl-io, `dropped_copperlists_total` increases.
 ```
 
 Bad fit:
@@ -365,7 +378,10 @@ Bad fit:
 The graph has no useful overlap to exploit.
 ```
 
-More slots help only when there is real work to overlap.
+With `async-cl-io`, one slot is always reserved for real-time execution, so at least two are
+required when an output sink is active and at most `copperlist_count - 1` completed CopperLists
+can await output. More slots absorb bursts; they cannot compensate for sustained output I/O that
+is slower than the producer.
 
 ## Tune Memory Pools
 
