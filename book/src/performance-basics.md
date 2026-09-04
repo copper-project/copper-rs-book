@@ -106,13 +106,13 @@ This is the fast path for readers who already know what kind of bottleneck they 
 
 | Knob | What it changes | Typical symptom |
 |---|---|---|
-| `async-cl-io` | Moves CopperList serialization and logging to a dedicated thread | Task latencies are fine, but end-of-CL overhead is too high |
+| `async-cl-io` | Hands completed CopperLists and keyframes to bounded output workers without waiting; saturation drops a CopperList or skips keyframe capture | Task latencies are fine, but end-of-CL overhead is too high |
 | `parallel-rt` | Pipelines multiple CopperLists across generated process stages | Several CPU-bound stages are back to back and the global rate is too low |
 | `mmap-fsync` | Forces file `sync_all()` on section flush | The system runs fine for a while, then collapses under dirty-page / writeback pressure |
 | `background: true` | Runs one compatible source or task on the `background` thread pool and returns `None` while it is still busy | One isolated stage is too slow, but it does not need to block every cycle |
 | Task-local thread pool / parallel `for` | Parallelizes the internals of one task | One hot task has obvious internal data parallelism |
 | `logging: (enabled: false)` or `enable_task_logging: false` | Reduces logged bytes | Bandwidth and serialized size are too high |
-| `logging.copperlist_count` | Increases the number of preallocated in-flight CopperLists | Async or parallel modes stall because they run out of CopperList slots |
+| `logging.copperlist_count` | Increases the number of preallocated in-flight CopperLists | Async output reports drops, or parallel execution is underfilled |
 
 ## Feature switches
 
