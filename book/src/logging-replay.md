@@ -471,6 +471,7 @@ just run loss
 just run outage
 just run late
 just run restart
+just run idle
 ```
 
 The deterministic counter/accumulator graph records onboard while the receiver
@@ -483,6 +484,29 @@ running. All output stays in a fresh directory under this example's `logs/`.
 
 Run `just logstream-demo-check` at the repository root to check all scenarios.
 The receiver status display reports the latest archived CopperList, verified
-anchor, and gaps. This is a low-rate demonstrator: configured bitrate is not yet
-enforced, and manifests/anchors follow qualifying keyframe captures. Independent
-repetition, packet pacing, optional feedback, and dashboard APIs remain deferred.
+anchor, and gaps. `idle` drops the entire initial transmission, captures only
+CL0, and then recovers its archive through periodic repetition with no new captures.
+
+Each generated destination has one background sender that enforces the configured
+bitrate and burst allowance across messages, repairs, and recovery objects.
+Ordinary packets expire after the configured latency; retained recovery remains
+available until replaced. Replay/recovery scheduling uses byte-deficit weights
+3:1. The demo uses 2 Mbps including Copper headers and FEC, excluding UDP/IP overhead.
+
+The manifest and latest complete keyframe/anchor/CopperList-boundary bundle repeat
+on a 250 ms local deadline. Requests coalesce while a transfer is pending; a newer
+bundle never continually restarts an in-flight transfer. Runtime capture objects
+are released before packets wait for transmission. The buffer budget includes
+explicit sender storage and continuous FEC state; thread stacks, channel/allocator
+bookkeeping, and object-size-bounded RaptorQ scratch are additional.
+
+Pacing uses a local `RobotClock`; it needs no clock synchronization with the ground
+station. Real-link simulation uses a running clock independently of mocked task
+timestamps. Shutdown stops repetition and drains to a finite deadline. Copper
+structured logs contain sender shutdown statistics and failures.
+
+Optional feedback has logical packet interfaces (`CuFeedbackTx`/`CuFeedbackRx`)
+that can share the same bidirectional carrier or use separate endpoints. The
+one-way sender does not require feedback. Its protocol, negotiation, and adaptive
+tuning remain deferred along with dashboard APIs. Run `just logstream-pacing-check`
+to check scheduler bounds, worker lifecycle, and all six process scenarios.
