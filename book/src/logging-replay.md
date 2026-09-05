@@ -454,6 +454,35 @@ keyframe. A later verified keyframe permits replay from that boundary, while the
 missing range remains a gap in the archive. Closing a receiver archive does not
 claim that an unobserved sender tail was complete.
 
+Generated exact-output replay aligns the next allocated CopperList id with the
+recorded recovery boundary and drains pending output between offline iterations.
+This preserves IDs after a gap and prevents the replay harness from overrunning
+the bounded output pool. Production real-time execution keeps its nonblocking
+handoff. Replay harnesses explicitly restore task state from verified keyframes.
+
 The source checkout's `just logstream-receiver-check` tests clean UDP archives,
-late joins, outages, and replay gap handling. A runnable two-process demonstrator,
-packet pacing, optional feedback, and dashboard APIs remain follow-up work.
+late joins, outages, and replay gap handling. For a runnable pair of processes,
+use the [UDP demo](https://github.com/copper-project/copper-rs/tree/master/examples/cu_logstream_demo):
+
+```sh
+cd examples/cu_logstream_demo
+just
+just run loss
+just run outage
+just run late
+just run restart
+```
+
+The deterministic counter/accumulator graph records onboard while the receiver
+writes a separate native archive. Each scenario verifies received payloads and
+sender timestamps against the onboard log, runs the ordinary logreader's `fsck`,
+and replays the captured records with keyframe restoration. Loss within the FEC
+window recovers without gaps; longer outages and late starts retain explicit
+missing ranges. Restart launches a fresh receiver process while the sender keeps
+running. All output stays in a fresh directory under this example's `logs/`.
+
+Run `just logstream-demo-check` at the repository root to check all scenarios.
+The receiver status display reports the latest archived CopperList, verified
+anchor, and gaps. This is a low-rate demonstrator: configured bitrate is not yet
+enforced, and manifests/anchors follow qualifying keyframe captures. Independent
+repetition, packet pacing, optional feedback, and dashboard APIs remain deferred.
