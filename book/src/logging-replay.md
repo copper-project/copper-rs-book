@@ -508,5 +508,39 @@ structured logs contain sender shutdown statistics and failures.
 Optional feedback has logical packet interfaces (`CuFeedbackTx`/`CuFeedbackRx`)
 that can share the same bidirectional carrier or use separate endpoints. The
 one-way sender does not require feedback. Its protocol, negotiation, and adaptive
-tuning remain deferred along with dashboard APIs. Run `just logstream-pacing-check`
+tuning remain deferred. Run `just logstream-pacing-check`
 to check scheduler bounds, worker lifecycle, and all six process scenarios.
+
+
+## Native ground-station telemetry
+
+The UDP demo now includes an optional Ratatui screen. In `examples/cu_logstream_demo`,
+start `just dashboard`, then `just sender` in another terminal. Use fresh log paths
+for repeated runs. The manual sender runs for about a minute. Space pauses the view;
+q closes the receiver and its archive. The screen shows counter/sum values, a counter
+chart, packet freshness, archive progress, recovery anchors, and separate source-gap
+and UI-overwrite counts.
+
+The std-only `cu29_logstream::telemetry::telemetry_channel` moves successfully archived,
+already decoded frames into a bounded circular buffer. User code waits on `ready().await`,
+`wait_timeout`, or a registered scheduling waker, then pulls `try_read()` on its own thread.
+It receives a stable borrowed typed frame and an exact count of unread overwritten samples,
+resuming at the oldest retained frame. Status is coalesced separately and remains readable
+while the view is paused. There are no receiver-thread data callbacks. The user owns chart
+history, projections, storage, and widgets. The demo uses generated named task accessors.
+
+Storage is preallocated for the ring and one in-flight reader frame; payload-owned allocations
+are additional. Recording never waits for slow or disconnected readers.
+Both share a process failure boundary. Only successfully archived captures enter this initial
+telemetry path; a writer error is reported rather than retried or hidden.
+
+Run `just logstream-telemetry-check` at the repository root for notification/overrun tests,
+archive equality with fast/stalled/disconnected readers, terminal layouts, and all six
+existing UDP recovery/replay scenarios. The UI dependency is behind the example's `tui`
+feature; telemetry is std-only and adds no work to the robot's real-time task path.
+
+This step displays captured outputs. Live deterministic reconstruction is next: extend the
+demo with a third task derived from `sum`, omit its output from all transmitted views, and
+execute that task through generated Copper replay on the ground before presenting it.
+Captured archives can reconstruct omitted outputs later through offline resim. Generated
+numeric mission dispatch remains a subsequent milestone.
