@@ -428,3 +428,32 @@ to decide what to *exclude* (via `logging: (enabled: false)`) if storage is a co
 This "record everything by default" approach is what makes Copper's deterministic replay
 possible. Since every message and every timestamp is captured automatically, you can always
 go back and reproduce any moment of your robot's execution.
+
+## Receiving a streamed archive
+
+The experimental `cu29/logstream` path can reconstruct native `.copper` archives
+on another host. A `SessionRouter` reads packets through `CuStreamRx`, discovers
+the sender's manifest, and verifies restart anchors against their referenced
+manifest and keyframe. Startup packets and recovery objects are retained within
+explicit receiver-local limits; starting late does not recover expired history.
+
+Use `cu29_logstream::NativeArchive<P>` with the receiver's generated dataset type.
+It checks the manifest against that type's output schema, decodes each CopperList
+once, and writes the original canonical payload bytes into native log sections.
+Verified keyframes are stored with them. This requires the matching application
+and full-capture native codec; hybrid reconstruction is deferred.
+
+Read the result with your ordinary application logreader. A separate
+`StreamContinuity` section preserves the session manifest, inclusive missing
+ranges, verified anchor references, and the receiver's final known boundary.
+The logreader's `fsck` command reports source gaps and anchors, and
+`cu29_export::stream_continuity_reader` provides a Rust iterator over these records.
+
+Replay cannot execute across missing CopperList history without a matching
+keyframe. A later verified keyframe permits replay from that boundary, while the
+missing range remains a gap in the archive. Closing a receiver archive does not
+claim that an unobserved sender tail was complete.
+
+The source checkout's `just logstream-receiver-check` tests clean UDP archives,
+late joins, outages, and replay gap handling. A runnable two-process demonstrator,
+packet pacing, optional feedback, and dashboard APIs remain follow-up work.
