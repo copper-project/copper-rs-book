@@ -414,6 +414,25 @@ sender-side `archive` or `live_viz` flags or `content` wrapper. The generated
 twin writes a capture archive and exposes typed frames to the caller;
 `.archive_only()` disables task reconstruction while retaining recording.
 
+For custom receivers, `SessionRouter` lends each `SessionEventRef` to your callback.
+The receiver owns the encoded bytes and keeps them available if the callback
+fails; `drain_events` retries delivery. Call `event.to_owned()` only when you
+intend to allocate and keep a separate copy of the event.
+
+`ReceivedManifest` provides both the decoded manifest and its verified original
+record. Pass it to `NativeArchive::new` or `CaptureArchive::new`; recovery events
+also carry the original recovery-point record. Archive writes borrow these bytes
+through `StreamContinuityRecord<&[u8]>`, avoiding an intermediate serialization
+buffer. Offline readers can use the default owned `StreamContinuityRecord`.
+
+Continuous record assembly recycles buffers after delivery or expiry. Storage
+grows on demand when record sizes or concurrent assemblies exceed their previous
+sizes, within receiver limits; it does not reserve every slot at the maximum
+record size. After warmup, packet parsing, assembly, and borrowed event delivery
+need no heap allocations. This does not make the entire ground station allocation
+free: session discovery, RaptorQ control decoding, owned task-state decoding for
+replay, and application payload decoding may still allocate.
+
 ## Difference with ROS
 
 In ROS, data recording is a separate tool: `rosbag2`. You start a `ros2 bag record`
