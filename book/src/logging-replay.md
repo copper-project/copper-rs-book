@@ -389,6 +389,27 @@ code when it is disabled, which is useful for applications whose background work
 still be active at a CopperList boundary. Replay then has message history but no task-state
 snapshots to restore.
 
+## Streaming logs to a receiver
+
+Enable `cu29/logstream` and configure static `log_streaming.destinations` to send
+Copper records over a packet transport. Each destination declares `transport`,
+`link`, `fec`, `anchor_interval`, and `max_record_bytes`. See the
+[UDP log streaming demo](https://github.com/copper-project/copper-rs/tree/master/examples/cu_logstream_demo)
+for a complete configuration and runnable sender, receiver, and dashboard.
+
+`anchor_interval` is directly on the destination and counts CopperLists. It must
+be a nonzero multiple of `logging.keyframe_interval`: keyframes every 20 and
+anchors every 100 select recovery boundaries at CopperList IDs 0, 100, 200, and
+so on. Each anchor references a keyframe captured at that same boundary. The
+sender retains the latest complete recovery bundle for periodic retransmission.
+Streaming requires a nonzero keyframe interval, even when local keyframe
+recording is disabled with `enable_keyframe_logging: false`.
+
+Archival and visualization are receiver uses of the stream. There are no
+sender-side `archive` or `live_viz` flags or `content` wrapper. The generated
+twin writes a capture archive and exposes typed frames to the caller;
+`.archive_only()` disables task reconstruction while retaining recording.
+
 ## Difference with ROS
 
 In ROS, data recording is a separate tool: `rosbag2`. You start a `ros2 bag record`
