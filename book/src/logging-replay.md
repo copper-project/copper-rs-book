@@ -393,14 +393,18 @@ snapshots to restore.
 
 Enable `cu29/logstream` and configure static `log_streaming.destinations` to send
 Copper records over a packet transport. Each destination declares `transport`,
-`link`, `fec`, `anchor_interval`, and `max_record_bytes`. See the
+`link`, `fec`, `recovery_interval`, and `max_record_bytes`. See the
 [UDP log streaming demo](https://github.com/copper-project/copper-rs/tree/master/examples/cu_logstream_demo)
 for a complete configuration and runnable sender, receiver, and dashboard.
 
-`anchor_interval` is directly on the destination and counts CopperLists. It must
+A **keyframe** saves task state. A **recovery point** binds that keyframe to the
+stream manifest and a CopperList boundary, so a receiver can join midway or
+resume after missing data. The receiver verifies the binding before using it.
+
+`recovery_interval` is directly on the destination and counts CopperLists. It must
 be a nonzero multiple of `logging.keyframe_interval`: keyframes every 20 and
-anchors every 100 select recovery boundaries at CopperList IDs 0, 100, 200, and
-so on. Each anchor references a keyframe captured at that same boundary. The
+recovery points every 100 select recovery boundaries at CopperList IDs 0, 100, 200, and
+so on. Each recovery point references a keyframe captured at that same boundary. The
 sender retains the latest complete recovery bundle for periodic retransmission.
 Streaming requires a nonzero keyframe interval, even when local keyframe
 recording is disabled with `enable_keyframe_logging: false`.
