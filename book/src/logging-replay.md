@@ -464,3 +464,19 @@ for feedback; both directions use bounded nonblocking packets on background work
 One-way destinations keep the v1 manifest encoding; feedback destinations use v2. `SenderMonitor::snapshot()`
 exposes live TX and feedback state, including stale reports and failures. `CuTwinStatus` counts feedback
 submissions/drops separately from archive progress. Run the root `just logstream-feedback-check` target.
+
+### TUI bandwidth panel
+
+The console monitor's BW tab includes `Telemetry / TX` panels for each configured destination.
+One-way panels show actual submitted Copper bytes/packets, the configured budget, drops by cause,
+recovery activity, and baseline FEC. These are local submissions, not delivery acknowledgements.
+
+Two-way panels additionally show feedback state/age, receiver throughput, finalized source loss and
+FEC recovery, receiver buffer/progress counters, and the effective repair interval. Waiting, stale,
+and failed feedback show `n/a` for receiver measurements. Arrow keys or `hjkl` scroll the BW content
+horizontally and vertically on small terminals or when several destinations are configured.
+
+Generated apps attach read-only worker handles through `CuMonitoringRuntime`. Console and Bevy monitors
+pass those handles to the shared TUI model; custom monitor frontends can use `runtime.log_streams()`.
+Snapshots are published on sender workers and sampled by the presentation thread. The task path gains
+no monitoring callbacks, serialization, or synchronization. Run `just logstream-monitor-check`.
