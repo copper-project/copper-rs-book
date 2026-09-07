@@ -167,3 +167,55 @@ The biggest difference is the **compile-time guarantee**. In ROS, you can wire t
 together with mismatched message types and only find out when you run the system. In
 Copper, if your PID controller expects `ImuPayload` and your driver produces
 `CameraFrame`, the compiler tells you immediately.
+
+## Composing resource bundles
+
+Resource bundles can consume other bundles' outputs through their own `resources`
+map. For example, a UART and SET pin become an HC-12 radio, and that radio can
+become a serial LogStream transport:
+
+```ron
+resources: [
+    (id: "board", provider: "BoardResources"),
+    (id: "radio", provider: "RadioResources",
+     resources: { "serial": "board.uart", "set": "board.set", "delay": "board.delay" },
+     config: { "channel": 21 }),
+    (id: "telemetry", provider: "RadioLogResources",
+     resources: { "serial": "radio.serial" }),
+],
+```
+
+`RadioResources` and `RadioLogResources` are concrete application aliases for the
+chosen hardware and framing providers. The runtime macro computes construction
+order per mission; declaration order does not change bundle indices. Cycles,
+missing/inactive providers and unknown input or output names fail compilation.
+Bindings compile into static resource keys. Changes to provider input wiring need
+a rebuild; a runtime configuration cannot replace the compiled input topology.
+
+A composing provider declares inputs with `resources!`, sets
+`ResourceBundle::INPUT_NAMES` to `<Inputs as ResourceBindings>::NAMES`, and calls
+`bundle.inputs::<Inputs>(manager)?` inside its existing `build` method. It consumes
+owned inputs or clones explicitly shared handles, then registers the wrapped
+output. Borrowed manager references cannot be stored in owned `'static` outputs.
+Concrete resource types and exclusive takes are still checked by the manager at
+startup. Existing providers require no changes: `INPUT_NAMES` defaults to empty,
+and the `ResourceBundle::build` signature is unchanged.
+
+`just dag` includes bundle consumers and LogStream destinations in each resource's
+“Used by” column. Dashed directed arrows run from provider bundles to consuming
+bundles; hover an arrow for the source slot and destination binding. These arrows
+show startup dependencies, not scheduled task-message edges.
+
+The `cu-hc12` component offers FU3 channel configuration, `cu-serial-bridge` offers
+raw byte channels, and `cu29-logstream-serial` adds bounded packet framing. Choose
+one consumer per radio; simultaneous raw traffic and log streaming requires an
+explicit multiplexing protocol and is not part of these adapters.
+
+For USB-to-TTL HC-12 wiring on Unix, enable the `cu-linux-resources/serial-rts`
+Cargo feature and set `serial0_rts: true` alongside `serial0_dev` and
+`serial0_nonblocking: true` in the Linux bundle config. Bind the radio's `set`
+input to `board.serial0_rts` and use `LinuxSerialRtsPin` as its pin type. This
+owned `OutputPin` disables flow control, starts high and maps low/high to
+asserted/deasserted active-low RTS#. Use a compatible 3.3 V RTS# output and common
+ground. The same option works for `serial1` through `serial5`; unsupported modem
+control fails startup. The HC-12 echo example shows complete USB-only wiring.
