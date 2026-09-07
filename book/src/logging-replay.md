@@ -185,12 +185,20 @@ cargo run --features logreader --bin my-project-logreader -- \
     logs/my-project.copper extract-copperlists
 ```
 
+CopperList lifecycle state is runtime bookkeeping and is omitted from every
+serialization, including binary logs, JSON, Python exports, and remote-debug
+snapshots. Serialized lists contain the cycle `id` and `msgs`.
+
+Unified log format version 2 and logstream record version 2 use this layout.
+Older recordings require a reader built against their original layout. Moving
+timestamp-delta and metadata-backreference encoding to `cu_bincode::Uleb128`
+preserves those compressed metadata bytes; ordinary integer encoding is unchanged.
+
 The output is JSON by default. Here's what the first CopperList looks like:
 
 ```json
 {
   "id": 0,
-  "state": "BeingSerialized",
   "msgs": [
     {
       "payload": {
