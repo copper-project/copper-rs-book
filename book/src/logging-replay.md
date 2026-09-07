@@ -189,9 +189,11 @@ CopperList lifecycle state is runtime bookkeeping and is omitted from every
 serialization, including binary logs, JSON, Python exports, and remote-debug
 snapshots. Serialized lists contain the cycle `id` and `msgs`.
 
-Unified log format version 2 and logstream record version 2 use this layout.
-Older recordings require a reader built against their original layout. Moving
-timestamp-delta and metadata-backreference encoding to `cu_bincode::Uleb128`
+Unified-log encapsulation version **1** describes only file and section layout.
+It must never change for encoded-content changes. Always use the logreader built
+for the exact application version that produced the recording. Logstream carries
+no version fields in its packets, records, RLC fragments, or session manifests.
+Moving timestamp-delta and metadata-backreference encoding to `cu_bincode::Uleb128`
 preserves those compressed metadata bytes; ordinary integer encoding is unchanged.
 
 The output is JSON by default. Here's what the first CopperList looks like:
