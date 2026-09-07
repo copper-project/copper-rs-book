@@ -428,3 +428,39 @@ to decide what to *exclude* (via `logging: (enabled: false)`) if storage is a co
 This "record everything by default" approach is what makes Copper's deterministic replay
 possible. Since every message and every timestamp is captured automatically, you can always
 go back and reproduce any moment of your robot's execution.
+
+## Optional logstream receiver feedback
+
+Log streaming remains one-way by default. To receive health reports and optionally adapt continuous FEC,
+add an explicit reverse resource to a `log_streaming.destinations` entry:
+
+```ron
+feedback: (
+    transport: (type: "cu29_logstream_udp::CuUdpLogStreamRx", resource: "network.rx"),
+    report_interval_ms: 500,
+    timeout_ms: 2000,
+    adaptation: (
+        min_repair_every_source_symbols: 1,
+        max_repair_every_source_symbols: 16,
+    ),
+),
+```
+
+The resource bundle sets socket addresses. On the ground, explicitly configure a TX endpoint targeting
+the sender and call `Twin::twin(rx).with_feedback(tx)`. Each logical receiver has one owner; shared sockets
+do not enable feedback implicitly. The manifest advertises feedback capability and cadence.
+
+Omit `adaptation` for reports only. The configured `repair_every_source_symbols` is the startup/fallback
+baseline and must lie inside the bounds; smaller intervals mean more redundancy. The sender increases
+protection promptly under loss and reduces it cautiously after healthier reports. It may reduce redundancy
+below baseline. After feedback timeout, it marks reports stale and gradually returns to baseline.
+
+Reports carry receiver identity/sequence, throughput counters, finalized received/recovered/missing source
+symbols, buffer pressure, latest delivered CopperList, and an optional request for retained recovery data.
+Loss excludes the active coding window and unseen history/tails. Reports are advisory, never per-record ACKs.
+Bitrate, burst, latency, memory, FEC window/field/density, and object FEC remain fixed. Capture never waits
+for feedback; both directions use bounded nonblocking packets on background workers.
+
+One-way destinations keep the v1 manifest encoding; feedback destinations use v2. `SenderMonitor::snapshot()`
+exposes live TX and feedback state, including stale reports and failures. `CuTwinStatus` counts feedback
+submissions/drops separately from archive progress. Run the root `just logstream-feedback-check` target.
