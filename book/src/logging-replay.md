@@ -212,7 +212,7 @@ manifest record by digest. Use matching sender and receiver builds.
 
 Logstream packet headers omit packet sequence counters: FEC symbol identifiers
 and record identities provide recovery and deduplication. RLC source headers use
-36 bytes and repair headers use 40 bytes; RaptorQ headers use 55 bytes. RLC carries
+32 bytes and repair headers use 36 bytes; RaptorQ headers use 51 bytes. RLC carries
 object identity, record length, and fragment index inside its protected source
 fragments, and transmits only the active FEC ID bytes. The protected fragment header
 uses 20 bytes: magic (4), object ID (8), record length (4), and fragment index (4).
@@ -226,7 +226,7 @@ of the library's 12-byte representation. The receiver restores that byte
 before validating geometry and decoding; encoding rejects a nonzero reserved
 byte. This saves one byte per RaptorQ source or repair packet.
 Preallocated symbol capacity stays at 1128 bytes. At a 1200-byte MTU, packets are
-at most 1164 bytes for RLC sources, 1168 for RLC repairs, and 1183 for RaptorQ.
+at most 1160 bytes for RLC sources, 1164 for RLC repairs, and 1179 for RaptorQ.
 Packet payload length is derived from the complete packet extent supplied by the
 carrier, saving two bytes per packet. Serial and transparent-radio adapters frame
 byte streams into complete packets before decoding.
@@ -236,9 +236,20 @@ saving eight bytes per record. The digest still binds kind, object ID, payload l
 as a big endian u64, and payload, so recovery-point digest references are unchanged.
 Truncated payloads and appended bytes fail digest verification; receiver allocation
 bounds still apply to the complete framed record before assembly.
-CRC32C still protects every packet; moving integrity checks to transport adapters
-must preserve framing integrity for serial and transparent radio. Sender and
-receiver must use the matching wire layout.
+Packet integrity belongs to the carrier, saving four bytes per externally
+protected packet. The common LogStream envelope has no CRC. UDP/network and
+packet-radio carriers rely on external integrity checks. Serial/transparent-radio
+adapters append a four-byte big endian CRC32C over the complete unescaped packet,
+then escape packet and checksum between delimiters. The receiver verifies and
+strips the checksum before delivery, discards damaged frames, and resynchronizes
+at the next delimiter. This turns corruption into packet loss before FEC.
+The serial adapter's unchanged 514-byte buffer permits packets up to 252 bytes
+under worst-case escaping: `(N - 2) / 2 - 4`. Account for framing/checksum bytes,
+escaping, and serial start/stop bits when budgeting link throughput. Both serial
+peers need the new framing; the older adapter that relied on the common CRC is
+incompatible. Direct decoder callers must supply complete, carrier-verified packets.
+Record digests and recovery-point digest references retain their content binding.
+Sender and receiver must use the matching wire layout.
 
 The output is JSON by default. Here's what the first CopperList looks like:
 
