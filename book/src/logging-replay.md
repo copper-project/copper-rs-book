@@ -196,6 +196,12 @@ no version fields in its packets, records, RLC fragments, or session manifests.
 Moving timestamp-delta and metadata-backreference encoding to `cu_bincode::Uleb128`
 preserves those compressed metadata bytes; ordinary integer encoding is unchanged.
 
+Logstream packet headers omit packet sequence counters: FEC symbol identifiers
+and record identities provide recovery and deduplication. The packed packet header
+is 58 bytes, saving 8 bytes per packet. Preallocated symbol capacity stays at
+1128 bytes, so a 1200-byte MTU carries packets of at most 1186 bytes. Sender and
+receiver must use the matching wire layout.
+
 The output is JSON by default. Here's what the first CopperList looks like:
 
 ```json
