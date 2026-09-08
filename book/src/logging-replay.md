@@ -428,3 +428,31 @@ to decide what to *exclude* (via `logging: (enabled: false)`) if storage is a co
 This "record everything by default" approach is what makes Copper's deterministic replay
 possible. Since every message and every timestamp is captured automatically, you can always
 go back and reproduce any moment of your robot's execution.
+
+## Reading structured logs remotely
+
+Enable `cu29/logstream` and configure a `log_streaming` destination to forward
+structured entries while retaining the onboard log. Copper copies the encoded
+bytes into bounded destination buffers during the existing local serialization
+pass. Sender workers perform framing, FEC, and transmission within the configured
+link budget; a full stream buffer drops the streamed entry while local recording
+continues.
+
+The wire carries interned message and parameter-name IDs plus typed parameter
+values. The ground station reconstructs readable text with the producing build's
+`cu29_log_index`. String-valued parameters remain payload data when explicitly
+logged. Received `.copper` archives preserve the original binary entries,
+timestamps, levels, and task origin for the ordinary `extract-text-log` reader.
+
+For a live view, take the generated twin's independent log reader with
+`twin.take_log_reader()`. Its bounded 64-entry ring publishes entries after
+archival succeeds; `update.frame.entry` contains the original `CuLogEntry`.
+Use `rebuild_logline(&strings, &entry)` with the sender's string index. Pausing or
+dropping this reader leaves recording active.
+
+Try `just telemetry` in `examples/cu_logstream_demo`, then `just sender` in a
+second terminal. The robot calls `info!(ctx, ...)` once per second with numeric
+encoder values, and the **Robot logs · received over UDP** pane displays them.
+The telemetry command reads `cu29_log_index` beside the executable by default;
+`--log-index <path>` selects another producing build's index. Space pauses the
+frame and log views while recording continues.
