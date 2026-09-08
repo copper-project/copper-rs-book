@@ -212,6 +212,12 @@ at most 1164 bytes for RLC sources, 1168 for RLC repairs, and 1184 for RaptorQ.
 Packet payload length is derived from the complete packet extent supplied by the
 carrier, saving two bytes per packet. Serial and transparent-radio adapters frame
 byte streams into complete packets before decoding.
+Semantic records use a 45-byte header: magic (4), kind (1), object ID (8), and
+BLAKE3 digest (32). Payload length is derived from the complete reassembled record,
+saving eight bytes per record. The digest still binds kind, object ID, payload length
+as a big endian u64, and payload, so recovery-point digest references are unchanged.
+Truncated payloads and appended bytes fail digest verification; receiver allocation
+bounds still apply to the complete framed record before assembly.
 CRC32C still protects every packet; moving integrity checks to transport adapters
 must preserve framing integrity for serial and transparent radio. Sender and
 receiver must use the matching wire layout.
