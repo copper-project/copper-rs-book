@@ -451,8 +451,10 @@ Use `rebuild_logline(&strings, &entry)` with the sender's string index. Pausing 
 dropping this reader leaves recording active.
 
 Try `just telemetry` in `examples/cu_logstream_demo`, then `just sender` in a
-second terminal. The robot calls `info!(ctx, ...)` once per second with numeric
-encoder values, and the **Robot logs · received over UDP** pane displays them.
+second terminal. The robot calls `info!(ctx, ...)` once per second with simulated
+encoder temperature and supply-voltage diagnostics, and the **Robot logs · received
+over UDP** pane displays them. These numeric diagnostics travel only in structured
+logs; task messages carry joint angles.
 The telemetry command reads `cu29_log_index` beside the executable by default;
 `--log-index <path>` selects another producing build's index. Space pauses the
 frame and log views while recording continues.
