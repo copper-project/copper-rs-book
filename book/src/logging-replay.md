@@ -198,13 +198,14 @@ preserves those compressed metadata bytes; ordinary integer encoding is unchange
 
 Logstream session manifests carry identity, receiver requirements, and application
 schema using standard bincode encoding. Requirements contain only symbol size,
-RLC field, window symbols, and maximum complete CopperList record bytes. The
-receiver validates those values and enforces its own decoder and buffering limits.
+RLC field, window symbols, maximum complete CopperList record bytes, and optional
+feedback requirements: report interval and destination key. Feedback timeout and
+adaptation bounds stay in the local sender configuration. The receiver validates those values and enforces its own decoder and buffering limits.
 RaptorQ geometry comes from packet OTI and uses receiver-local object limits.
 Destination ID, MTU, pacing, sender memory budget, repair policy, recovery interval,
 and sender object bounds remain local to the sender. For the `ground` test profile
-(1128-byte symbols, GF(256), window 64, 65536-byte records), requirements take 10
-bincode bytes versus 39 for the former sender plan: 29 bytes saved per repeated
+(1128-byte symbols, GF(256), window 64, 65536-byte records), one-way requirements take 11
+bincode bytes versus 40 for the former sender plan: 29 bytes saved per repeated
 manifest. Savings vary with policy values and destination-name length. Schema and
 reconstruction ABI checks remain intact; recovery points still bind the exact
 manifest record by digest. Use matching sender and receiver builds.
