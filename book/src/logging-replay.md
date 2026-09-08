@@ -197,9 +197,15 @@ Moving timestamp-delta and metadata-backreference encoding to `cu_bincode::Uleb1
 preserves those compressed metadata bytes; ordinary integer encoding is unchanged.
 
 Logstream packet headers omit packet sequence counters: FEC symbol identifiers
-and record identities provide recovery and deduplication. The packed packet header
-is 58 bytes, saving 8 bytes per packet. Preallocated symbol capacity stays at
-1128 bytes, so a 1200-byte MTU carries packets of at most 1186 bytes. Sender and
+and record identities provide recovery and deduplication. RLC source headers use
+38 bytes and repair headers use 42 bytes; RaptorQ headers use 58 bytes. RLC carries
+object identity and fragment count inside its protected source fragments, and
+transmits only the active FEC ID bytes. This saves another 20 bytes per RLC source
+packet and 16 bytes per repair packet after removing packet sequence counters.
+Preallocated symbol capacity stays at 1128 bytes. At a 1200-byte MTU, packets are
+at most 1166 bytes for RLC sources, 1170 for RLC repairs, and 1186 for RaptorQ.
+CRC32C still protects every packet; moving integrity checks to transport adapters
+must preserve framing integrity for serial and transparent radio. Sender and
 receiver must use the matching wire layout.
 
 The output is JSON by default. Here's what the first CopperList looks like:
