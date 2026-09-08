@@ -196,6 +196,19 @@ no version fields in its packets, records, RLC fragments, or session manifests.
 Moving timestamp-delta and metadata-backreference encoding to `cu_bincode::Uleb128`
 preserves those compressed metadata bytes; ordinary integer encoding is unchanged.
 
+Logstream session manifests carry identity, receiver requirements, and application
+schema using standard bincode encoding. Requirements contain only symbol size,
+RLC field, window symbols, and maximum complete CopperList record bytes. The
+receiver validates those values and enforces its own decoder and buffering limits.
+RaptorQ geometry comes from packet OTI and uses receiver-local object limits.
+Destination ID, MTU, pacing, sender memory budget, repair policy, recovery interval,
+and sender object bounds remain local to the sender. For the `ground` test profile
+(1128-byte symbols, GF(256), window 64, 65536-byte records), requirements take 10
+bincode bytes versus 39 for the former sender plan: 29 bytes saved per repeated
+manifest. Savings vary with policy values and destination-name length. Schema and
+reconstruction ABI checks remain intact; recovery points still bind the exact
+manifest record by digest. Use matching sender and receiver builds.
+
 Logstream packet headers omit packet sequence counters: FEC symbol identifiers
 and record identities provide recovery and deduplication. RLC source headers use
 36 bytes and repair headers use 40 bytes; RaptorQ headers use 55 bytes. RLC carries
