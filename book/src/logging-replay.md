@@ -199,9 +199,14 @@ preserves those compressed metadata bytes; ordinary integer encoding is unchange
 Logstream packet headers omit packet sequence counters: FEC symbol identifiers
 and record identities provide recovery and deduplication. RLC source headers use
 38 bytes and repair headers use 42 bytes; RaptorQ headers use 58 bytes. RLC carries
-object identity and fragment count inside its protected source fragments, and
-transmits only the active FEC ID bytes. This saves another 20 bytes per RLC source
-packet and 16 bytes per repair packet after removing packet sequence counters.
+object identity, record length, and fragment index inside its protected source
+fragments, and transmits only the active FEC ID bytes. The protected fragment header
+uses 20 bytes: magic (4), object ID (8), record length (4), and fragment index (4).
+Fragment count and payload length are derived from that geometry and the configured
+symbol capacity; fragment kind is implicitly CopperList. The reassembled record
+must still match that kind and identity and pass digest verification. This frees
+7 bytes per source fragment compared with the previous 27-byte header, allowing
+more record data in each fixed-size symbol and sometimes fewer fragments.
 Preallocated symbol capacity stays at 1128 bytes. At a 1200-byte MTU, packets are
 at most 1166 bytes for RLC sources, 1170 for RLC repairs, and 1186 for RaptorQ.
 CRC32C still protects every packet; moving integrity checks to transport adapters
