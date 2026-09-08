@@ -236,11 +236,14 @@ saving eight bytes per record. The digest still binds kind, object ID, payload l
 as a big endian u64, and payload, so recovery-point digest references are unchanged.
 Truncated payloads and appended bytes fail digest verification; receiver allocation
 bounds still apply to the complete framed record before assembly.
-Packet integrity belongs to the carrier, saving four bytes per externally
-protected packet. The common LogStream envelope has no CRC. UDP/network and
-packet-radio carriers rely on external integrity checks. Serial/transparent-radio
-adapters append a four-byte big endian CRC32C over the complete unescaped packet,
-then escape packet and checksum between delimiters. The receiver verifies and
+Data packets and feedback reports use the same transport integrity contract,
+saving four bytes per packet in both directions. Neither LogStream format carries
+an inner CRC. Delivery, ordering, and uniqueness are not guaranteed; feedback
+controllers reject stale and duplicate reports using their sequence and counters.
+UDP supplies packet integrity through the network stack. Raw serial supplies
+neither packet boundaries nor integrity. The framing adapter between LogStream
+and raw serial appends a four-byte big endian CRC32C over the complete unescaped
+packet, then escapes packet and checksum between delimiters. The adapter verifies and
 strips the checksum before delivery, discards damaged frames, and resynchronizes
 at the next delimiter. This turns corruption into packet loss before FEC.
 The serial adapter's unchanged 514-byte buffer permits packets up to 252 bytes
