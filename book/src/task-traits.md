@@ -250,6 +250,15 @@ The sink reads the value and does something with it (here, it logs it).
 
 Notice the `process()` signature: it only has `input`, no `output`.
 
+## Deterministic tasks in live replay
+
+A live Copper twin can reconstruct a synchronous task from captured inputs,
+recorded time, and frozen state. Select it with `streaming: (replay: reconstruct)`
+in the shared graph. Keep logging enabled on that task and all its input
+producers; missing replay inputs are rejected at compile time. See
+[task reconstruction](./logstream-telemetry.md#4-reduce-traffic-with-task-reconstruction)
+for supported codecs, a camera pipeline example, and development verification.
+
 ## Tying it back to the task graph
 
 Remember our `copperconfig.ron`:

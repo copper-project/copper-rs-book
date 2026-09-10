@@ -185,12 +185,17 @@ cargo run --features logreader --bin my-project-logreader -- \
     logs/my-project.copper extract-copperlists
 ```
 
+Serialized CopperLists contain the cycle `id` and `msgs`. Lifecycle state is
+runtime bookkeeping and is omitted from binary logs, JSON, Python exports, and
+remote-debug snapshots. Use the logreader built for the exact application version
+that produced the recording; the file encapsulation version does not describe
+application-content compatibility.
+
 The output is JSON by default. Here's what the first CopperList looks like:
 
 ```json
 {
   "id": 0,
-  "state": "BeingSerialized",
   "msgs": [
     {
       "payload": {
@@ -388,6 +393,14 @@ This is a compile-time application property. The generated runtime omits keyfram
 code when it is disabled, which is useful for applications whose background workers may
 still be active at a CopperList boundary. Replay then has message history but no task-state
 snapshots to restore.
+
+## Streaming to a ground station
+
+To collect a native archive on another machine while the robot runs, continue to
+[Streaming Logs and Live Telemetry](./logstream-telemetry.md). The guide covers
+UDP setup, structured robot logs, live task reconstruction, optional receiver
+feedback, and recovery after packet loss. Per-task logging controls also determine
+which inputs are available for reconstruction.
 
 ## Difference with ROS
 
