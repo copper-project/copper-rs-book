@@ -24,6 +24,24 @@ This is different from most robotics frameworks where logging is opt-in and you 
 explicitly record topics. In Copper, **every message is logged by default**. The runtime
 does this automatically as part of its execution loop -- no extra code needed.
 
+## Typed logging codecs
+
+A task's `logging.codec` or `logging.codecs` setting selects a typed codec for its
+recorded payloads. Copper places each present codec payload inside a frame with a
+fixed four-byte little-endian encoded length. The codec writes directly into log
+storage; Copper fills in the reserved length after encoding. This framing adds no
+payload buffer or additional encoding pass.
+
+On replay or export, Copper limits the codec reader to that frame. The codec must
+consume its complete payload, so read-ahead cannot reach the next message or its
+metadata. Custom destination writers must implement bincode's `position` and
+`overwrite` operations; Copper's memory-mapped log writer supports both.
+
+Keep the logreader built for the application version that produced a recording.
+Codec framing is part of the encoded content, whose layout can change between
+application versions. The unified-log file and section header version describes
+the outer storage layout.
+
 ## Step 1: Generate a log file
 
 Make sure your project is in the state from the previous chapters, with the 1 Hz rate
