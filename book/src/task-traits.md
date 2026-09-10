@@ -250,6 +250,28 @@ The sink reads the value and does something with it (here, it logs it).
 
 Notice the `process()` signature: it only has `input`, no `output`.
 
+## Deterministic tasks in live replay
+
+For a live stream, Copper can reconstruct a task's output on the receiver from
+captured inputs, clock, and frozen state. Both sides use the same application and
+Copper version. Implement the marker trait to promise identical results across
+supported targets and freedom from external side effects:
+
+```rust,ignore
+impl CuCrossPlatformDeterministic for MyTask {}
+```
+
+Then select reconstruction on that task in `copperconfig.ron`:
+
+```ron
+(id: "t-0", type: "tasks::MyTask", streaming: (replay: reconstruct)),
+```
+
+This requires an ordinary synchronous task with logging enabled, the lossless
+native compressed codec, and full handle capture. Copper checks the marker trait
+at compile time. The robot records the full output locally while the receiver
+recomputes the omitted streamed payload.
+
 ## Tying it back to the task graph
 
 Remember our `copperconfig.ron`:
