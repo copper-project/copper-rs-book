@@ -264,6 +264,13 @@ This requires an ordinary synchronous task with logging enabled, the lossless
 native compressed codec, and full handle capture. The robot records the full
 output locally while the receiver recomputes the omitted streamed payload.
 
+Every input to a reconstructed task must come from a node with logging enabled.
+Copper checks this at compile time and reports the producer, consumer, and message
+type when an input is unavailable. For a camera pipeline, you can disable image
+logging, capture the detector's output, and reconstruct downstream tracking and
+planning. Reconstructing the detector itself requires captured camera images.
+The check covers every incoming connection and each mission graph.
+
 ## Tying it back to the task graph
 
 Remember our `copperconfig.ron`:
