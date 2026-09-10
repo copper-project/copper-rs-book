@@ -116,6 +116,12 @@ This is the new one. Copper includes a tool called `cu29-rendercfg` that reads y
 `copperconfig.ron` and generates a visual diagram of the task graph -- an SVG showing
 all tasks and their connections as a directed acyclic graph (DAG).
 
+Resource tables show each task, bridge, or system consumer. A configured
+LogStream transport such as `network.tx` appears as
+`system: logstream (ground)` in the **Used by** column, inferred from the
+destination transport resource binding. See the
+[LogStream guide](./logstream-telemetry.md#2-configure-your-robots-sender) for an example.
+
 Let's try it on our workspace.
 
 Then, from the `my_workspace/` directory:
