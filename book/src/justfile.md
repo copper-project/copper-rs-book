@@ -110,6 +110,20 @@ Now it's just:
 just cl
 ```
 
+### `just resim` and `just resim-debug` -- Replay efficiently
+
+Generated projects run replay targets through Copper's `debug-optimized` Cargo profile:
+
+```bash
+just resim
+just resim-debug
+```
+
+The profile enables compiler optimization while retaining Copper `debug!()` structured
+logs, debug assertions, and debugger information. This matters for Time Traveler and
+other remote-debug clients: an unoptimized dev build can make seeking, stepping, and
+state inspection dramatically slower.
+
 ### `just dag` -- Render the task graph
 
 This is the new one. Copper includes a tool called `cu29-rendercfg` that reads your
