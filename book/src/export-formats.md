@@ -262,15 +262,11 @@ And make sure your existing `cu29-export` dependency enables the `"mcap"` featur
 > **Note:** If your project already depends on `cu29-export` via `git`, a local `path`, or
 > crates.io, keep that same source and Copper release and just add the `"mcap"` feature.
 
-### Implementing `PayloadSchemas`
+### Automatic payload schemas
 
-When the `mcap` feature is enabled, `run_cli` requires your `CuStampedDataSet` to
-implement the `PayloadSchemas` trait. This trait tells the MCAP exporter what JSON Schema
-to use for each task's payload, so Foxglove can understand your data structure.
-
-The `gen_cumsgs!` macro does **not** implement this trait automatically -- you need to add
-the implementation yourself in `src/logreader.rs`. Here's what it looks like for our
-project where every task uses `MyPayload`:
+`gen_cumsgs!` records the concrete payload type for every output slot. The MCAP exporter
+uses that generated metadata to build each JSON Schema automatically, including when one
+task has multiple output types. Your logreader does not need a task-ID-to-schema table:
 
 ```rust
 pub mod tasks;
@@ -280,38 +276,17 @@ use cu29_export::run_cli;
 
 gen_cumsgs!("copperconfig.ron");
 
-#[cfg(feature = "logreader-mcap")]
-use cu29_export::serde_to_jsonschema::trace_type_to_jsonschema;
-#[cfg(feature = "logreader-mcap")]
-impl PayloadSchemas for cumsgs::CuStampedDataSet {
-    fn get_payload_schemas() -> Vec<(&'static str, String)> {
-        let task_ids =
-            <cumsgs::CuStampedDataSet as MatchingTasks>::get_all_task_ids();
-        let schema = trace_type_to_jsonschema::<tasks::MyPayload>();
-        task_ids.iter().map(|&id| (id, schema.clone())).collect()
-    }
-}
-
 fn main() {
     run_cli::<CuStampedDataSet>().expect("Failed to run the export CLI");
 }
 ```
 
-The key pieces:
-
-- **`trace_type_to_jsonschema::<T>()`** -- Introspects a Rust type at compile time using
-  `serde-reflection` and produces a JSON Schema string. Your payload type must derive
-  `Serialize` and `Deserialize`.
-- **`MatchingTasks::get_all_task_ids()`** -- Returns the task IDs from your config, in
-  graph order. The macro generates this for you.
-- The `#[cfg(feature = "logreader-mcap")]` guard ensures this code only compiles when the
-  MCAP feature is active, so your regular `logreader` feature keeps working without
-  the extra dependency.
-
-If your tasks use **different** payload types, you'll need to map each task ID to its
-specific schema instead of reusing a single one. See the
-[cu_caterpillar example](https://github.com/copper-project/copper-rs/blob/master/examples/cu_caterpillar/src/logreader.rs)
-in the Copper repository for a reference.
+For ordinary derived serialization, reflection is enough. If a reusable payload has a
+custom `Serialize` implementation whose wire shape differs from its reflected fields,
+the payload crate implements `SerializedPayloadSchema` beside that serializer and adds
+`SerializedPayloadSchema` to its `#[reflect(...)]` attribute. That one payload-owned
+definition is then discovered by every logreader automatically. Application authors do
+not repeat the schema or maintain per-task matches.
 
 ### Exporting to MCAP
 
