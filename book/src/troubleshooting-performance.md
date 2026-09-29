@@ -110,6 +110,25 @@ async-cl-io = ["cu29/async-cl-io"]
 cargo run --features async-cl-io
 ```
 
+For a regular background task fed by an intermittent source, add
+`background_skip_empty: true` to its node:
+
+```ron
+(
+    id: "heavy",
+    type: "tasks::HeavyTask",
+    background: true,
+    background_skip_empty: true,
+),
+```
+
+Empty inputs then skip dispatch. Copper still collects a completed result once,
+even on an empty-input cycle, and emits an empty output until another result is
+ready. Inputs arriving while a job is running are skipped. The setting defaults
+to `false`, works with named pools and background anytime tasks, and requires a
+regular background task. Keyframe replay preserves a pending job's saved input
+and whether its completed result has already been collected.
+
 Good fit:
 
 ```text
