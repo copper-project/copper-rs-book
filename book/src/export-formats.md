@@ -45,44 +45,100 @@ ls -lh logs/
 
 ## Selecting a runtime instance
 
-A unified log can contain multiple runtime instances after a mission change or an
+A unified log can contain multiple recorded runs after a mission change or an
 appended restart. Each `Instantiated` lifecycle record announces a fresh runtime.
-Its CopperList IDs and clock can start over independently of the previous instance.
+Its CopperList IDs and clock can start over independently of the previous run.
 
-Use the application's logreader binary to list the instances and select one:
+Use the application's logreader binary to list the runs and select one:
 
 ```sh
-logreader logs/robot.copper list-instances
-logreader logs/robot.copper --instance 1 fsck --dump-runtime-lifecycle
-logreader logs/robot.copper --instance 1 extract-copperlists
-logreader logs/robot.copper --instance 1 extract-text-log target/debug/cu29_log_index
-logreader logs/robot.copper --instance 1 log-stats --output instance-1.json
-logreader logs/robot.copper --instance 1 export-mcap --output instance-1.mcap
+logreader logs/robot.copper list-runs
+logreader logs/robot.copper --run 1 fsck --dump-runtime-lifecycle
+logreader logs/robot.copper --run 1 extract-copperlists
+logreader logs/robot.copper --run 1 extract-text-log target/debug/cu29_log_index
+logreader logs/robot.copper --run 1 log-stats --output run-1.json
+logreader logs/robot.copper --run 1 export-mcap --output run-1.mcap
 ```
 
 Indices are zero-based and follow `Instantiated` record order. They are distinct
 from the recorded `instance_id`, which can repeat across process restarts.
-`list-instances` reads lifecycle metadata without decoding application payloads.
+`list-runs` reads lifecycle metadata without decoding application payloads.
 It shows the mission, application, runtime instance ID, start time, and whether
 `ShutdownCompleted` was recorded.
 
-Single-instance logs select their instance automatically. Logs from standalone
-writers with no `Instantiated` record are treated as one implicit instance.
-Multi-instance logs require `--instance` for extraction, fsck, statistics, and MCAP
+Single-run logs select their run automatically. Logs from standalone
+writers with no `Instantiated` record are treated as one implicit run.
+Multi-run logs require `--run` for extraction, fsck, statistics, and MCAP
 export. The selection includes the runtime's initial stream reservations and all
 of its CL, keyframe, lifecycle, and structured-log sections. A multi-instance log
 whose startup section ordering cannot be recognized is listed but rejected for
 selection.
 
-The selected instance supplies the recorded configuration used by logging codecs.
+The selected run supplies the recorded configuration used by logging codecs.
 Statistics also default to that configuration and its recorded mission; `--config`
 and `--mission` provide explicit overrides. Without a recorded configuration,
 statistics use `copperconfig.ron`. Use a logreader and string index built for the
-application version that produced the selected instance.
+application version that produced the selected run.
 
-`fsck` checks CopperList IDs within the selected instance, reports decoding errors,
+`fsck` checks CopperList IDs within the selected run, reports decoding errors,
 and returns an error for repeated or decreasing IDs and an unclean final log close.
-An ID reset at the next `Instantiated` belongs to that next instance.
+An ID reset at the next `Instantiated` belongs to that next run.
+
+## Standalone self-describing log tools
+
+Logs recorded with an embedded `ValueDecodeCatalog` can be read by the standalone
+`cu29-logextract` binary. Build it with `cu29-export/self-describing-logs`, or use
+`just logextract` from the Copper workspace. Run `just` in
+`examples/cu_self_describing_logs` for a complete recording/inspection example.
+
+```sh
+cu29-logextract logs/robot.copper list-runs
+cu29-logextract logs/robot.copper --run 1 catalog
+cu29-logextract logs/robot.copper --run 1 catalog --export-format ron > catalog.ron
+cu29-logextract logs/robot.copper --run 1 catalog --export-format json > catalog.json
+cu29-logextract logs/robot.copper --run 1 extract-copperlists --export-format jsonl > samples.jsonl
+cu29-logextract logs/robot.copper --run 1 extract-copperlists --export-format csv > samples.csv
+cu29-logextract logs/robot.copper --run 1 fsck --deep
+```
+
+`catalog` displays slots, type/field descriptions and coherent storage units.
+`--color auto|always|never` controls Catppuccin Mocha terminal colors. RON/JSON dump
+the complete versioned catalog document, including canonical config and the shared
+wire/schema graph. Machine output contains only data; diagnostics use stderr.
+
+Record extraction defaults to one streamed JSON array; JSONL emits one record per
+line. Each record has `id` and ordered `msgs`, retaining slot identity, payload,
+TOV, common metadata and capture status. Schemas retain scalar widths and units.
+Both Compact and Flat layouts decode in the same extractor. Flat records report
+unknown original presence when suppression erased that information.
+
+Each selected run uses its own catalog; multi-run logs require `--run N`. Plain
+standalone fsck checks structure and common streams. `fsck --deep` requires a
+catalog, validates its full graph and decodes every recorded CopperList/captured
+payload to exact section exhaustion. Invalid/truncated records return nonzero
+with their recorded location. Keyframe envelopes are checked; frozen task-state
+bytes remain opaque. Offline decoding bounds input, recursion, collections,
+values and copied output bytes.
+
+App logreaders keep typed decoding by default. With `self-describing-logs`,
+`extract-copperlists --decoder catalog` selects the embedded reader. Text log
+reconstruction still takes the matching string index.
+
+Enable both `python` and `self-describing-logs` for catalog-based dictionaries:
+
+```python
+import libcu29_export as cu
+
+catalog = cu.value_decode_catalog_unified("logs/robot.copper", run=1)
+for cl in cu.copperlist_value_iterator_unified("logs/robot.copper", run=1):
+    print(cl["id"], cl["msgs"][0]["payload"])
+```
+
+The iterator requires no native decoder registration. Integers retain their full
+precision; corrupt records raise `IOError` and stop iteration. The Rust APIs are
+`cu29_export::catalog::read_value_decode_catalog` and `copperlist_values_reader`.
+All catalog APIs remain experimental. Recording keeps its native encoding pass;
+startup copies the prepared compressed catalog once.
 
 ## CSV export
 

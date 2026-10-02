@@ -9,6 +9,28 @@ If you only remember one thing from this chapter, remember this:
 > Python on the **live task path** is a prototyping hack and should not be treated as
 > a production architecture.
 
+## Catalog-based offline analysis
+
+Enable `cu29-export` features `python` and `self-describing-logs` to read an
+embedded catalog without registering an application-specific decoder:
+
+```python
+import libcu29_export as cu
+
+catalog = cu.value_decode_catalog_unified("logs/robot.copper", run=1)
+for cl in cu.copperlist_value_iterator_unified("logs/robot.copper", run=1):
+    print(cl["id"], cl["msgs"][0]["payload"])
+```
+
+Both functions select the recorded run by the zero-based index from `list-runs`.
+Single-run logs can omit `run`. The catalog dictionary retains config, slot order,
+wire/schema descriptions and storage units. CopperList dictionaries contain `id`
+and ordered `msgs` with payloads, TOV, metadata and capture status. Integers keep
+full precision; corrupt records raise `IOError` and stop iteration.
+
+These experimental functions run offline. See [standalone log tools](./export-formats.md#standalone-self-describing-log-tools)
+for catalog dumps, complete output shapes and deep validation.
+
 ## Offline Python Analysis
 
 Copper can expose recorded `.copper` data to Python after the run:
