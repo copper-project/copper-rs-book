@@ -110,6 +110,24 @@ async-cl-io = ["cu29/async-cl-io"]
 cargo run --features async-cl-io
 ```
 
+Regular background tasks skip empty inputs by default:
+
+```ron
+(
+    id: "heavy",
+    type: "tasks::HeavyTask",
+    background: true,
+),
+```
+
+Empty inputs then skip dispatch. Copper still collects a completed result once,
+even on an empty-input cycle, and emits an empty output until another result is
+ready. Inputs arriving while a job is running are skipped. Set `background_process_empty: true` to dispatch empty inputs. This positive
+setting defaults to `false` and works with named pools and background anytime
+tasks. The default corrects a specification bug to match the intended behavior;
+the former `background_skip_empty` setting had the inverse meaning. Keyframe replay preserves a pending job's saved input
+and whether its completed result has already been collected.
+
 Good fit:
 
 ```text
