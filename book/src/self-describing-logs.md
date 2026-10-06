@@ -72,9 +72,8 @@ its existing backend storage policy. Exceeding the type limit returns a startup
 error.
 
 Catalog chunks continue across sections and slabs. Readers check chunk sequence,
-uncompressed length, and checksum. V4 Heatshrink startup catalogs and V3 Brotli
-packaged catalogs carry typed metadata. Readers also translate string metadata
-from legacy V1 Brotli and V2 Heatshrink catalogs. Payload recording keeps its
+uncompressed length, and checksum. Startup recording and build-host packaging use
+one version-1 Heatshrink format with typed metadata. Payload recording keeps its
 ordinary native encoding pass.
 
 ## Reading a recorded log
