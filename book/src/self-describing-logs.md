@@ -41,10 +41,25 @@ impl cu29::bincode::ValueDecode for Orientation {
 }
 ```
 
-Copper units and time carry their coherent storage units in the catalog. A
-length created from centimetres still records metres. Captured custom logging
+Copper units carry their coherent storage units in the catalog, and Copper time
+records nanoseconds. A length created from centimetres still records metres. Captured custom logging
 codecs need an explicit catalog for their chosen representation; startup errors
 identify the task, output type, and codec.
+
+## Typed quantity metadata
+
+Each type attaches metadata through `ValueDecode::METADATA`, a static slice of
+Copper-owned `ValueMetadata` values. The allocation-free `cu29-value-types` crate
+supplies the shared vocabulary, re-exported through `cu29-value` and the Copper
+prelude. `QuantityMetadata::coherent(Quantity::Velocity)` describes coherent SI
+storage; `QuantityMetadata::time(TimeStorageUnit::Nanosecond)` describes Copper
+clock storage. Quantity and storage choices are checked by the type system.
+
+Portable metadata uses permanent numeric IDs and length-delimited bodies. Readers
+retain unknown kinds, quantities, and storage alternatives while exposing the raw
+decoded payload value. Known metadata supplies conventional symbols such as `V`,
+`N·m`, and `m·s⁻¹` for display. JSON and RON exports retain the IDs and include
+readable quantity and unit information.
 
 ## Embedded startup
 
@@ -57,8 +72,10 @@ its existing backend storage policy. Exceeding the type limit returns a startup
 error.
 
 Catalog chunks continue across sections and slabs. Readers check chunk sequence,
-uncompressed length, and checksum. V2 Heatshrink catalogs and V1 Brotli catalogs
-are both readable. Payload recording keeps its ordinary native encoding pass.
+uncompressed length, and checksum. V4 Heatshrink startup catalogs and V3 Brotli
+packaged catalogs carry typed metadata. Readers also translate string metadata
+from legacy V1 Brotli and V2 Heatshrink catalogs. Payload recording keeps its
+ordinary native encoding pass.
 
 ## Reading a recorded log
 
