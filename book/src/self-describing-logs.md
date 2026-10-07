@@ -3,8 +3,9 @@
 The experimental `self-describing-logs` feature records a payload catalog during
 application startup. Offline tools use it to decode recorded payloads and
 inspect their fields, types, and units. This workflow is introduced by the
-[automatic catalog PR](https://github.com/copper-project/copper-rs/pull/1447)
-and [standalone tools PR](https://github.com/copper-project/copper-rs/pull/1449).
+[startup catalog PR](https://github.com/copper-project/copper-rs/pull/1447)
+and [standalone tools PR](https://github.com/copper-project/copper-rs/pull/1449),
+following [metadata-aware rollover](https://github.com/copper-project/copper-rs/pull/1465).
 
 ## Application setup
 
@@ -43,7 +44,7 @@ impl cu29::bincode::ValueDecode for Orientation {
 
 Copper units carry their coherent storage units in the catalog, and Copper time
 records nanoseconds. A length created from centimetres still records metres. Captured custom logging
-codecs need an explicit catalog for their chosen representation; startup errors
+codecs need a native recipe for their chosen representation; startup errors
 identify the task, output type, and codec.
 
 ## Typed quantity metadata
@@ -67,14 +68,32 @@ readable quantity and unit information.
 encoding recipes and compresses them with Heatshrink before initializing the
 runtime. The serializer and compressor allocate no heap memory on success. Their
 working memory is bounded: 256 reachable native type references, a 2 KiB compressor
-buffer, and small output buffers. The logger reserves 4 KiB catalog sections using
-its existing backend storage policy. Exceeding the type limit returns a startup
-error.
+buffer, and small output buffers. The logger sizes one catalog section before writing it directly to backend storage. Exceeding the type limit returns a startup error.
 
-Catalog chunks continue across sections and slabs. Readers check chunk sequence,
-uncompressed length, and checksum. Startup recording and build-host packaging use
-one version-1 Heatshrink format with typed metadata. Payload recording keeps its
-ordinary native encoding pass.
+## Metadata, append and rollover
+
+The application produces and saves its catalog only during construction, before
+resource initialization. One shared schema graph covers all compiled missions;
+each mission supplies its ordered CopperList slot map. Application identity,
+canonical RON configuration and sorted mission names occupy a separate static
+metadata section. Matching appended runs compare and reuse both sections.
+
+Each catalog is a single bincode value compressed with Heatshrink, including its
+ordinary version-2 field. Its footer records uncompressed length and CRC32.
+A section can span backing files. Readers bound decompression and validate the
+complete catalog. Payload recording keeps its ordinary native encoding pass.
+
+The metadata sections remain outside the rotating data region. Rollover reclaims
+closed data sections using byte-offset links, while retaining application metadata
+and the catalog. Every data section identifies its run, instance and mission.
+Readers can decode surviving CopperLists even when their startup lifecycle markers
+have rotated out; missing start times remain unknown. Mmap and SD/eMMC share this
+format and allocator. Append requires a cleanly closed log with matching metadata.
+
+Lifecycle records mark successful construction, start, stop and shutdown, with
+separate failure and panic records. CopperList, keyframe and lifecycle streams
+retain their construction context. Structured text keeps the process-global sink:
+interleaved instances send text to the most recently installed sink.
 
 ## Reading a recorded log
 
@@ -87,7 +106,8 @@ just logextract logs/app.copper fsck --deep
 ```
 
 Appended logs require selecting a run with `--run N`; use `list-runs` to find its
-zero-based index. The standalone reader uses the catalog stored in that run.
+zero-based index. The standalone reader selects that run's mission map from the shared static catalog.
+The Python catalog result includes every compiled mission map.
 
 Host Rust tools enable `cu29/decode-catalog`; `cu29-export/self-describing-logs`
 selects it automatically. Reader features use `std` and allocate value trees.
