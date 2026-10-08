@@ -33,7 +33,7 @@ The rest is scaffolding that you set up once and rarely change:
 | `build.rs` | Sets an env var for Copper's logging macros | Never |
 | `logreader.rs` | CLI tool to decode and export Copper's binary logs | Rarely |
 | `resim.rs` | Replay target for deterministic re-simulation and remote debug | Rarely |
-| `justfile` | Shortcuts for common commands like `just log` and `just dag` | Occasionally |
+| `justfile` | Shortcuts for common commands like `just log` and `just graph` | Occasionally |
 | `Cargo.toml` | Dependencies | When adding new hardware driver crates |
 
 ## The mental model

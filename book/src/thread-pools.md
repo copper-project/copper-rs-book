@@ -1,8 +1,8 @@
 # Thread Pools, Affinity, and Real-Time Scheduling
 
 By default, Copper runs your task graph on one thread: the global loop executes
-source -> processing -> sink back-to-back every cycle. Two features step outside that
-single thread -- `background: true` tasks and the `parallel-rt` runtime -- and both need
+source -> processing -> sink back-to-back every cycle. Background tasks and a concurrent plan such as `Pipeline` step outside that
+single thread, and both need
 worker threads to run on. This chapter is about controlling those workers: how many there
 are, which CPU cores they run on, and what scheduling priority the OS gives them.
 
@@ -154,8 +154,8 @@ call.
 ### `rt`
 
 The `rt` in `parallel-rt` stands for **runtime** -- the generated execution engine that
-runs the task graph -- not "real-time". The pool named `rt` is the one the runtime looks
-for to drive the [`parallel-rt`](./performance-basics.md) engine: it spawns one worker per
+runs the task graph -- not "real-time". The pool named `rt` configures workers created by the
+[`Pipeline` planner](./performance-basics.md#select-a-pipeline-plan): it spawns one worker per
 generated process stage, and the `rt` pool lets you pin and prioritize those workers
 exactly like any other pool:
 

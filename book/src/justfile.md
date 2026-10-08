@@ -1,215 +1,146 @@
 # Automating Tasks with Just
 
-Throughout this book, we've been typing long `cargo` commands to run the logreader, extract
-CopperLists, and more. Those commands are precise but tedious -- especially when they
-involve feature flags, binary names, and multiple path arguments.
+Running a logreader or rendering a graph involves binary names, features, and
+paths. A `justfile` gives those commands short names so you can spend your time
+changing the robot instead of reconstructing command lines.
 
-The workspace template ships with a `justfile` that wraps common operations into short,
-memorable commands. In this chapter, we'll see what `just` is, what recipes come built-in,
-and how to visualize the task graph.
+This chapter uses the 1.3.0-dev templates and assumes `just` is available.
+Start in the project directory from [Setting Up](./setup.md), or the workspace
+root from [From Project to Workspace](./workspace.md). Run `just --list` to see
+the recipes your generated project provides.
 
-## What is Just?
+## Read a recording in two commands
 
-[Just](https://just.systems/) is a command runner -- think of it as a modern, simpler
-alternative to `make` for project automation. You define **recipes** (named commands) in a
-`justfile`, then run them with `just <recipe>`.
+After running the application once, use:
 
-### Installing Just
-
-If you don't have it already:
-
-```bash
-cargo install just
-```
-
-Or on most Linux distributions:
-
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | \
-    bash -s -- --to ~/bin
-```
-
-Verify with:
-
-```bash
-just --version
-```
-
-## The workspace justfile
-
-Here's the `justfile` that comes with the `cu_full` workspace template:
-
-```just
-# Render the execution DAG from the app config.
-dag:
-  #!/usr/bin/env bash
-  set -euo pipefail
-  APP_DIR="${APP_DIR:-cu_example_app}"
-  cu29-rendercfg apps/"${APP_DIR}"/copperconfig.ron --open
-
-# Compatibility alias for older docs.
-rcfg: dag
-
-# Extract the structured log via the log reader.
-log:
-  #!/usr/bin/env bash
-  set -euo pipefail
-  APP_DIR="${APP_DIR:-cu_example_app}"
-  APP_NAME="${APP_NAME:-${APP_DIR}}"
-  RUST_BACKTRACE=1 cargo run -p "${APP_NAME}" --features=logreader \
-    --bin "${APP_NAME}-logreader" \
-    apps/"${APP_DIR}"/logs/"${APP_NAME}".copper \
-    extract-text-log target/debug/cu29_log_index
-
-# Extract CopperLists from the log output.
-cl:
-  #!/usr/bin/env bash
-  set -euo pipefail
-  APP_DIR="${APP_DIR:-cu_example_app}"
-  APP_NAME="${APP_NAME:-${APP_DIR}}"
-  RUST_BACKTRACE=1 cargo run -p "${APP_NAME}" --features=logreader \
-    --bin "${APP_NAME}-logreader" \
-    apps/"${APP_DIR}"/logs/"${APP_NAME}".copper extract-copperlists
-```
-
-Three recipes, each wrapping a command we'd otherwise have to type (or remember) by hand.
-
-## The recipes
-
-### `just log` -- Extract text logs
-
-Remember in [Logging and Replaying Data](./logging-replay.md) when we ran this?
-
-```bash
-cargo run --features logreader --bin my-project-logreader -- \
-    logs/my-project.copper extract-text-log target/debug/cu29_log_index
-```
-
-In the workspace, that becomes:
-
-```bash
+```sh
 just log
-```
-
-It extracts the structured text logs (`debug!()`, `info!()`, etc.) from the `.copper` file
-and reconstructs the human-readable output using the compile-time string index.
-
-### `just cl` -- Extract CopperLists
-
-Also from [Logging and Replaying Data](./logging-replay.md), extracting CopperList data (the message payloads from every cycle)
-was:
-
-```bash
-cargo run --features logreader --bin my-project-logreader -- \
-    logs/my-project.copper extract-copperlists
-```
-
-Now it's just:
-
-```bash
 just cl
 ```
 
-### `just resim` and `just resim-debug` -- Replay efficiently
+`log` reconstructs the structured text with the producing build's string index.
+`cl` exports each recorded CopperList, including task payloads and timestamps.
+For the first project, look for the source value `42` and processing value `43`.
+Both commands default to the application's normal log path.
 
-Generated projects run replay targets through Copper's `debug-optimized` Cargo profile:
+For a different recording in a single-crate project:
 
-```bash
+```sh
+just cl logs/another-session.copper
+```
+
+In the workspace template, the first argument selects the application and the
+second selects its recording:
+
+```sh
+just cl cu_example_app apps/cu_example_app/logs/cu_example_app.copper
+```
+
+Recipe arguments are positional. When you target another app, provide its log
+path too; the default log path still names `cu_example_app`.
+
+## See the graph and the execution schedule
+
+The graph answers “what connects to what?” The schedule answers “where and in
+what order will that work execute?” Both views help you check a RON edit before
+running hardware.
+
+From either template's root:
+
+```sh
+just graph
+just sched
+```
+
+The recipes open SVG files in your default viewer. In a single-crate project,
+the outputs are `graph.svg` and `schedule.svg`. In the workspace template they
+are `apps/cu_example_app/graph.svg` and
+`apps/cu_example_app/schedule.svg`.
+
+For our three-task app, the graph shows `src -> t-0 -> sink`. Its default serial
+schedule runs those operations on one worker. After selecting the
+[Pipeline planner](./performance-basics.md#select-a-pipeline-plan), inspect the
+schedule to see the process stages placed on separate workers and CopperLists
+overlapping across stages.
+
+Resource tables list the consumers of each resource, including configured
+LogStream transports. A destination using `network.tx`, for example, appears as
+`system: logstream (ground)` in the **Used by** column. Use this to check shared
+hardware ownership alongside the task graph.
+
+### Add observed timing
+
+A schedule diagram explains placement and ordering; it does not establish how
+fast your app runs. Record a representative run, then add its measured timings:
+
+```sh
+just graph-log
+just sched-log
+```
+
+These recipes use the application's logreader to obtain statistics from its
+normal log. Keep the log and configuration from the same application version.
+Look for an expensive stage or a large gap between stages, then use the
+[performance chapters](./reading-performance-metrics.md) to investigate it.
+
+### Target another configuration
+
+In a single-crate project, render an alternate configuration without replacing
+your application config:
+
+```sh
+just graph copperconfig.ron graph-check.svg
+just sched copperconfig.ron schedule-check.svg
+```
+
+In a workspace, supply the app, config, and output paths:
+
+```sh
+just graph cu_example_app apps/cu_example_app/copperconfig.ron graph-check.svg
+just sched cu_example_app apps/cu_example_app/copperconfig.ron schedule-check.svg
+```
+
+The first argument is the Cargo application package name. Both templates also
+provide a Rust viewer helper for additional options, including mission
+selection. For example, in the workspace from the
+[missions exercise](./missions.md), select `normal` with:
+
+```sh
+cargo run -p cu29-view-helper -- schedule --app cu_example_app --mission normal --output schedule-normal.svg --open
+```
+
+Use a mission ID that your selected app actually declares.
+
+## Replay a failure
+
+The generated recipes run replay through the `debug-optimized` Cargo profile:
+
+```sh
 just resim
 just resim-debug
 ```
 
-The profile enables compiler optimization while retaining Copper `debug!()` structured
-logs, debug assertions, and debugger information. This matters for Time Traveler and
-other remote-debug clients: an unoptimized dev build can make seeking, stepping, and
-state inspection dramatically slower.
+`resim` replays the recording. `resim-debug` serves a replay session to a remote
+debug client. Compiler optimization keeps seeking practical while preserving
+Copper's debug logs, assertions, and debugger information. See
+[Logging and Replaying Data](./logging-replay.md) for the replay workflow.
 
-### `just dag` -- Render the task graph
+## Automate your own repeated commands
 
-This is the new one. Copper includes a tool called `cu29-rendercfg` that reads your
-`copperconfig.ron` and generates a visual diagram of the task graph -- an SVG showing
-all tasks and their connections as a directed acyclic graph (DAG).
-
-Resource tables show each task, bridge, or system consumer. A configured
-LogStream transport such as `network.tx` appears as
-`system: logstream (ground)` in the **Used by** column, inferred from the
-destination transport resource binding. See the
-[LogStream guide](./logstream-telemetry.md#2-configure-your-robots-sender) for an example.
-
-Let's try it on our workspace.
-
-Then, from the `my_workspace/` directory:
-
-```bash
-just dag
-```
-
-This renders the DAG from `apps/cu_example_app/copperconfig.ron` and opens it in your
-default browser. You'll see a diagram like:
-
-```text
-┌─────────┐     ┌─────────┐     ┌─────────┐
-│   src   │────▶│   t-0   │────▶│  sink   │
-└─────────┘     └─────────┘     └─────────┘
-```
-
-For our simple three-task pipeline, the diagram is straightforward. But as your robot
-grows to 10, 20, or 50 tasks with complex wiring, this visualization becomes invaluable
-for understanding the data flow at a glance.
-
-## Targeting a different app
-
-All three recipes default to `cu_example_app`. If your workspace has multiple applications,
-override the target with environment variables:
-
-```bash
-APP_DIR=my_other_app just log
-APP_DIR=my_other_app just cl
-APP_DIR=my_other_app just dag
-```
-
-The `APP_DIR` variable controls which app directory to look in, and `APP_NAME` (which
-defaults to `APP_DIR`) controls the binary and package name passed to `cargo`.
-
-`just rcfg` still works as a compatibility alias, but `just dag` is the current primary
-name in the generated template.
-
-## Adding your own recipes
-
-The `justfile` is yours to extend. Here are some recipes you might add as your project
-evolves:
+A recipe is a name followed by indented shell commands. In the workspace
+`justfile`, add this complete recipe:
 
 ```just
-# Run the main application.
 run:
   cargo run -p cu_example_app
-
-# Run with the console monitor enabled.
-run-mon:
-  cargo run -p cu_example_app -- --monitor
-
-# Build everything in release mode.
-release:
-  cargo build --release
-
-# Clean build artifacts and log files.
-clean:
-  cargo clean
-  rm -f apps/*/logs/*.copper
 ```
 
-Recipes are just shell commands with names. If you find yourself typing the same command
-twice, make it a recipe.
+Then run:
 
-## Why not make?
+```sh
+just run
+```
 
-You could use `make` for all of this, and some people do. `just` has a few advantages for
-this use case:
-
-- **No tabs-vs-spaces headaches** -- `just` uses consistent indentation rules.
-- **No implicit rules** -- every recipe is explicit. No "magic" `.PHONY` targets.
-- **Variables and defaults** -- `just` supports environment variable defaults natively
-  (the `${APP_DIR:-cu_example_app}` syntax).
-- **Cross-platform** -- works the same on Linux, macOS, and Windows.
-- **No build system baggage** -- `just` is purely a command runner, not a build system.
-  Cargo is already your build system.
+It starts the same application you would launch with the Cargo command. Use
+`just` for operations you repeat, keeping explicit arguments for the paths and
+applications that change.

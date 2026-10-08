@@ -107,7 +107,7 @@ This is the fast path for readers who already know what kind of bottleneck they 
 | Knob | What it changes | Typical symptom |
 |---|---|---|
 | `async-cl-io` | Moves CopperList serialization and logging to a dedicated thread | Task latencies are fine, but end-of-CL overhead is too high |
-| `parallel-rt` | Pipelines multiple CopperLists across generated process stages | Several CPU-bound stages are back to back and the global rate is too low |
+| `parallel-rt` + `runtime.planner` | Enables an explicitly selected concurrent execution plan | Several CPU-bound stages are back to back and the global rate is too low |
 | `mmap-fsync` | Forces file `sync_all()` on section flush | The system runs fine for a while, then collapses under dirty-page / writeback pressure |
 | `background: true` | Runs one compatible source or task on the `background` thread pool and returns `None` while it is still busy | One isolated stage is too slow, but it does not need to block every cycle |
 | Task-local thread pool / parallel `for` | Parallelizes the internals of one task | One hot task has obvious internal data parallelism |
@@ -133,6 +133,77 @@ cargo run --features async-cl-io
 cargo run --features parallel-rt
 cargo run --features mmap-fsync
 ```
+
+## Select a pipeline plan
+
+In Copper 1.3.0-dev, `parallel-rt` enables the concurrent executor. Your RON
+configuration chooses the plan. The default planner is `Serial`, so enabling
+only the Cargo feature keeps serial execution.
+
+Use `Pipeline` when several CPU-heavy stages can work on different CopperLists
+at the same time. While a later stage handles cycle A, an earlier stage can
+start cycle B. Each cycle still follows the graph's dependencies.
+
+Try it in the single-crate project from [Writing Tasks](./task-traits.md).
+The small arithmetic graph makes the setup visible; its work is too cheap to
+promise a throughput improvement.
+
+### 1. Forward the executor feature
+
+Add this entry to the application's existing `[features]` table:
+
+```toml
+parallel-rt = ["cu29/parallel-rt"]
+```
+
+### 2. Select the plan and its capacity
+
+Keep the tasks and connections in `copperconfig.ron`. Add the following
+`runtime` and `logging` sections inside its top-level parentheses, replacing
+those sections if they already exist:
+
+```ron
+runtime: (
+    planner: (kind: Pipeline, config: {"max_in_flight": 4}),
+),
+logging: (
+    copperlist_count: 4,
+),
+```
+
+`max_in_flight` bounds concurrent cycles. `copperlist_count` reserves their
+message storage at startup and must be at least that large. Start with a small
+limit: more slots increase memory use, and extra in-flight work can increase
+latency without improving throughput.
+
+The example removes the 1 Hz limiter so it does not hold back the pipeline.
+Keep or restore `rate_target_hz` when your application needs a fixed maximum
+loop rate.
+
+### 3. Run and inspect
+
+From the project root:
+
+```sh
+cargo run --features parallel-rt
+```
+
+The source and sink still report `42` and `43`. Stop with Ctrl-C. With the
+1.3.0-dev template's viewer recipes, run:
+
+```sh
+just sched
+```
+
+The schedule shows separate process-stage workers and overlap between cycles.
+The `rt` pool's affinity and policy control these workers; its `threads` value
+does not determine how many stages `Pipeline` creates. See
+[Thread Pools](./thread-pools.md#rt) before assigning cores or priorities.
+
+To return to serial execution, change the planner to `(kind: Serial)` and run
+`cargo run`. To choose worker placement and ordering from recorded timings,
+continue to [Profile-Guided Scheduling](./profile-guided-scheduling.md), whose
+candidates use explicit schedules.
 
 ## Two distinctions that matter
 
