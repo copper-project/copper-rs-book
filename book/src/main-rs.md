@@ -29,15 +29,15 @@ fn main() {
     }
     debug!("Logger created at {}.", logger_path);
     debug!("Creating application... ");
-    let mut application = MyProjectApplication::builder()
+    let application = MyProjectApplication::builder()
         .with_log_path(logger_path, PREALLOCATED_STORAGE_SIZE)
         .expect("Failed to setup logger.")
         .build()
         .expect("Failed to create application.");
     debug!("Running... starting clock: {}.", application.clock().now());
 
-    application.run().expect("Failed to run application.");
-    debug!("End of program: {}.", application.clock().now());
+    let stopped = application.run_until_shutdown().expect("Failed to run application.");
+    debug!("End of program: {}.", stopped.clock().now());
     sleep(Duration::from_secs(1));
 }
 ```
@@ -64,31 +64,27 @@ resource factory.
 everything together: creates each task by calling their `new()` constructors,
 pre-allocates all message buffers, and sets up the scheduler.
 
-**`application.run()`** -- Starts the deterministic execution loop. Calls `start()` on
+**`application.run_until_shutdown()`** -- Starts the deterministic execution loop. Calls `start()` on
 all tasks, then enters the cycle loop (`preprocess` -> `process` -> `postprocess` for
 each task, in topological order), and continues until you stop the application (Ctrl+C).
+It consumes the initialized handle and returns a stopped handle, so the code uses
+`stopped.clock()` after the run.
 
 **`application.clock()`** -- Returns the runtime clock handle. The builder creates a
 default clock unless you override it with `.with_clock(...)`, which is mainly useful in
 tests or simulation.
 
-## build.rs -- log index setup
+## build.rs -- build-time setup
+
+Keep the template's complete build script:
 
 ```rust
 fn main() {
-    println!(
-        "cargo:rustc-env=LOG_INDEX_DIR={}",
-        std::env::var("OUT_DIR").unwrap()
-    );
+    cu29_build::setup();
 }
 ```
 
-This sets the `LOG_INDEX_DIR` environment variable at compile time. Copper's logging macros
-(`debug!`, `info!`, etc.) need it to generate a string index for log messages. Without it,
-you'll get:
-
-```text
-no LOG_INDEX_DIR system variable set, be sure build.rs sets it
-```
-
-**You never need to change this file.** Just make sure it exists.
+The generated `Cargo.toml` already includes `cu29-build` under
+`[build-dependencies]`. This helper prepares the interned string index used by
+Copper's structured logging and the other build-time metadata. Keep its Copper
+source and version aligned with `cu29`.

@@ -1,7 +1,7 @@
 # Setting Up Your Environment
 
-Before we can build a Copper project, we need Rust 1.95 or newer and the Copper project
-bootstrap tool.
+This book follows Copper 1.3.0-dev on `master`. Before building a project, we
+need Rust 1.95 or newer and the Copper project bootstrap tool.
 
 ## Install Rust
 
@@ -31,10 +31,12 @@ cargo install cargo-cunew
 Generate a new project directly:
 
 ```bash
-cargo cunew my_project
+cargo cunew --source git --git-branch master my_project
 ```
 
-This generates a complete, ready-to-compile Copper project at the path you specify.
+This selects the development code used by these chapters and generates a complete
+project. All Copper dependencies use the same source. For a released application,
+select a release supported by the feature you want to use.
 
 For more details, see the official documentation:
 <https://copper-project.github.io/copper-rs/Project-Templates/>
@@ -53,6 +55,9 @@ my_project/
     ├── main.rs           # Runtime entry point
     ├── logreader.rs      # Offline log export utility
     ├── resim.rs          # Replay / remote-debug entry point
+    ├── view.rs           # Graph and schedule viewer helper
+    ├── pgs.rs            # Profile-guided scheduling helper
+    ├── pgs_candidate.rs  # Candidate runtime for measured scheduling
     └── tasks.rs          # Your task implementations
 ```
 

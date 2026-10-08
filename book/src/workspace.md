@@ -14,7 +14,7 @@ generate one and understand its layout.
 Use `cargo-cunew` with the workspace template:
 
 ```bash
-cargo cunew --template workspace my_workspace
+cargo cunew --template workspace --source git --git-branch master my_workspace
 ```
 
 This creates a `my_workspace/` directory with a full workspace layout.
@@ -34,12 +34,16 @@ my_workspace/
 │           ├── main.rs
 │           ├── logreader.rs
 │           ├── resim.rs
+│           ├── pgs.rs
+│           ├── pgs_candidate.rs
 │           ├── messages.rs
 │           └── tasks/
 │               ├── mod.rs
 │               ├── local_example_src.rs
 │               ├── local_example_task.rs
 │               └── local_example_sink.rs
+├── tools/
+│   └── cu29_view_helper/               # Graph and schedule launcher
 ├── components/
 │   ├── bridges/
 │   ├── monitors/
@@ -61,15 +65,21 @@ The top-level `Cargo.toml` defines the workspace and shared dependencies:
 members = [
     "apps/cu_example_app",
     "components/bridges/cu_example_shared_bridge",
+    "tools/cu29_view_helper",
 ]
 resolver = "2"
 
 [workspace.dependencies]
-cu29 = { path = "../../core/cu29" }
-cu29-export = { path = "../../core/cu29_export" }
-bincode = { package = "cu-bincode", version = "2.0", default-features = false, features = ["derive", "alloc"] }
+cu29 = { git = "https://github.com/copper-project/copper-rs", branch = "master" }
+cu29-build = { git = "https://github.com/copper-project/copper-rs", branch = "master" }
+cu29-export = { git = "https://github.com/copper-project/copper-rs", branch = "master" }
 serde = { version = "1.0", features = ["derive"] }
 ```
+
+This example selects the 1.3.0-dev code on `master`. Keep the same Copper source
+for all three crates; a generated workspace records the source you selected when
+scaffolding it. The codec is available through `cu29::bincode`, so application
+crates do not need a separate bincode dependency.
 
 Every crate in the workspace references these shared dependencies with
 `workspace = true` in its own `Cargo.toml`. This means you define dependency versions
@@ -91,11 +101,12 @@ Instead of defining `MyPayload` inside `tasks.rs`, the workspace template puts m
 types in a dedicated `messages.rs`:
 
 ```rust
-use bincode::{Decode, Encode};
+use cu29::bincode::{Decode, Encode};
 use cu29::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Default, Debug, Clone, Encode, Decode, Serialize, Deserialize, Reflect)]
+#[bincode(crate = "cu29::bincode")]
 pub struct MyPayload {
     pub value: i32,
 }

@@ -176,23 +176,23 @@ fn main() {
     match mission.as_str() {
         "normal" => {
             debug!("Starting mission: normal");
-            let mut app = NormalApp::builder()
+            let app = NormalApp::builder()
                 .with_clock(clock.clone())
                 .with_log_path(logger_path, PREALLOCATED_STORAGE_SIZE)
                 .expect("Failed to setup logger.")
                 .build()
                 .expect("Failed to create application.");
-            app.run().expect("Failed to run application.");
+            app.run_until_shutdown().expect("Failed to run application.");
         }
         "direct" => {
             debug!("Starting mission: direct");
-            let mut app = DirectApp::builder()
+            let app = DirectApp::builder()
                 .with_clock(clock.clone())
                 .with_log_path(logger_path, PREALLOCATED_STORAGE_SIZE)
                 .expect("Failed to setup logger.")
                 .build()
                 .expect("Failed to create application.");
-            app.run().expect("Failed to run application.");
+            app.run_until_shutdown().expect("Failed to run application.");
         }
         other => {
             eprintln!("Unknown mission: '{}'. Available: normal, direct", other);

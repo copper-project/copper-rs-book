@@ -9,16 +9,30 @@ with the right derives.
 Here's the message type from our template project (in src/tasks.rs):
 
 ```rust
-use bincode::{Decode, Encode};
+use cu29::bincode::{Decode, Encode};
 use cu29::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Default, Debug, Clone, Encode, Decode, Serialize, Deserialize, Reflect)]
+#[bincode(crate = "cu29::bincode")]
 pub struct MyPayload {
     value: i32,
 }
 ```
 
+
+## Use Copper's codec
+
+In 1.3.0-dev, import the encoding derives from `cu29::bincode` and add
+`#[bincode(crate = "cu29::bincode")]` to each type deriving `Encode` or `Decode`.
+The attribute tells generated code where to find Copper's codec. This keeps your
+payloads, logreader, and runtime on the same encoding implementation, including
+when you enable self-describing logs.
+
+You only need the existing `cu29` dependency for the codec; keep `serde` for its
+own derives. If a copied example fails with an unresolved `bincode` import,
+check both the import and the derive attribute against the complete example
+above.
 
 ## What each derive does
 
@@ -126,7 +140,7 @@ Copper exposes the `cu29-units` wrappers (through `cu29::units`) so your payload
 carry units directly instead of raw `f32` values.
 
 ```rust
-use bincode::{Decode, Encode};
+use cu29::bincode::{Decode, Encode};
 use cu29::prelude::*;
 use cu29::units::si::f32::{Length, Time, Velocity};
 use cu29::units::si::length::{inch, meter};
@@ -135,6 +149,7 @@ use cu29::units::si::velocity::{kilometer_per_hour, meter_per_second};
 use serde::{Deserialize, Serialize};
 
 #[derive(Default, Debug, Clone, Encode, Decode, Serialize, Deserialize, Reflect)]
+#[bincode(crate = "cu29::bincode")]
 pub struct WheelSample {
     pub distance: Length,
     pub dt: Time,
@@ -193,6 +208,7 @@ Here's what a more realistic payload might look like for an IMU sensor (from [he
 
 ```rust
 #[derive(Default, Debug, Clone, Encode, Decode, Serialize, Deserialize, Reflect)]
+#[bincode(crate = "cu29::bincode")]
 pub struct ImuPayload {
     pub accel_x: Acceleration,
     pub accel_y: Acceleration,
