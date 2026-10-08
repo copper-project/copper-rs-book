@@ -42,21 +42,14 @@ Codec framing is part of the encoded content, whose layout can change between
 application versions. The unified-log file and section header version describes
 the outer storage layout.
 
-## Experimental self-describing logs
+## Reading payloads without an application logreader
 
-Enable `cu29/self-describing-logs` and use the ordinary application builder.
-During construction, before resource initialization, Copper serializes native
-encoding descriptions for every compiled mission and saves one compressed catalog
-in static log metadata. Matching appended runs reuse it. The catalog and application
-metadata survive byte-addressed rollover; data sections identify their run,
-instance and mission, so surviving CopperLists remain decodable after startup
-markers rotate out.
-
-The producer supports `no_std` and uses bounded memory for startup compression.
-Native payload encoding retains its existing recording pass. Host readers enable
-`cu29/decode-catalog` for allocated value trees. Use the standalone CLI's `catalog`,
-`extract-copperlists` and `fsck --deep` commands, or its Python API, to inspect logs.
-See [Self-describing logs](self-describing-logs.md) for setup and format details.
+If you want to share a recording or analyse it without compiling the application's
+payload types, enable `cu29/self-describing-logs`. Copper saves a catalog of field
+names, encodings, and storage units at startup. The standalone reader uses that
+catalog to export captured messages. The feature is experimental in 1.3.0-dev;
+follow [Self-Describing Logs](./self-describing-logs.md) to record a wheel sensor,
+inspect its units, and enable it in your own application.
 
 ## Step 1: Generate a log file
 
