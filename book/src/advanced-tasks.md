@@ -32,7 +32,7 @@ periodically takes "snapshots" (keyframes) of every task's internal state, much 
 keyframes in a video codec. During replay, it can jump to any snapshot instead of
 replaying from the very beginning.
 
-### Stateless tasks
+### Tasks with no state to freeze
 
 For tasks that hold no internal state (or state that can be trivially reconstructed), the
 empty implementation is all you need:
@@ -104,6 +104,104 @@ Think of it like a video file: without keyframes, you'd have to decode from the 
 every time you want to seek. With keyframes (state snapshots), you can jump to any point
 and resume from there. `Freezable` is how Copper creates those keyframes for your task's
 internal state.
+
+## A transform that can process independent cycles
+
+An image conversion or a fixed arithmetic transform often depends only on its
+current input and immutable settings. Such work can use `CuStatelessTask`: its
+per-cycle callbacks borrow `&self`, allowing an execution plan to overlap calls
+for different CopperLists. Use it when each cycle can be processed independently.
+A controller whose next output depends on an accumulated error belongs in
+`CuTask`, with that error included in its frozen state.
+
+Try this in the single-crate project from
+[Writing Tasks](./task-traits.md), using Copper 1.3.0-dev. The source still
+produces `MyPayload { value: 42 }` and the sink still receives `MyPayload`.
+
+### 1. Replace the processing task
+
+In `src/tasks.rs`, replace the `MyTask` struct and its trait implementations
+with this complete block. Keep the file's existing imports, payload, source,
+and sink:
+
+```rust
+#[derive(Reflect)]
+pub struct MyTask {}
+
+impl Freezable for MyTask {}
+
+impl CuStatelessTask for MyTask {
+    type Resources<'r> = ();
+    type Input<'m> = input_msg!(MyPayload);
+    type Output<'m> = output_msg!(MyPayload);
+
+    fn new(_config: Option<&ComponentConfig>, _resources: Self::Resources<'_>) -> CuResult<Self> {
+        Ok(Self {})
+    }
+
+    fn process(
+        &self,
+        ctx: &CuContext,
+        input: &Self::Input<'_>,
+        output: &mut Self::Output<'_>,
+    ) -> CuResult<()> {
+        if let Some(payload) = input.payload() {
+            output.set_payload(MyPayload { value: payload.value * 2 });
+            output.tov = input.tov;
+            debug!(ctx, "Doubled input: {}", payload.value * 2);
+        } else {
+            output.clear_payload();
+        }
+        Ok(())
+    }
+}
+```
+
+The arithmetic uses only the current input. `output` remains mutable because it
+belongs to this CopperList; the task instance is shared through `&self`.
+
+### 2. Declare the task kind
+
+Replace the `t-0` entry in `copperconfig.ron` with:
+
+```ron
+(
+    id: "t-0",
+    type: "tasks::MyTask",
+    kind: stateless_task,
+),
+```
+
+Keep the existing `src -> t-0 -> sink` connections. The explicit kind tells
+Copper to call `CuStatelessTask` rather than `CuTask`; it cannot infer this
+choice from the connections.
+
+### 3. Run and observe the transform
+
+From the project root:
+
+```sh
+cargo run
+```
+
+The task reports `Doubled input: 84`, and the sink reports
+`Sink Received message: 84`. Stop the app with Ctrl-C. You have changed the
+transform's execution contract while keeping its message type and graph wiring.
+The serial plan is sufficient for this exercise; overlapping execution requires
+a plan that schedules independent occurrences concurrently.
+
+### Choosing the contract
+
+`CuStatelessTask` requires `Send + Sync`. `preprocess`, `process`, and
+`postprocess` all use `&self`; construction, `start`, `stop`, and restoring a
+keyframe remain exclusive operations. Immutable calibration or configuration
+can live in the struct. An empty `Freezable` implementation is appropriate when
+there is no changing state to restore.
+
+Any interior mutability or shared resource must preserve the same output when
+calls overlap. A lock makes access safe but does not make order-dependent
+algorithm state deterministic. Use `CuTask` for that state. Stateless nodes
+cannot use `background` or anytime-task configuration.
 
 ## `Resources` -- Hardware Injection
 
