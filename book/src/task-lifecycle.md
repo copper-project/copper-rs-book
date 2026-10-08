@@ -156,7 +156,13 @@ keyframe at a low rate. During replay, the runtime jumps to the nearest keyframe
 minute 7, restores every task's state via `thaw()`, and replays from there -- no need to
 start from the beginning.
 
-For stateless tasks (like our simple `MySource`, `MyTask`, `MySink`), the empty
-`impl Freezable` is fine -- there's nothing to snapshot. We'll cover how to implement
-`freeze` and `thaw` for stateful tasks in the
-[Advanced Task Features](./advanced-tasks.md) chapter.
+Tasks implementing `CuStatelessTask` do not need to implement `Freezable`.
+Their per-cycle callbacks receive `&self`, and the runtime records an empty
+keyframe component for them. Restoring a keyframe leaves these task instances
+unchanged. Keep any state that affects later outputs in a task implementing
+`CuTask`, with `freeze` and `thaw` preserving that state.
+
+For `CuSrcTask`, `CuTask`, and `CuSinkTask` implementations with no state to
+snapshot (like our simple `MySource`, `MyTask`, `MySink`), the empty
+`impl Freezable` is sufficient. We'll cover how to implement `freeze` and `thaw`
+for stateful tasks in the [Advanced Task Features](./advanced-tasks.md) chapter.
