@@ -28,8 +28,7 @@ not retrieve expired history.
 
 ## 1. Try the UDP demo
 
-Use a Copper source checkout containing the implementation described here,
-including [replay-input validation in PR #1379](https://github.com/copper-project/copper-rs/pull/1379).
+Use a Copper 1.3.0-dev source checkout.
 The [demo](https://github.com/copper-project/copper-rs/tree/master/examples/cu_logstream_demo)
 requires the checkout's Rust toolchain, Just, and Python 3. From that checkout:
 
