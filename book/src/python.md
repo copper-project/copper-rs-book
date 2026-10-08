@@ -9,6 +9,50 @@ If you only remember one thing from this chapter, remember this:
 > Python on the **live task path** is a prototyping hack and should not be treated as
 > a production architecture.
 
+## Catalog-Based Offline Analysis
+
+If you want to analyse a self-describing recording without rebuilding its
+application or registering Rust payload types, use Copper's catalog reader.
+It returns ordinary Python dictionaries for the recorded values.
+
+Start with the wheel log from the [export exercise](./export-formats.md#inspecting-a-self-describing-recording).
+On Linux, with Rust and Python 3 available, run this complete sequence from the
+copper-rs 1.3.0-dev repository root:
+
+```sh
+cargo build -p cu29-export --lib --features python-extension-module,self-describing-logs
+mkdir -p target/python
+cp target/debug/libcu29_export.so target/python/libcu29_export.so
+PYTHONPATH=target/python python3 - <<'PYTHON'
+import libcu29_export as cu
+
+path = "examples/cu_self_describing_logs/logs/wheel.copper"
+catalog = cu.value_decode_catalog_unified(path)
+count = 0
+for cl in cu.copperlist_value_iterator_unified(path):
+    print(cl["id"], cl["msgs"][0]["payload"])
+    count += 1
+assert count == 10
+PYTHON
+```
+
+`python-extension-module` builds an importable extension and enables the Python
+API; `self-describing-logs` enables the catalog reader. The temporary
+`PYTHONPATH` makes this built module available to that Python command.
+
+You see the source wheel sample for each of the ten cycles. Inspect the catalog
+when you need field descriptions or storage units for plotting.
+
+For a multi-run recording, pass `run=1` to both functions to select the same
+zero-based run index you found with `list-runs`. A single-run log needs no
+`run` argument. The catalog describes all compiled missions; each CopperList
+uses the selected run's mission and output order.
+
+Each cycle dictionary has `id` and `msgs`, whose entries retain payload, time
+of validity, metadata, and capture status. Integers keep full precision. A
+corrupt record raises `IOError` and stops iteration. These APIs are experimental
+in 1.3.0-dev and run offline.
+
 ## Offline Python Analysis
 
 Copper can expose recorded `.copper` data to Python after the run:
