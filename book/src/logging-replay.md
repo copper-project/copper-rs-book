@@ -42,6 +42,15 @@ Codec framing is part of the encoded content, whose layout can change between
 application versions. The unified-log file and section header version describes
 the outer storage layout.
 
+## Reading payloads without an application logreader
+
+If you want to share a recording or analyse it without compiling the application's
+payload types, enable `cu29/self-describing-logs`. Copper saves a catalog of field
+names, encodings, and storage units at startup. The standalone reader uses that
+catalog to export captured messages. The feature is experimental in 1.3.0-dev;
+follow [Self-Describing Logs](./self-describing-logs.md) to record a wheel sensor,
+inspect its units, and enable it in your own application.
+
 ## Step 1: Generate a log file
 
 Make sure your project is in the state from the previous chapters, with the 1 Hz rate
