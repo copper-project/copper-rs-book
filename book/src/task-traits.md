@@ -11,12 +11,13 @@ down piece by piece.
 Here is the full `tasks.rs` from our template project:
 
 ```rust
-use bincode::{Decode, Encode};
+use cu29::bincode::{Decode, Encode};
 use cu29::prelude::*;
 use serde::{Deserialize, Serialize};
 
 // Define a message type
 #[derive(Default, Debug, Clone, Encode, Decode, Serialize, Deserialize, Reflect)]
+#[bincode(crate = "cu29::bincode")]
 pub struct MyPayload {
     value: i32,
 }
@@ -103,7 +104,7 @@ That's the entire file. Let's walk through it section by section.
 ## The imports
 
 ```rust
-use bincode::{Decode, Encode};
+use cu29::bincode::{Decode, Encode};
 use cu29::prelude::*;
 use serde::{Deserialize, Serialize};
 ```
@@ -111,13 +112,14 @@ use serde::{Deserialize, Serialize};
 - **`cu29::prelude::*`** -- Brings in everything you need from Copper: task traits,
   `CuContext`, `ComponentConfig`, `CuResult`, `Freezable`, `Reflect`, the `input_msg!` /
   `output_msg!` macros, and the `debug!` logging macro.
-- **`bincode`** and **`serde`** -- For the serialization derives on `MyPayload` (covered in
+- **`cu29::bincode`** and **`serde`** -- For the serialization derives on `MyPayload` (covered in
   the [Defining Messages](./messages.md) chapter).
 
 ## The message type
 
 ```rust
 #[derive(Default, Debug, Clone, Encode, Decode, Serialize, Deserialize, Reflect)]
+#[bincode(crate = "cu29::bincode")]
 pub struct MyPayload {
     value: i32,
 }

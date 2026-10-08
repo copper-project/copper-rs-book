@@ -56,9 +56,9 @@ The `Freezable` trait uses bincode's `Encoder` and `Decoder` for serialization:
 
 ```rust
 use cu29::prelude::*;
-use bincode::enc::Encoder;
-use bincode::de::Decoder;
-use bincode::error::{EncodeError, DecodeError};
+use cu29::bincode::enc::Encoder;
+use cu29::bincode::de::Decoder;
+use cu29::bincode::error::{EncodeError, DecodeError};
 
 #[derive(Reflect)]
 pub struct PidController {
@@ -72,14 +72,14 @@ pub struct PidController {
 impl Freezable for PidController {
     fn freeze<E: Encoder>(&self, encoder: &mut E) -> Result<(), EncodeError> {
         // Serialize the fields that change at runtime
-        bincode::Encode::encode(&self.accumulated_error, encoder)?;
-        bincode::Encode::encode(&self.previous_error, encoder)?;
+        cu29::bincode::Encode::encode(&self.accumulated_error, encoder)?;
+        cu29::bincode::Encode::encode(&self.previous_error, encoder)?;
         Ok(())
     }
 
     fn thaw<D: Decoder>(&mut self, decoder: &mut D) -> Result<(), DecodeError> {
-        self.accumulated_error = bincode::Decode::decode(decoder)?;
-        self.previous_error = bincode::Decode::decode(decoder)?;
+        self.accumulated_error = cu29::bincode::Decode::decode(decoder)?;
+        self.previous_error = cu29::bincode::Decode::decode(decoder)?;
         Ok(())
     }
 }

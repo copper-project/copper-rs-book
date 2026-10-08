@@ -32,16 +32,18 @@ counter/command_in  ──▶  CountCommands  ──▶  counter/status_out
 Create a new file called `src/messages.rs`:
 
 ```rust
-use bincode::{Decode, Encode};
+use cu29::bincode::{Decode, Encode};
 use cu29::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, Encode, Decode, Reflect)]
+#[bincode(crate = "cu29::bincode")]
 pub struct CommandPayload {
     pub requested_count: u64,
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, Encode, Decode, Reflect)]
+#[bincode(crate = "cu29::bincode")]
 pub struct StatusPayload {
     pub cycles: u64,
 }
