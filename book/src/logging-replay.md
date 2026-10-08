@@ -477,3 +477,132 @@ to decide what to *exclude* (via `logging: (enabled: false)`) if storage is a co
 This "record everything by default" approach is what makes Copper's deterministic replay
 possible. Since every message and every timestamp is captured automatically, you can always
 go back and reproduce any moment of your robot's execution.
+
+## Keep recordings across restarts and bound disk use
+
+The normal `.with_log_path(...)` setup creates a fresh recording. Use **append**
+when you want another run of the same application in that recording. Use
+**rollover** for a robot that must keep recording within a fixed storage budget,
+retaining recent history as older sections are reclaimed.
+
+This exercise uses the single-crate project from
+[The Remaining Files and Running](./main-rs.md) with Copper 1.3.0-dev. Keep its
+`src/tasks.rs` and task graph, and remove any `rate_target_hz` setting for the
+longer rollover exercise below.
+
+### 1. Create a short recording
+
+In `copperconfig.ron`, add or replace the top-level logging section:
+
+```ron
+logging: (
+    slab_size_mib: 4,
+    section_size_mib: 1,
+    enable_keyframe_logging: false,
+),
+```
+
+This exercise uses tasks with no changing internal state and disables keyframe
+capture to fit the small budget. For a stateful replay application, keep
+keyframes and budget for their stream as well.
+
+Replace `src/main.rs` with this complete entry point:
+
+```rust
+pub mod tasks;
+
+use cu29::prelude::*;
+use std::path::Path;
+use std::sync::{Arc, Mutex};
+
+#[copper_runtime(config = "copperconfig.ron")]
+struct MyProjectApplication {}
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    std::fs::create_dir_all("logs")?;
+    let logger = UnifiedLoggerBuilder::new()
+        .write(true)
+        .create(true)
+        .file_base_name(Path::new("logs/retained.copper"))
+        .preallocated_size(4 * 1024 * 1024)
+        .append(false)
+        .build()?;
+    let UnifiedLogger::Write(logger) = logger else {
+        return Err("Expected a write-capable logger".into());
+    };
+    let app = MyProjectApplication::builder()
+        .with_unified_logger(Arc::new(Mutex::new(logger)))
+        .build()?;
+    let mut running = app.start().expect("start application");
+    for _ in 0..10 {
+        running.run_one_iteration()?;
+    }
+    running.stop().expect("stop application");
+    Ok(())
+}
+```
+
+Run from the project root:
+
+```sh
+cargo run
+```
+
+It records ten cycles and exits normally. Normal teardown closes the streams
+and logger so the next process can append. Keep the entire `retained.copper`
+slab family.
+
+### 2. Append another run
+
+Change `.append(false)` to `.append(true)` in that entry point, then run it again:
+
+```sh
+cargo run
+cargo run --features logreader --bin my-project-logreader -- logs/retained.copper list-runs
+cargo run --features logreader --bin my-project-logreader -- logs/retained.copper --run 1 extract-copperlists
+```
+
+These commands use the `my-project-logreader` binary from the book's first
+project; use your generated binary name if you named it differently. The list
+now contains two runs. Selecting run `1` exports the second set of ten cycles,
+whose CopperList IDs start again for the new construction.
+
+Append requires a cleanly closed log, the same slab allocation size, and matching
+application metadata and configuration. With self-describing logs it also checks
+the complete shared catalog. A crash or metadata mismatch rejects append.
+Use a fresh path when you change the application, mission set, or configuration.
+
+### 3. Bound the recent history
+
+Add `.rollover(8 * 1024 * 1024)` before `.build()` on the logger builder and
+change the loop to `for _ in 0..300_000`. Keep `.append(true)` to continue the
+recording already created. Run a release build to avoid printing every debug
+line while generating enough cycles to fill the budget:
+
+```sh
+cargo run --release
+cargo run --features logreader --bin my-project-logreader -- logs/retained.copper list-runs
+cargo run --features logreader --bin my-project-logreader -- logs/retained.copper fsck
+```
+
+`fsck` shows a retained CopperList ID range ending at `299999`, with the earlier
+IDs missing after rollover. Those reported holes are the intentionally reclaimed
+history. The start time can also be unknown once its lifecycle event is gone.
+
+The capacity is eight MiB across the logical log; slabs are its backing files.
+Rollover reclaims the oldest closed **data sections** as more space is needed.
+Application metadata and any payload catalog remain available. Those static
+sections also consume capacity, so leave room for them and the active streams;
+one MiB sections fit the budget used here.
+
+Run indices follow the first retained section of each run. After rollover,
+list runs again before choosing `--run`: old runs can disappear, and start times
+can become unknown when lifecycle events have rotated out. The reader still
+knows the mission of each surviving data section. Read order follows the log's
+section links, rather than the numerical order of slab filenames.
+
+Retaining the catalog preserves the descriptions of the samples that remain.
+Rollover can discard earlier samples and keyframes, so archive a recording you
+need for full-history analysis or replay before they are reclaimed. If an open
+section prevents reclamation, the logger returns a space error; it does not
+silently overwrite a write in progress.
