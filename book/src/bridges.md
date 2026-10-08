@@ -450,6 +450,105 @@ There are also protocol-specific bridges such as MSP, CRSF, DSHOT, ROS 2, and Ic
 Those are useful references, but they are not the first examples to read: each one adds
 domain-specific protocol details on top of the bridge mechanics.
 
+## Keep sensor data fresh with a Zenoh bridge
+
+A network publisher can send data faster than your robot processes it. If the
+receiver queues every sample, the control loop can keep receiving messages while
+quietly falling seconds behind. For a sensor such as odometry, you usually want
+the newest available reading. For a command stream, you may need every event.
+
+Copper 1.3.0-dev's `cu-zenoh-bridge` makes that choice per receive channel.
+It consumes at most one queued sample per `receive` call. The default is a
+one-entry ring: a new arrival replaces the queued older sample.
+
+### Try two apps on one machine
+
+Start from the root of a copper-rs 1.3.0-dev checkout. Build both demo binaries
+before starting either process:
+
+```sh
+cargo build -p cu-zenoh-bridge-demo --bin zenoh-ping --bin zenoh-pong
+```
+
+In terminal 1, from that root:
+
+```sh
+cargo run -p cu-zenoh-bridge-demo --bin zenoh-pong -- --iterations 100 --instance-id 2
+```
+
+While it is running, use terminal 2 from the same root:
+
+```sh
+cargo run -p cu-zenoh-bridge-demo --bin zenoh-ping -- --iterations 20 --instance-id 1
+```
+
+The apps discover each other as local Zenoh peers. Look for replies tagged
+`pong-bincode`, `pong-json`, and `pong-cbor` in the ping app. Each channel uses
+its configured representation over one bridge session.
+
+### Choose what waits for the next iteration
+
+In `examples/cu_zenoh_bridge_demo/pong_config.ron`, replace the `ping_bin` Rx
+entry inside the bridge's `channels` list with this explicit latest-sample policy:
+
+```ron
+Rx(
+    id: "ping_bin",
+    route: "demo/ping/bin",
+    config: {
+        "wire_format": "bincode",
+        "queue_mode": "ring",
+        "ring_size": 1,
+    },
+),
+```
+
+Rebuild and rerun the two commands. The wiring and payload types stay the same;
+this setting determines which arrival the next receive call reads. In your own
+sensor channel, use the same `config` entries. Setting `ring_size` alone also
+selects a ring of that depth.
+
+To retain every queued event instead, replace that entry with:
+
+```ron
+Rx(
+    id: "ping_bin",
+    route: "demo/ping/bin",
+    config: {
+        "wire_format": "bincode",
+        "queue_mode": "fifo",
+    },
+),
+```
+
+FIFO delivers queued samples in arrival order. Use it for commands or events
+only when the consumer can keep up: its queue can grow without bound if arrivals
+outpace receive calls. A deeper ring keeps a bounded backlog and discards the
+oldest queued sample when full; depth one gives the freshest pending sample.
+
+To see the difference, in `src/bin/pong.rs` within the demo replace both
+`Duration::from_millis(200)` sleeps with `Duration::from_millis(1000)`.
+Repeat the runs first with the ring and then with FIFO. Ping still sends every
+200 ms. With the ring, the replies' sequence numbers skip intermediate arrivals.
+With FIFO, replies progress through the older queued numbers. Exact numbers
+depend on peer discovery and timing; watch the increasing lag from the current
+ping sequence. Restore the sleeps after the exercise.
+
+### Apply it to a robot
+
+Choose a queue policy for each Rx channel according to what the message means:
+
+| Data | Starting choice | Reason |
+|---|---|---|
+| Current pose, temperature, or sensor sample | `ring`, depth `1` | Old samples should not delay the current reading |
+| A short burst whose recent history matters | `ring`, bounded depth | Retain a finite backlog |
+| Commands and events that must each be consumed | `fifo` | Preserve queued events while ensuring the consumer keeps up |
+
+`ring_size` must be positive. Set `queue_mode` on Rx channels; a Tx setting is
+rejected during construction. During replay, Copper injects recorded bridge
+outputs, so the live subscriber's queue policy does not change the recorded
+values.
+
 ## When to make a bridge
 
 Use a bridge when the channels belong to the same external connection or protocol:
