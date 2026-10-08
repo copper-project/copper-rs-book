@@ -167,6 +167,10 @@ Minimal feature forwarding:
 parallel-rt = ["cu29/parallel-rt"]
 ```
 
+The feature enables the executor; select `runtime.planner: (kind: Pipeline, ...)`
+and reserve enough CopperLists as shown in the
+[pipeline setup](./performance-basics.md#select-a-pipeline-plan), then run:
+
 ```bash
 cargo run --features parallel-rt
 ```
