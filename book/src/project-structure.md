@@ -13,7 +13,10 @@ my_project/
     ├── main.rs           # Runtime entry point
     ├── tasks.rs          # Your task implementations
     ├── logreader.rs      # Log export utility
-    └── resim.rs          # Replay / remote-debug entry point
+    ├── resim.rs          # Replay / remote-debug entry point
+    ├── view.rs           # Graph and schedule viewer helper
+    ├── pgs.rs            # Profile-guided scheduling helper
+    └── pgs_candidate.rs  # Candidate runtime for measured scheduling
 ```
 
 ## Which files do I actually work on?
@@ -33,6 +36,8 @@ The rest is scaffolding that you set up once and rarely change:
 | `build.rs` | Sets an env var for Copper's logging macros | Never |
 | `logreader.rs` | CLI tool to decode and export Copper's binary logs | Rarely |
 | `resim.rs` | Replay target for deterministic re-simulation and remote debug | Rarely |
+| `view.rs` | Launches the matching graph and schedule viewers | Rarely |
+| `pgs.rs`, `pgs_candidate.rs` | Compare scheduling candidates from recorded timings | When tuning schedules |
 | `justfile` | Shortcuts for common commands like `just log` and `just graph` | Occasionally |
 | `Cargo.toml` | Dependencies | When adding new hardware driver crates |
 
