@@ -68,7 +68,10 @@ Each entry in the `tasks` array declares one task:
 - **`id`** -- A unique name for this task instance. Used to reference it in connections.
 - **`type`** -- The fully qualified path to the Rust struct (relative to your crate root).
 - **`kind`** -- Declares whether the Rust type implements `CuSrcTask`, `CuTask`, or
-  `CuSinkTask`. Use `source`, `task`, or `sink`. Copper can still infer this for legacy
+  `CuSinkTask`. Use `source`, `task`, or `sink`. For a transform implementing
+  `CuStatelessTask`, use `kind: stateless_task`; see the
+  [working transform example](./advanced-tasks.md#a-transform-that-can-process-independent-cycles).
+  Copper can still infer the ordinary roles for legacy
   configs when the graph shape is unambiguous, but explicit `kind` is the preferred form.
 
 ### Optional task fields
