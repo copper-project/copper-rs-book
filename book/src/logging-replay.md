@@ -205,9 +205,9 @@ cargo run --features logreader --bin my-project-logreader -- \
 
 Serialized CopperLists contain the cycle `id` and `msgs`. Lifecycle state is
 runtime bookkeeping and is omitted from binary logs, JSON, Python exports, and
-remote-debug snapshots. Use the logreader built for the exact application version
-that produced the recording; the file encapsulation version does not describe
-application-content compatibility.
+remote-debug snapshots. Decode messages with the producing application's typed
+logreader or its embedded catalog; the file encapsulation version describes the
+file and section layout.
 
 The output is JSON by default. Here's what the first CopperList looks like:
 
