@@ -205,9 +205,9 @@ cargo run --features logreader --bin my-project-logreader -- \
 
 Serialized CopperLists contain the cycle `id` and `msgs`. Lifecycle state is
 runtime bookkeeping and is omitted from binary logs, JSON, Python exports, and
-remote-debug snapshots. Use the logreader built for the exact application version
-that produced the recording; the file encapsulation version does not describe
-application-content compatibility.
+remote-debug snapshots. Decode messages with the producing application's typed
+logreader or its embedded catalog; the file encapsulation version describes the
+file and section layout.
 
 The output is JSON by default. Here's what the first CopperList looks like:
 
@@ -606,3 +606,27 @@ Rollover can discard earlier samples and keyframes, so archive a recording you
 need for full-history analysis or replay before they are reclaimed. If an open
 section prevents reclamation, the logger returns a space error; it does not
 silently overwrite a write in progress.
+
+## Self-describing LogStream archives
+
+Generated LogStream twins seal application metadata before opening their archive's
+data streams. Enabling `cu29/self-describing-logs` also writes the shared decode
+catalog from the twin's compiled missions and payload recipes. Building sender and
+twin from the same application definitions and encoding features produces identical
+catalogs, so the standalone log extractor can decode received captures. The archive
+leaves its effective configuration string empty while config capture is deferred.
+With LogStream enabled, the shared catalog includes streamed payload recipes even
+when onboard task logging is disabled.
+
+To keep a ground station's archive bounded, set `.with_log_rollover(bytes)` on the
+twin builder. The unified logger overwrites the oldest data sections while keeping
+static metadata and the decode catalog. Capacity must exceed 64 KiB, be a multiple
+of 512 bytes, and fit static metadata plus one archive section. For example,
+`.with_log_rollover(256 * 1024 * 1024)` bounds the archive slabs to 256 MiB.
+
+Each sender session belongs to one application construction. The repeated manifest
+carries the onboard section context: run ID, instance ID and mission index. Every
+receiver archive section preserves that context across rollover, including after
+a late join. Select the twin generated for the sender's active mission. A new
+construction requires a new session and archive. Lifecycle transitions and failures
+remain runtime events in the onboard log.
