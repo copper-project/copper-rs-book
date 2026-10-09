@@ -606,3 +606,49 @@ Rollover can discard earlier samples and keyframes, so archive a recording you
 need for full-history analysis or replay before they are reclaimed. If an open
 section prevents reclamation, the logger returns a space error; it does not
 silently overwrite a write in progress.
+
+## Configuring a live twin's storage and receive limits
+
+For camera-heavy graphs, size the ground station's receiver for the complete
+serialized capture and the history you need to retain. This experimental builder
+API requires Copper `1.3.0-dev` with `cu29/logstream` enabled. In your ground
+station's existing `Ground::twin(rx)` setup, use these chained options before
+starting the workers:
+
+```rust,ignore
+use cu29::logstream::{FiniteObjectLimits, SessionRouterLimits};
+
+let limits = SessionRouterLimits {
+    max_record_bytes: 192 * 1024 * 1024,
+    finite_objects: FiniteObjectLimits::new(192 * 1024 * 1024, 1128, 2),
+    ..Default::default()
+};
+let (mut twin, mut frames) = Ground::twin(rx)
+    .with_log_path("logs/cameras.copper")
+    .with_slab_size(512 * 1024 * 1024)
+    .with_section_size(256 * 1024 * 1024)
+    .with_receiver_limits(limits)
+    .with_replay_capacity(2.try_into()?)
+    .with_frame_capacity(2.try_into()?)
+    .with_log_capacity(64.try_into()?)
+    .spawn()?;
+```
+
+A record bound covers the entire serialized CopperList, including all captured
+camera outputs and metadata. The example allows six raw 3840 × 2160 RGB8 frames
+plus metadata in one record. Match the sender's streaming record, memory and
+bandwidth budgets to the workload. Finite-object bounds cover manifests,
+keyframes and structured entries.
+
+A section must fit the larger record/object bound plus its 512-byte header and
+32 bytes of continuity envelope allowance. Sections must fit in a slab, and both
+sizes must be multiples of 512 bytes. The archive grows by adding slabs of the
+configured size. `spawn()` validates local settings before creating directories
+or starting workers; sender record requirements are checked on manifest arrival.
+
+Defaults are 16 MiB slabs, 128 KiB sections, 4 KiB records, 64 KiB finite objects,
+32 queued replay captures, and 64 retained frames and structured entries. The
+receiver supports the 1200-byte-MTU, 64-symbol FEC profile and one sender session.
+`SessionRouterLimits` also controls routing retention and finite-object concurrency.
+Choose retention counts together with byte limits because each queued capture or
+recovery object contributes to the receiver's memory use.
