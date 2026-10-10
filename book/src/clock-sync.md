@@ -37,6 +37,19 @@ Optional runtime fields are `acquisition_timeout_ns` (10000000000),
 before the maximum age. Raw time drives cadence and deadlines independently of
 corrections.
 
+Each `RobotClock` owns its hardware-counter calibration, including when
+`clock-sync` is disabled. `clock.raw_now()` reads undisciplined local counter
+time in nanoseconds. Clones share its origin and calibration; independently
+constructed clocks have separate raw origins. Use `ctx.now()` for message
+timestamps and raw time for reference capture and elapsed-time measurements.
+
+The instance-free `CuInstant`/`Instant` API is replaced by an explicit clock
+handle. Use `clock.raw_now()` for counter reads, `clock.busy_wait_for(duration)`
+for a raw elapsed-time wait, and `clock.busy_wait_until(raw_deadline)` for a
+deadline from that clock or one of its clones. Raw reads and waits are available
+with or without synchronization. Mock clocks require their control handle to
+advance time while waiting.
+
 For a local experiment without a PHC, `LinuxSystemPtpBundle` reads the system UTC
 clock associated with software-timestamped ptp4l. It requires the known TAI−UTC
 offset. A board bundle can export `BoardPtp<HZ>` with BSP hooks for its existing
@@ -46,7 +59,7 @@ in the BSP; keep Cortex-M counter reads in the foreground.
 Unified logs record each published correction in the RuntimeLifecycle stream.
 Enable `clock-sync` in recorded replay applications and matching logreaders.
 Replay restores curves and quality without starting reference I/O. Unconfigured
-clocks keep their local epoch and existing APIs.
+clocks keep their local epoch and constructor APIs.
 
 Follow the [runnable Linux example](https://github.com/copper-project/copper-rs/tree/master/examples/cu_clock_sync)
 for mock, software-grandmaster and hardware-grandmaster setup. The component's
