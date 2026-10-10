@@ -38,17 +38,25 @@ before the maximum age. Raw time drives cadence and deadlines independently of
 corrections.
 
 Each `RobotClock` owns its hardware-counter calibration, including when
-`clock-sync` is disabled. `clock.raw_now()` reads undisciplined local counter
-time in nanoseconds. Clones share its origin and calibration; independently
+`clock-sync` is disabled. `clock.raw_now()` returns a `CuInstant` on the
+undisciplined local timeline, while `clock.now()` and `clock.recent()` return
+execution timestamps as `CuTime`. Both use nanoseconds; intervals use
+`CuDuration`. These distinct types prevent raw readings from being used as
+message timestamps or execution timestamps from being used as raw deadlines. Clones share its origin and calibration; independently
 constructed clocks have separate raw origins. Use `ctx.now()` for message
 timestamps and raw time for reference capture and elapsed-time measurements.
 
-The instance-free `CuInstant`/`Instant` API is replaced by an explicit clock
-handle. Use `clock.raw_now()` for counter reads, `clock.busy_wait_for(duration)`
+`CuInstant` readings use an explicit clock handle. Use `clock.raw_now()` for counter reads, `clock.busy_wait_for(duration)`
 for a raw elapsed-time wait, and `clock.busy_wait_until(raw_deadline)` for a
 deadline from that clock or one of its clones. Raw reads and waits are available
 with or without synchronization. Mock clocks require their control handle to
-advance time while waiting.
+advance time while waiting. For typed readings from the control handle, use
+`control.raw_now()`. Its existing `now()` accessor retains the legacy view of
+the raw counter as `CuTime`; execution time comes from the associated clock.
+
+For a captured raw reading, `CuInstant::from_nanos(nanos)` reconstructs an
+instant using the capturing clock's origin. `ClockSnapshot::at(instant)` maps
+it to execution `CuTime` through the recorded epoch and rate.
 
 For a local experiment without a PHC, `LinuxSystemPtpBundle` reads the system UTC
 clock associated with software-timestamped ptp4l. It requires the known TAI−UTC
