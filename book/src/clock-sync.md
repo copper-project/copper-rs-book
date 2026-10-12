@@ -1,7 +1,9 @@
 # Shared reference time
 
-Copper's experimental `clock-sync` feature makes `ctx.now()` use a shared
-reference epoch. PTP references expose nanoseconds on the TAI timeline. Enable
+In Copper `1.3.0-dev`, the `clock-sync` feature makes `ctx.now()` use a shared
+reference epoch. The provider chooses that epoch: Linux PTP adapters expose TAI,
+while board and GNSS providers can supply bare GPS or application-defined
+nanoseconds without conversion. Enable
 `clock-sync` on `cu29`, enable `linux-phc` on `cu-ptp`, then select an owned resource:
 
 ```ron
@@ -10,7 +12,7 @@ resources: [(
     provider: "cu_ptp::LinuxPtpBundle",
     config: {
         "device": "/dev/ptp0",
-        "management": "/var/run/ptp4lro",
+        "management": "/var/run/ptp4l",
         "reference_error_ns": 10000,
     },
 )],
@@ -66,8 +68,30 @@ in the BSP; keep Cortex-M counter reads in the foreground.
 
 Unified logs record each published correction in the RuntimeLifecycle stream.
 Enable `clock-sync` in recorded replay applications and matching logreaders.
-Replay restores curves and quality without starting reference I/O. Unconfigured
+Replay restores curves, quality, source and epoch without starting reference I/O. Unconfigured
 clocks keep their local epoch and constructor APIs.
+
+`ctx.clock.origin()` identifies both the advertised upstream source and the epoch
+of `ctx.now()`. For example, a GNSS receiver distributed through PTP can report
+`ClockSource::Gnss` with `ClockEpoch::Tai`; a provider supplying bare GPS time
+reports `ClockSource::Gnss` with `ClockEpoch::Gps`. Source describes provenance,
+while epoch identifies what timestamp zero means. Unknown provenance stays unknown.
+The accessor performs no counter read, allocation, reference I/O or conversion.
+
+Board providers return source and epoch through `BoardPtpHooks::origin`, matching
+the nanoseconds returned by `read`. Reference observations carry this metadata with
+the captured time. For initialization without live synchronization,
+`RobotClock::from_ref_time_with_origin(ns, origin)` selects a named epoch; use
+`from_ref_time_with_rtc_and_origin` when supplying RTC calibration functions.
+An already synchronized clock keeps its epoch during resynchronization; selecting
+a different epoch requires a new clock.
+
+ConsoleMon's CLK panel shows numeric robot time, source and epoch. For TAI with
+a valid provider-supplied `tai_minus_utc_seconds`, it also shows the local timezone
+as an ISO 8601 date to whole seconds, including the timezone offset. The monitor
+performs this conversion only while drawing CLK. If the TAI minus UTC offset is
+unknown, local time is unavailable. GPS and application-defined values stay numeric;
+calendar conversion belongs to application display/debug code.
 
 Follow the [runnable Linux example](https://github.com/copper-project/copper-rs/tree/master/examples/cu_clock_sync)
 for mock, software-grandmaster and hardware-grandmaster setup. The component's
