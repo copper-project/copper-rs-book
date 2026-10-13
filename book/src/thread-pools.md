@@ -280,8 +280,8 @@ Why:
 | `policy` | OS scheduling policy/priority | `Fair` |
 | `on_error` | Behavior when affinity/policy cannot be applied | `Warn` |
 
-For a working example and regression coverage, see
+For complete working examples, see
 [`examples/cu_background_task`](https://github.com/copper-project/copper-rs/tree/master/examples/cu_background_task)
 (both `background` forms) and
-[`tests/cu_runtime_regression`](https://github.com/copper-project/copper-rs/tree/master/tests/cu_runtime_regression)
+[`examples/cu_runtime_matrix`](https://github.com/copper-project/copper-rs/tree/master/examples/cu_runtime_matrix)
 (`rt` and `background` pools).
