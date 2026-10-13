@@ -72,8 +72,8 @@ release ships. Update the single edition/release notice in
 `book/src/introduction.md` instead. Keep experimental status, required Cargo
 features, tools, and checkout directories in the tutorial's prerequisites.
 
-Check the [feature/version mapping](./feature-versions.md) before adding or changing
-a marker. Match the wiki release notes to the feature, then verify the actual
+Before adding or changing a marker, match the feature to the
+[wiki release notes](https://github.com/copper-project/copper-rs/wiki/Copper-Release-Notes), then verify the actual
 API in the corresponding copper-rs tag. A newer recipe or method can need a newer
 marker than the underlying feature. For unreleased features, compare the checkout
 against the latest release; do not guess from the version previously named in prose.
