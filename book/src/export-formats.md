@@ -9,45 +9,66 @@ formats -- CSV for spreadsheets and data science tools, MCAP for visualization i
 The log reader CLI you already have supports all of these. In this chapter, we'll explore
 every export format and diagnostic tool available in `cu29-export`.
 
-## A quick refresher
+## Choose a reader
 
-Recall from [Logging and Replaying Data](./logging-replay.md) that your project ships with a log reader binary at
-`src/logreader.rs`:
+For the wheel recording from the previous chapter, use the standalone
+`just logextract` reader or the example's `just` recipes. For your first
+project's log, use the matching `src/logreader.rs` binary from
+[Logging and Replaying Data](./logging-replay.md#step-2-the-log-reader).
+The following sections state the starting directory for each command.
 
-```rust
-pub mod tasks;
+## Inspecting a self-describing recording
 
-use cu29::prelude::*;
-use cu29_export::run_cli;
+Continue from the ten-cycle wheel recording in
+[Self-Describing Logs](./self-describing-logs.md#1-try-a-complete-recording).
+That chapter covers recording, payload descriptions, storage units, and your
+first JSONL export. Here we use the existing log to export the catalog and
+inspect storage costs.
 
-gen_cumsgs!("copperconfig.ron");
+### Export the catalog
 
-#[cfg(feature = "logreader")]
-fn main() {
-    run_cli::<CuStampedDataSet>().expect("Failed to run the export CLI");
-}
+From the copper-rs repository root, enter the example directory you used earlier:
+
+```sh
+cd examples/cu_self_describing_logs
+just catalog --export-format ron > catalog.ron
+just catalog --export-format json > catalog.json
 ```
 
-This program uses the `gen_cumsgs!` macro to generate a `CuStampedDataSet` type that knows
-how to decode your project's specific messages. Every subcommand we'll use in this chapter
-goes through this same binary -- you just pass different arguments.
+These files include the complete field descriptions, mission output-slot maps,
+and recorded configuration. Use them when another tool needs the descriptions.
 
-Make sure you have a `.copper` log file from a previous run (see [Logging and Replaying Data](./logging-replay.md) if you need to
-generate one):
+For your own log, run `just logextract <base-path> catalog --export-format json`
+from the repository root, substituting its base path. For multiple runs, see
+[Selecting a recorded run](#selecting-a-recorded-run).
 
-```bash
-ls -lh logs/
+### Interpret missing payloads
+
+When inspecting JSONL exports, use capture status to distinguish an absent
+payload from one excluded by logging. Compact recordings preserve that
+information; flat recordings can lose the original presence information when
+capture is suppressed. Each exported cycle retains its slot identity,
+payload, time of validity, and metadata.
+
+### Use an existing application logreader
+
+App logreaders use their native typed decoder by default. If the logreader's
+`cu29-export` dependency enables `self-describing-logs`, run this from the
+application directory to select the catalog:
+
+```sh
+logreader logs/robot.copper extract-copperlists --decoder catalog
 ```
 
-```text
--rw-r--r-- 1 user user 4.0K  logs/my-project.copper
-```
+Structured text still requires the producing build's string index. For direct
+Python access to the catalog and decoded dictionaries, follow
+[Catalog-Based Offline Analysis](./python.md#catalog-based-offline-analysis).
 
 ## Selecting a recorded run
 
 A unified log can contain several runs, for example when you append a restart or
 construct another mission. Each run has its own CopperList sequence and clock.
-Use the application's logreader to find the run you want:
+Use the application's built logreader to find the run you want:
 
 ```sh
 logreader logs/robot.copper list-runs
@@ -55,8 +76,11 @@ logreader logs/robot.copper --run 1 fsck --dump-runtime-lifecycle
 logreader logs/robot.copper --run 1 extract-copperlists
 ```
 
-Here `logreader` means your application's built logreader executable. The indices
-are zero-based and follow the first retained section of each run. They differ
+Run these commands from the application directory. Here `logreader` means its
+built logreader executable. With the standalone reader, use
+`just logextract <base-path> list-runs` from the copper-rs repository root, then
+put `--run N` before the subcommand. Indices are zero-based and follow the
+first retained section of each run. They differ
 from `instance_id`, which can repeat across process restarts. `list-runs` shows
 the mission, application, start time when available, and whether shutdown
 completed. After rollover removes startup events, the retained sections still
@@ -75,104 +99,18 @@ The selected run supplies the recorded configuration and mission. Statistics
 use those by default; `--config` and `--mission` override them. Use an
 application logreader and string index from the producing build.
 
-## Inspecting a self-describing recording
-
-A log recorded with `cu29/self-describing-logs` includes the payload descriptions
-needed by a standalone reader. Use this when you want to analyse a recording
-without compiling the application's Rust types. The feature is experimental in
-1.3.0-dev.
-
-For a complete exercise, start at the root of a copper-rs 1.3.0-dev checkout:
-
-```sh
-cd examples/cu_self_describing_logs
-just
-just catalog --export-format json > catalog.json
-just extract --export-format jsonl > samples.jsonl
-just extract --export-format csv > samples.csv
-just fsck
-```
-
-The first command records ten wheel-sensor cycles and inspects the log. The
-exports contain those ten cycles, and deep validation checks twenty captured
-payloads: a source sample and a filtered sample per cycle.
-
-### Inspect fields and units
-
-To inspect any self-describing recording from the repository root, replace the
-path below with its base path:
-
-```sh
-just logextract logs/robot.copper catalog
-just logextract logs/robot.copper catalog --export-format ron > catalog.ron
-just logextract logs/robot.copper catalog --export-format json > catalog.json
-```
-
-The terminal view shows output slots, field types, and storage units. For
-example, a wheel's `distance` is stored in metres and `speed` in `m·s⁻¹`.
-The RON and JSON files include the full catalog and recorded configuration;
-use them when another tool needs the descriptions.
-
-`just logextract` builds and runs `cu29-logextract` with the reader feature
-already enabled. Keep the entire slab family. For several runs, first use
-`list-runs`, then put `--run N` before the subcommand.
-
-### Export captured messages
-
-```sh
-just logextract logs/robot.copper extract-copperlists --export-format jsonl > samples.jsonl
-just logextract logs/robot.copper extract-copperlists --export-format csv > samples.csv
-```
-
-JSONL writes one CopperList per line. Each record has `id` and ordered `msgs`,
-including slot identity, payload, time of validity, common metadata, and capture
-status. The default JSON format writes one array. CSV is convenient for
-spreadsheets. Export output contains data only; diagnostics go to stderr.
-
-Use capture status when interpreting a missing payload. With compact recording,
-the reader can distinguish an absent payload from one excluded by logging.
-A flat recording can lose that original presence information when capture is
-suppressed.
-
-### Check integrity and find large payloads
-
-```sh
-just logextract logs/robot.copper fsck --deep
-```
-
-Plain `fsck` checks storage structure and common streams. `--deep` also validates
-the catalog and decodes every captured payload, returning an error with its
-location for invalid or truncated data. It checks keyframe envelopes; replay
-still needs the application's decoder for frozen task state.
-
-The report includes captured-payload counts and bytes. Its table groups payloads
-by task and message type, sorted by total bytes, with each group's share, mean
-size, and size range. Use it to find the outputs consuming most of your storage
-before reducing capture. These sizes count encoded payload bytes, excluding
-CopperList metadata.
-
-The catalog's compressed size includes its catalog headers, continuation
-framing, and integrity footer; the decompressed size is the encoded catalog body. This shows startup description overhead
-separately from the samples accumulated during the run.
-
-### Use an existing application logreader
-
-App logreaders use their native typed decoder by default. If the logreader's
-`cu29-export` dependency enables `self-describing-logs`, select the catalog with:
-
-```sh
-logreader logs/robot.copper extract-copperlists --decoder catalog
-```
-
-Structured text still requires the producing build's string index. For direct
-Python access to the catalog and decoded dictionaries, follow
-[Catalog-Based Offline Analysis](./python.md#catalog-based-offline-analysis).
-
 ## CSV export
 
 We already saw how `extract-copperlists` outputs JSON by default. But if you're working
 with spreadsheets, pandas, or any data analysis tool, CSV is often more convenient.
 
+In the wheel example directory, export the recording you already made:
+
+```sh
+just extract --export-format csv > samples.csv
+```
+
+For your first project's typed logreader, return to that project directory.
 The `--export-format` flag (or `-e` for short) switches the output format:
 
 ```bash
@@ -263,6 +201,32 @@ cargo run --features logreader --bin my-project-logreader -- \
 This prints every section header as it's read, along with the CopperList ID ranges and
 time ranges within each section. It's invaluable for debugging corrupted logs -- you can
 see exactly where the corruption starts.
+
+### Deep validation and payload storage costs
+
+For the wheel recording, return to `examples/cu_self_describing_logs` in the
+copper-rs checkout and run:
+
+```sh
+just fsck
+```
+
+The example's `fsck` recipe enables deep validation. Expect ten decoded
+CopperLists and twenty captured payloads: one source and one filtered sample
+per cycle. Invalid or truncated data returns an error with its location.
+Keyframe envelopes are checked too; replay still needs the application's
+decoder for frozen task state.
+
+The report includes captured-payload counts and bytes. Its table groups payloads
+by task and message type, sorted by total bytes, with each group's share, mean
+size, and size range. Use it to find the outputs consuming most of your storage
+before reducing capture. These sizes count encoded payload bytes, excluding
+CopperList metadata.
+
+The catalog's compressed size includes its catalog headers, continuation
+framing, and integrity footer; the decompressed size is the encoded catalog
+body. This shows startup description overhead separately from the samples
+accumulated during the run.
 
 ## Log statistics
 

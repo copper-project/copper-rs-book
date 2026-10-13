@@ -42,15 +42,6 @@ Codec framing is part of the encoded content, whose layout can change between
 application versions. The unified-log file and section header version describes
 the outer storage layout.
 
-## Reading payloads without an application logreader
-
-If you want to share a recording or analyse it without compiling the application's
-payload types, enable `cu29/self-describing-logs`. Copper saves a catalog of field
-names, encodings, and storage units at startup. The standalone reader uses that
-catalog to export captured messages. The feature is experimental in 1.3.0-dev;
-follow [Self-Describing Logs](./self-describing-logs.md) to record a wheel sensor,
-inspect its units, and enable it in your own application.
-
 ## Step 1: Generate a log file
 
 Make sure your project is in the state from the previous chapters, with the 1 Hz rate
@@ -610,32 +601,10 @@ can become unknown when lifecycle events have rotated out. The reader still
 knows the mission of each surviving data section. Read order follows the log's
 section links, rather than the numerical order of slab filenames.
 
-Retaining the catalog preserves the descriptions of the samples that remain.
 Rollover can discard earlier samples and keyframes, so archive a recording you
 need for full-history analysis or replay before they are reclaimed. If an open
 section prevents reclamation, the logger returns a space error; it does not
 silently overwrite a write in progress.
 
-## Self-describing LogStream archives
-
-Generated LogStream twins seal application metadata before opening their archive's
-data streams. Enabling `cu29/self-describing-logs` also writes the shared decode
-catalog from the twin's compiled missions and payload recipes. Building sender and
-twin from the same application definitions and encoding features produces identical
-catalogs, so the standalone log extractor can decode received captures. The archive
-leaves its effective configuration string empty while config capture is deferred.
-With LogStream enabled, the shared catalog includes streamed payload recipes even
-when onboard task logging is disabled.
-
-To keep a ground station's archive bounded, set `.with_log_rollover(bytes)` on the
-twin builder. The unified logger overwrites the oldest data sections while keeping
-static metadata and the decode catalog. Capacity must exceed 64 KiB, be a multiple
-of 512 bytes, and fit static metadata plus one archive section. For example,
-`.with_log_rollover(256 * 1024 * 1024)` bounds the archive slabs to 256 MiB.
-
-Each sender session belongs to one application construction. The repeated manifest
-carries the onboard section context: run ID, instance ID and mission index. Every
-receiver archive section preserves that context across rollover, including after
-a late join. Select the twin generated for the sender's active mission. A new
-construction requires a new session and archive. Lifecycle transitions and failures
-remain runtime events in the onboard log.
+Continue with [Self-Describing Logs](./self-describing-logs.md) to share these
+recordings with readers who do not have your application's payload types.

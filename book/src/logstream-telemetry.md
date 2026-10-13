@@ -157,7 +157,7 @@ demo's mock clock, impairment wrapper, and fixed iteration loop are test harness
 code and are not needed in your application.
 
 `network.tx` is a resource binding, not a task-graph edge. The
-[graph renderer](./justfile.md#just-dag--render-the-task-graph) shows it in
+[graph renderer](./justfile.md#see-the-graph-and-the-execution-schedule) shows it in
 the resource table as `system: logstream (ground)`.
 
 | Setting | How to choose it |
@@ -455,6 +455,36 @@ stream continuity records. `fsck` reports missing ranges and verified recovery
 boundaries. Replay cannot cross a gap without a matching keyframe; resuming later
 does not fill the gap. A clean receiver shutdown does not establish that an
 unobserved sender tail was complete.
+
+### Share and retain a received archive
+
+To read the archive with the standalone tools from the
+[self-describing log exercise](./self-describing-logs.md#4-read-your-own-recording),
+enable `cu29/self-describing-logs` in the sender and generated twin. Build them
+from the same application definitions and encoding features. The twin writes
+the matching catalog at archive startup, including streamed payload recipes
+when onboard task logging is disabled. Archive configuration capture is currently
+unavailable; supply the application's configuration explicitly for analysis
+that needs it.
+
+For bounded ground-station storage, add this option before `.spawn()` in the
+builder from [Step 3](#3-start-a-ground-side-twin):
+
+```rust,ignore
+.with_log_rollover(256 * 1024 * 1024)
+```
+
+This bounds storage to 256 MiB. Capacity must exceed the configured section
+size, be a multiple of 512 bytes, and fit static metadata plus an archive section. The archive uses the same
+[rollover behavior](./logging-replay.md#keep-recordings-across-restarts-and-bound-disk-use)
+as onboard recording, keeping the catalog while reclaiming old data.
+
+The sender's repeated manifest identifies its run, runtime instance, and mission.
+Received sections retain that identity through rollover and late joins. Use the
+twin generated for the sender's active mission; a new sender construction needs
+a fresh session and archive. Runtime lifecycle events remain in the onboard log.
+
+### Exercise stream recovery
 
 Exercise the failure modes before deploying:
 
