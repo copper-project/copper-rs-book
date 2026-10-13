@@ -33,12 +33,13 @@ Export the captured cycles from the same directory:
 
 ```sh
 just extract --export-format jsonl > samples.jsonl
-just extract --export-format csv > samples.csv
 ```
 
 Each JSONL line is one CopperList, with its `id` and ordered `msgs`. A message
-contains its payload, timestamps, and capture information. Use JSONL to process
-cycles one at a time, or CSV to load the recording into a spreadsheet.
+contains its payload, timestamps, and capture information. Check that
+`samples.jsonl` has ten lines, with source and filtered wheel samples in each
+cycle. [Exporting Data](./export-formats.md) continues with catalog dumps, CSV,
+and payload-size diagnostics using this same recording.
 
 ## 2. Enable it in your application
 
@@ -131,22 +132,13 @@ just logextract logs/app.copper extract-copperlists --export-format jsonl > samp
 just logextract logs/app.copper fsck --deep
 ```
 
-Keep the complete slab family with the recording. `fsck --deep` checks the
-catalog and decodes every captured payload; use it before analysing a log
-copied from a robot. The catalog replaces the payload decoder, while structured
-text reconstruction still uses the producing build's `cu29_log_index`.
+`just logextract` builds the standalone reader with catalog support. Keep the
+complete slab family with the recording. Structured text reconstruction still
+uses the producing build's `cu29_log_index`.
 
-If several runs share the log, list them and select the one you want:
-
-```sh
-just logextract logs/app.copper list-runs
-just logextract logs/app.copper --run 1 extract-copperlists --export-format jsonl
-```
-
-`--run` is a zero-based index from `list-runs`. The reader selects that run's
-mission map from the shared catalog. See [Exporting Data](./export-formats.md)
-for catalog dumps and validation reports, and [Python Support](./python.md)
-for offline analysis.
+For recordings containing several runs and for detailed validation reports,
+continue to [Exporting Data](./export-formats.md). For dictionary-based analysis,
+see [Python Support](./python.md#catalog-based-offline-analysis).
 
 ## Recording on an embedded target
 
@@ -161,11 +153,9 @@ error. Host-side catalog readers enable `cu29/decode-catalog` and use `std` to
 allocate decoded value trees; `cu29-export/self-describing-logs` selects that
 reader feature automatically.
 
-Matching append operations reuse the catalog and application metadata. Rollover
-retains those descriptions while reclaiming old data sections, so the remaining
-samples still have their type and mission information. It can remove older
-samples, keyframes, and lifecycle events; archive a recording before those are
-needed for analysis or replay.
+Append reuses a matching catalog, and rollover retains it so surviving samples
+remain decodable. See [recording retention](./logging-replay.md#keep-recordings-across-restarts-and-bound-disk-use)
+for the storage budget and the history that rollover can reclaim.
 
 The [wheel example](https://github.com/copper-project/copper-rs/tree/master/examples/cu_self_describing_logs)
 provides the complete application. The

@@ -31,6 +31,7 @@
 - [Adding the Console Monitor](./monitoring.md)
 - [Logging and Replaying Data](./logging-replay.md)
 - [Self-Describing Logs](./self-describing-logs.md)
+- [Exporting Data to Other Formats](./export-formats.md)
 - [Streaming Logs and Live Telemetry](./logstream-telemetry.md)
   - [Transport and Receiver Reference](./logstream-reference.md)
 - [Using Missions](./missions.md)
@@ -51,7 +52,6 @@
 - [Advanced Task Features](./advanced-tasks.md)
 - [Writing a Bridge](./bridges.md)
 - [Interfacing a Simulator](./simulators.md)
-- [Exporting Data to Other Formats](./export-formats.md)
 - [Useful Resources](./resources.md)
 - [Python Support](./python.md)
 

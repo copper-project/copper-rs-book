@@ -15,7 +15,8 @@ If you want to analyse a self-describing recording without rebuilding its
 application or registering Rust payload types, use Copper's catalog reader.
 It returns ordinary Python dictionaries for the recorded values.
 
-Start with the wheel log from the [export exercise](./export-formats.md#inspecting-a-self-describing-recording).
+Reuse the wheel recording from
+[Self-Describing Logs](./self-describing-logs.md#1-try-a-complete-recording).
 On Linux, with Rust and Python 3 available, run this complete sequence from the
 copper-rs 1.3.0-dev repository root:
 
@@ -55,29 +56,13 @@ of validity, metadata, and capture status. Integers keep full precision. A
 corrupt record raises `IOError` and stops iteration. These APIs are experimental
 in 1.3.0-dev and run offline.
 
-## Offline Python Analysis
+## Application-Specific Offline Analysis
 
-Copper can expose recorded `.copper` data to Python after the run:
-
-- structured text logs
-- runtime lifecycle records
-- app-specific typed CopperLists
-
-This is the good Python workflow in Copper because it stays off the runtime path.
-The robot runs normally in Rust, Copper records everything, and Python inspects the
-results later.
-
-Typical use cases:
-
-- notebooks
-- one-off analysis scripts
-- extracting selected fields from a log
-- integrating recorded Copper data into an existing Python data science workflow
-
-The `cu_flight_controller` example shows the pattern:
-
-- Rust exposes an app-specific PyO3 module in `src/python_module.rs`
-- Python imports that module and reads typed CopperLists from the unified log
+If you already expose Rust payload types through an application-specific PyO3
+module, you can read typed CopperLists alongside structured logs and runtime
+lifecycle records. The `cu_flight_controller` example shows this approach in
+`src/python_module.rs`. Use it when your analysis needs those Rust types; the
+catalog reader above supplies ordinary dictionaries without that registration.
 
 ## Runtime Python Tasks
 
