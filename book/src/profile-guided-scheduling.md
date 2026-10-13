@@ -235,23 +235,3 @@ Contract and comparison failures usually indicate a mismatch:
 | Profiles were recorded on different graphs or missions | Rebuild and record baseline and candidates from the same topology, component config, resource bindings, and mission |
 | No valid plan on the requested CPUs | Revisit the CPU set, deadlines, headroom, and in-flight capacity; do not weaken requirements merely to produce a file |
 | Candidate fails to apply its scheduling policy | Use `Fair` while validating the workflow, or configure the required affinity and Linux real-time privileges described in [Thread Pools](./thread-pools.md) |
-
-## Supporting example: Mandelbrot
-
-`examples/cu_parallel_mandelbrot` in the copper-rs repository is a controlled PGS fixture.
-It is deterministic and compute-bound, which makes the full workflow and model errors easy
-to reproduce. It is not a representative robotics workload.
-
-From that example directory, the one-line Just aliases run the same method:
-
-```bash
-just pgs-baseline
-just pgs-optimize
-just pgs-candidate
-just pgs-measure
-```
-
-In one recorded development run, the baseline measured 41.66 ms p99. PGS predicted 43.71 ms
-for `plan-1`, but the candidate measured 119.49 ms p99 on the same 250 ms chain. The measured
-ranking correctly kept the baseline. Those numbers are machine-specific; the useful result
-is the method catching a prediction error before deployment.
