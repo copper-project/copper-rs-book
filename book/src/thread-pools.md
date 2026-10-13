@@ -144,8 +144,8 @@ collecting completed results. If a task must run on empty ticks, set
 ),
 ```
 
-This option applies to regular background tasks. Background sources have no
-inputs to skip; anytime tasks use their own scheduling contract.
+This option applies to regular background tasks, including background anytime
+tasks wrapped as regular tasks. Background sources have no inputs to skip.
 
 A task can also opt into a **different** pool with the object form of `background`:
 
