@@ -29,6 +29,7 @@
 - [Controlling the Loop Frequency](./frequency.md)
 - [Adding the Console Monitor](./monitoring.md)
 - [Logging and Replaying Data](./logging-replay.md)
+- [Self-Describing Logs](./self-describing-logs.md)
 - [Streaming Logs and Live Telemetry](./logstream-telemetry.md)
   - [Transport and Receiver Reference](./logstream-reference.md)
 - [Using Missions](./missions.md)
