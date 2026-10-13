@@ -1,6 +1,41 @@
 # Shared reference time
 
-In Copper `1.3.0-dev`, the `clock-sync` feature makes `ctx.now()` use a shared
+Two robots exchanging timestamped measurements need timestamps with the same
+meaning. A shared reference clock gives `ctx.now()` a named epoch and lets the
+runtime stop consuming measurements when its synchronization uncertainty exceeds
+your chosen limit. Task code still uses ordinary Copper timestamps.
+
+## See synchronization in the monitor
+
+Use the experimental Copper 1.3.0-dev feature from a copper-rs checkout. The
+Linux demo needs Rust, `just`, `ptp4l`, `phc2sys`, `pmc`, `ethtool`, and `ip`, plus
+an active Ethernet interface exposing `/dev/ptp0` and read access to that device.
+Use a test network: the demo advertises a local PTP master on that interface.
+From the repository root, in an interactive terminal, run:
+
+```sh
+cd examples/cu_clock_sync
+just
+```
+
+The recipe asks for sudo to start the PTP services it needs, then opens
+ConsoleMon's **CLK** panel. It cleans up the services it started when you exit;
+existing services are reused. If services are already configured with suitable
+permissions, `just run` starts only the Copper application.
+
+Look for **Clock / reference**, a shared epoch, **Offset from reference**, and
+**Estimated uncertainty**. The demo's 20 ms uncertainty limit decides when the
+clock becomes unusable; it is not an accuracy target. A local reference sourced
+from the host's own clock demonstrates synchronization without establishing
+absolute accuracy. Local calendar time appears only when the provider supplies
+a valid TAI minus UTC offset.
+
+For another PHC device or software timestamping, follow the example's
+[Linux setup guide](https://github.com/copper-project/copper-rs/blob/master/examples/cu_clock_sync/docs/linux-setup.md).
+
+## Configure your application's reference
+
+The `clock-sync` feature makes `ctx.now()` use a shared
 reference epoch. The provider chooses that epoch: Linux PTP adapters expose TAI,
 while board and GNSS providers can supply bare GPS or application-defined
 nanoseconds without conversion. Enable
@@ -30,8 +65,8 @@ checks clock health before each iteration. Clock clones share the same monotonic
 curve. `ctx.clock.sync_status()` reports domain/session, sample age, phase,
 drift and estimated error. Reference loss enters bounded holdover. Exceeding the
 error budget or age limit fails the iteration before consumers execute;
-restarting acquires the reference again. Pipeline scheduling is rejected in v0
-until a correction barrier can coordinate in-flight CopperLists.
+restarting acquires the reference again. This experimental API supports the Serial plan. Pipeline scheduling is rejected
+because correction changes must be coordinated across in-flight CopperLists.
 
 Optional runtime fields are `acquisition_timeout_ns` (10000000000),
 `sample_interval_ns` (1000000000), `max_age_ns` (5000000000),
@@ -94,6 +129,6 @@ unknown, local time is unavailable. GPS and application-defined values stay nume
 calendar conversion belongs to application display/debug code.
 
 Follow the [runnable Linux example](https://github.com/copper-project/copper-rs/tree/master/examples/cu_clock_sync)
-for mock, software-grandmaster and hardware-grandmaster setup. The component's
+for software-grandmaster and hardware-grandmaster setup. The component's
 [reference guide](https://github.com/copper-project/copper-rs/tree/master/components/res/cu_ptp)
 describes Linux resource parameters and the board contract.
