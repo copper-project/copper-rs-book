@@ -32,8 +32,7 @@ parameters, and merges the resulting tasks and connections into the main configu
 
 ## Selecting graph fragments with Cargo features
 
-<span class="version-marker" data-version="1.1">v1.1+</span>
-
+<span class="version-marker" data-version="1.1">v1.1</span>
 Use `when` on an include when a Cargo feature also enables an optional component crate:
 
 ```ron

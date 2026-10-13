@@ -1,7 +1,6 @@
 # LogStream Transport and Receiver Reference
 
-<span class="version-marker" data-version="1.2">v1.2+</span>
-
+<span class="version-marker" data-version="1.2">v1.2</span>
 Start with [Streaming Logs and Live Telemetry](./logstream-telemetry.md) for the
 UDP walkthrough. This reference covers custom carriers, receiver ownership, and
 format details needed when sizing or extending an integration.

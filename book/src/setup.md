@@ -21,8 +21,7 @@ rustc --version
 
 ## Install cargo-cunew
 
-<span class="version-marker" data-version="1.0">v1.0+</span>
-
+<span class="version-marker" data-version="1.0">v1.0</span>
 `cargo-cunew` scaffolds a new Copper project from the official Copper templates:
 
 ```bash

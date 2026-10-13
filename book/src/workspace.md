@@ -11,8 +11,7 @@ generate one and understand its layout.
 
 ## Generating a workspace
 
-<span class="version-marker" data-version="1.0">v1.0+</span>
-
+<span class="version-marker" data-version="1.0">v1.0</span>
 Use `cargo-cunew` with the workspace template:
 
 ```bash

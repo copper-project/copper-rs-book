@@ -1,7 +1,6 @@
 # Self-Describing Logs
 
-<span class="version-marker" data-version="1.3">v1.3+</span>
-
+<span class="version-marker" data-version="1.3">v1.3</span>
 Suppose you receive a robot's `.copper` recording and want to plot wheel speed.
 With an application-specific logreader, you need the Rust payload types used by
 that application. A self-describing log carries a **catalog** that tells an

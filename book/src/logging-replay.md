@@ -26,28 +26,13 @@ does this automatically as part of its execution loop -- no extra code needed.
 
 ## Typed logging codecs
 
-<span class="version-marker" data-version="1.0">v1.0+</span>
-
+<span class="version-marker" data-version="1.0">v1.0</span>
 A task's `logging.codec` or `logging.codecs` setting selects a typed codec for its
 recorded payloads, such as lossless PNG or FFV1 image compression. This lets the
 encoding follow the payload's structure while keeping codec selection in RON.
 
-### Codec frames
-
-<span class="version-marker" data-version="1.3">v1.3+</span>
-
-Copper places each present codec payload inside a frame with a
-fixed four-byte little-endian encoded length. The codec writes directly into log
-storage; Copper fills in the reserved length after encoding. This framing adds no
-payload buffer or additional encoding pass.
-
-On replay or export, Copper limits the codec reader to that frame. The codec must
-consume its complete payload, so read-ahead cannot reach the next message or its
-metadata. Custom destination writers must implement bincode's `position` and
-`overwrite` operations; Copper's memory-mapped log writer supports both.
-
 Keep the logreader built for the application version that produced a recording.
-Codec framing is part of the encoded content, whose layout can change between
+The codec's representation is part of the encoded content, whose layout can change between
 application versions. The unified-log file and section header version describes
 the outer storage layout.
 
@@ -296,8 +281,7 @@ structured logs from the same session.
 
 ### Replay CLI and structured log queries
 
-<span class="version-marker" data-version="1.0">v1.0+</span>
-
+<span class="version-marker" data-version="1.0">v1.0</span>
 Replay targets use three standard arguments:
 
 ```text
@@ -335,8 +319,7 @@ Application replay binaries normally use `cu29::replay::ReplayCli`, or flatten
 
 ### Session leases and deferred payloads
 
-<span class="version-marker" data-version="1.1">v1.1+</span>
-
+<span class="version-marker" data-version="1.1">v1.1</span>
 Each replay server grants one active debug-session lease. While the debugger is otherwise
 idle, it sends `health.ping` with the active `session_id` every second. Any session-scoped
 request also renews the lease. After 3 seconds without session activity, the server
@@ -359,8 +342,7 @@ queries describe enums, maps, and fixed-capacity `CuArrayVec` values, and
 
 ### Linux shared-memory setup
 
-<span class="version-marker" data-version="1.1">v1.1+</span>
-
+<span class="version-marker" data-version="1.1">v1.1</span>
 On Linux, the default local remote-debug transport uses a 1 GiB Zenoh shared-memory pool
 and requires replies of 256 KiB or larger to use SHM. Both the Copper process and the
 debugger need sufficient `RLIMIT_MEMLOCK`, and `/dev/shm` must have room for the pool.
@@ -438,8 +420,7 @@ logging: (
 
 ### Task-state keyframes
 
-<span class="version-marker" data-version="1.2">v1.2+</span>
-
+<span class="version-marker" data-version="1.2">v1.2</span>
 Task-state keyframes can be disabled independently of CopperList and structured logging:
 
 ```ron
@@ -455,8 +436,7 @@ snapshots to restore.
 
 ## Streaming to a ground station
 
-<span class="version-marker" data-version="1.2">v1.2+</span>
-
+<span class="version-marker" data-version="1.2">v1.2</span>
 To collect a native archive on another machine while the robot runs, continue to
 [Streaming Logs and Live Telemetry](./logstream-telemetry.md). The guide covers
 UDP setup, structured robot logs, live task reconstruction, optional receiver
@@ -505,13 +485,12 @@ go back and reproduce any moment of your robot's execution.
 
 ## Keep recordings across restarts and bound disk use
 
-<span class="version-marker" data-version="1.3">v1.3+</span>
-
 The normal `.with_log_path(...)` setup creates a fresh recording.
 
-<span class="version-marker" data-version="1.2">v1.2+</span> Use **append**
+<span class="version-marker" data-version="1.2">v1.2</span> Use **append**
 when you want another run of the same application in that recording.
 
+<span class="version-marker" data-version="1.3">v1.3</span>
 Use **rollover** for a robot that must keep recording within a fixed storage budget,
 retaining recent history as older sections are reclaimed.
 
@@ -584,10 +563,17 @@ slab family.
 
 ### 2. Append another run
 
+<span class="version-marker" data-version="1.2">v1.2</span>
 Change `.append(false)` to `.append(true)` in that entry point, then run it again:
 
 ```sh
 cargo run
+```
+
+<span class="version-marker" data-version="1.3">v1.3</span>
+Use the logreader's run-selection commands to inspect the appended recording:
+
+```sh
 cargo run --features logreader --bin my-project-logreader -- logs/retained.copper list-runs
 cargo run --features logreader --bin my-project-logreader -- logs/retained.copper --run 1 extract-copperlists
 ```
@@ -604,6 +590,7 @@ Use a fresh path when you change the application, mission set, or configuration.
 
 ### 3. Bound the recent history
 
+<span class="version-marker" data-version="1.3">v1.3</span>
 Add `.rollover(8 * 1024 * 1024)` before `.build()` on the logger builder and
 change the loop to `for _ in 0..300_000`. Keep `.append(true)` to continue the
 recording already created. Run a release build to avoid printing every debug

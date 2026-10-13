@@ -11,8 +11,7 @@ If you only remember one thing from this chapter, remember this:
 
 ## Catalog-Based Offline Analysis
 
-<span class="version-marker" data-version="1.3">v1.3+</span>
-
+<span class="version-marker" data-version="1.3">v1.3</span>
 If you want to analyse a self-describing recording without rebuilding its
 application or registering Rust payload types, use Copper's catalog reader.
 It returns ordinary Python dictionaries for the recorded values.

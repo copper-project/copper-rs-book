@@ -110,8 +110,7 @@ async-cl-io = ["cu29/async-cl-io"]
 cargo run --features async-cl-io
 ```
 
-<span class="version-marker" data-version="1.1" title="Minimum patch on the 1.1 release line">v1.1.4+</span>
-<span class="version-marker" data-version="1.2" title="Minimum patch on the 1.2 release line; also available in newer releases">v1.2.2+</span>
+<span class="version-markers"><span class="version-marker" data-version="1.1" title="Minimum patch on the 1.1 release line">v1.1.4</span> <span class="version-marker" data-version="1.2" title="Minimum patch on the 1.2 release line; also available in newer releases">v1.2.2</span></span>
 Regular background tasks skip empty inputs by default:
 
 ```ron
@@ -154,8 +153,7 @@ Two checks after enabling it:
 
 ## Enable `parallel-rt`
 
-<span class="version-marker" data-version="1.3">v1.3+</span>
-
+<span class="version-marker" data-version="1.3">v1.3</span>
 Use this when you have **several CPU-bound stages back to back** and want higher global
 throughput.
 
@@ -349,7 +347,7 @@ logging: (
 ),
 ```
 
-<span class="version-marker" data-version="1.2">v1.2+</span>
+<span class="version-marker" data-version="1.2">v1.2</span>
 If CopperLists are still needed but task-state snapshots are not, disable keyframes only:
 
 ```ron

@@ -107,8 +107,7 @@ internal state.
 
 ## A transform that can process independent cycles
 
-<span class="version-marker" data-version="1.3">v1.3+</span>
-
+<span class="version-marker" data-version="1.3">v1.3</span>
 An image conversion or a fixed arithmetic transform often depends only on its
 current input and immutable settings. Such work can use `CuStatelessTask`: its
 per-cycle callbacks borrow `&self`, allowing an execution plan to overlap calls
@@ -300,7 +299,7 @@ Resources can also be **shared**. A shared bus (like I2C) can be bound to multip
 The resource manager handles the ownership semantics: exclusive resources are moved to a
 single task, shared resources are behind an `Arc` and each consumer receives a cloned handle.
 
-<span class="version-marker" data-version="1.1">v1.1+</span>
+<span class="version-marker" data-version="1.1">v1.1</span>
 The same pattern applies to GPU services. With the `cu29/cuda` feature, a bundle can own a
 shared CUDA context and `CuCudaPool`, while tasks pass
 `CuHandle<CudaSliceWrapper<T>>` through the graph. Keep CUDA streams task-local unless a
@@ -325,8 +324,7 @@ bindings.
 
 ## Composing resource bundles
 
-<span class="version-marker" data-version="1.2">v1.2+</span>
-
+<span class="version-marker" data-version="1.2">v1.2</span>
 A hardware handle sometimes needs several layers before a task can use it: a
 UART becomes a configured radio, and the radio becomes a framed telemetry
 transport. A resource bundle can consume another bundle's output, so each layer

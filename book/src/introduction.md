@@ -17,17 +17,19 @@ pipelines, and run everything with sub-microsecond deterministic scheduling.
 
 ## Reading version markers
 
-<span class="version-marker" data-version="1.0">v1.0+</span>
-<span class="version-marker" data-version="1.1">v1.1+</span>
-<span class="version-marker" data-version="1.2">v1.2+</span>
-<span class="version-marker" data-version="1.3">v1.3+</span>
+<div class="version-legend">
+<span class="version-marker" data-version="1.0">v1.0</span>
+<span class="version-marker" data-version="1.1">v1.1</span>
+<span class="version-marker" data-version="1.2">v1.2</span>
+<span class="version-marker" data-version="1.3">v1.3</span>
+</div>
 
-A marker gives the minimum version for a feature or the API shown. Under a heading,
+A marker means “available since this version” for a feature or the API shown. Under a heading,
 it applies to that section; beside a paragraph or list item, it applies only there.
 Features that predate 1.0 have no marker. Paired patch markers give the minimum
 patch on each release line when a feature was backported.
 
-This edition's examples use **1.3.0-dev**. Sections marked **v1.3+** currently
+This edition's examples use **1.3.0-dev**. Sections marked **v1.3** currently
 require that development checkout; see [Setting Up](./setup.md). Older markers
 identify when a capability became available, but the examples use this edition's
 APIs and tools. Keep your application and its logreaders on the same version.

@@ -132,7 +132,7 @@ reports the observed loop rate, CopperList size, and raw memory throughput. The 
 structured log bandwidth, and total disk write rate. Useful for sizing your log storage
 and checking that the logger can keep up.
 
-<span class="version-marker" data-version="1.2">v1.2+</span>
+<span class="version-marker" data-version="1.2">v1.2</span>
 With LogStream configured, BW also shows a **Telemetry / TX** panel per
 destination: local submissions, budget, drops, and recovery activity. Two-way
 streams add receiver reports and the effective FEC repair interval. See

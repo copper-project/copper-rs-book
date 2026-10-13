@@ -454,8 +454,7 @@ domain-specific protocol details on top of the bridge mechanics.
 
 ## Keep sensor data fresh with a Zenoh bridge
 
-<span class="version-marker" data-version="1.3">v1.3+</span>
-
+<span class="version-marker" data-version="1.3">v1.3</span>
 A network publisher can send data faster than your robot processes it. If the
 receiver queues every sample, the control loop can keep receiving messages while
 quietly falling seconds behind. For a sensor such as odometry, you usually want

@@ -1,7 +1,6 @@
 # Shared reference time
 
-<span class="version-marker" data-version="1.3">v1.3+</span>
-
+<span class="version-marker" data-version="1.3">v1.3</span>
 Two robots exchanging timestamped measurements need timestamps with the same
 meaning. A shared reference clock gives `ctx.now()` a named epoch and lets the
 runtime stop consuming measurements when its synchronization uncertainty exceeds

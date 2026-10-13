@@ -135,7 +135,7 @@ let value = input.payload().unwrap();
 `output.set_payload(value)` writes your data into a buffer that was **pre-allocated at
 startup**.
 
-<span class="version-marker" data-version="1.0">v1.0+</span>
+<span class="version-marker" data-version="1.0">v1.0</span>
 For values that should persist on the consumer side until explicitly replaced, Copper also
 has a generic latched-state pattern:
 
@@ -160,7 +160,7 @@ timeline. By default, that timeline starts when the clock is constructed. Tasks
 should use it rather than `std::time::SystemTime::now()` or
 `std::time::Instant::now()` so recorded runs can be replayed.
 
-<span class="version-marker" data-version="1.3">v1.3+</span>
+<span class="version-marker" data-version="1.3">v1.3</span>
 With [shared reference time](./clock-sync.md), the timeline can instead use a
 shared reference epoch, such as TAI. Task code still reads `ctx.now()`.
 

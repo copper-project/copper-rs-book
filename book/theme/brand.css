@@ -63,6 +63,32 @@
   --version-bg: #b4befe;
 }
 
+/* Section markers sit beside the opening text, which wraps below the badge. */
+.content main > p:has(> .version-marker, > .version-markers) {
+  display: flow-root;
+}
+
+.content main > p > :is(.version-marker, .version-markers) {
+  float: right;
+  margin: 0.1rem 0 0.4rem 1.4rem;
+}
+
+.version-markers,
+.version-legend {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.version-markers > .version-marker,
+.version-legend > .version-marker {
+  margin-right: 0;
+}
+
+.version-legend {
+  margin: 1em 0;
+}
+
 @media print {
   .version-marker {
     background: transparent;

@@ -1,7 +1,6 @@
 # Thread Pools, Affinity, and Real-Time Scheduling
 
-<span class="version-marker" data-version="1.0">v1.0+</span>
-
+<span class="version-marker" data-version="1.0">v1.0</span>
 By default, Copper runs your task graph on one thread: the global loop executes
 source -> processing -> sink back-to-back every cycle. Background tasks and a concurrent plan such as `Pipeline` step outside that
 single thread, and both need
@@ -133,8 +132,7 @@ runtime: (
 ),
 ```
 
-<span class="version-marker" data-version="1.1" title="Minimum patch on the 1.1 release line">v1.1.4+</span>
-<span class="version-marker" data-version="1.2" title="Minimum patch on the 1.2 release line; also available in newer releases">v1.2.2+</span>
+<span class="version-markers"><span class="version-marker" data-version="1.1" title="Minimum patch on the 1.1 release line">v1.1.4</span> <span class="version-marker" data-version="1.2" title="Minimum patch on the 1.2 release line; also available in newer releases">v1.2.2</span></span>
 Regular background tasks skip dispatch when inputs are empty, while still
 collecting completed results. If a task must run on empty ticks, set
 `background_process_empty: true` on its node:
@@ -173,8 +171,7 @@ call.
 
 ### `rt`
 
-<span class="version-marker" data-version="1.3">v1.3+</span>
-
+<span class="version-marker" data-version="1.3">v1.3</span>
 The `rt` in `parallel-rt` stands for **runtime** -- the generated execution engine that
 runs the task graph -- not "real-time". The pool named `rt` configures workers created by the
 [`Pipeline` planner](./performance-basics.md#select-a-pipeline-plan): it spawns one worker per

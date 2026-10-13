@@ -67,8 +67,7 @@ types with multiple fields.
 
 ## Latched state updates
 
-<span class="version-marker" data-version="1.0">v1.0+</span>
-
+<span class="version-marker" data-version="1.0">v1.0</span>
 Not every payload is a fresh sample. Some values are low-rate state: camera calibration,
 static transforms, lookup tables, map metadata, and similar data that usually stays the
 same for many cycles.

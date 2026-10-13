@@ -1,7 +1,6 @@
 # Streaming Logs and Live Telemetry
 
-<span class="version-marker" data-version="1.2">v1.2+</span>
-
+<span class="version-marker" data-version="1.2">v1.2</span>
 LogStream sends your robot's execution log to a ground station while the robot
 runs. The ground station records a native `.copper` archive, displays typed task
 outputs and structured logs, and can run selected tasks locally to reconstruct
@@ -237,8 +236,7 @@ records and recovery objects. For other FEC geometry or custom routing, use the
 
 ### Size storage and receiver buffers
 
-<span class="version-marker" data-version="1.3">v1.3+</span>
-
+<span class="version-marker" data-version="1.3">v1.3</span>
 Size the ground station's receiver for the largest serialized capture and for
 pauses in replay or UI consumption. This experimental builder API requires
 `cu29/logstream`. In your ground station's existing
@@ -539,8 +537,7 @@ unobserved sender tail was complete.
 
 ### Share and retain a received archive
 
-<span class="version-marker" data-version="1.3">v1.3+</span>
-
+<span class="version-marker" data-version="1.3">v1.3</span>
 To read the archive with the standalone tools from the
 [self-describing log exercise](./self-describing-logs.md#4-read-your-own-recording),
 enable `cu29/self-describing-logs` in the sender and generated twin. Build them

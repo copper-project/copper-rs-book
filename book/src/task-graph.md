@@ -67,13 +67,13 @@ Each entry in the `tasks` array declares one task:
 
 - **`id`** -- A unique name for this task instance. Used to reference it in connections.
 - **`type`** -- The fully qualified path to the Rust struct (relative to your crate root).
-- **`kind`** -- <span class="version-marker" data-version="1.0">v1.0+</span>
+- **`kind`** -- <span class="version-marker" data-version="1.0">v1.0</span>
   Declares whether the Rust type implements `CuSrcTask`, `CuTask`, or
   `CuSinkTask`. Use `source`, `task`, or `sink`.
   Copper can still infer the ordinary roles for legacy
   configs when the graph shape is unambiguous, but explicit `kind` is the preferred form.
 
-  <span class="version-marker" data-version="1.3">v1.3+</span>
+  <span class="version-marker" data-version="1.3">v1.3</span>
   For a transform implementing `CuStatelessTask`, use `kind: stateless_task`; see the
   [working transform example](./advanced-tasks.md#a-transform-that-can-process-independent-cycles).
 
@@ -121,7 +121,7 @@ Beyond `id` and `type`, each task entry supports several optional fields:
   ),
   ```
 
-  <span class="version-marker" data-version="1.0">v1.0+</span>
+  <span class="version-marker" data-version="1.0">v1.0</span>
   Sources can also run in the background. To run a source or task on a specific
   thread pool instead of the default `background` one, use the
   object form `background: (pool: "name")`. See
@@ -129,8 +129,8 @@ Beyond `id` and `type`, each task entry supports several optional fields:
   with custom sizing, CPU affinity, and real-time priority.
 
 - **`background_process_empty`** --
-  <span class="version-marker" data-version="1.1" title="Minimum patch on the 1.1 release line">v1.1.4+</span>
-  <span class="version-marker" data-version="1.2" title="Minimum patch on the 1.2 release line; also available in newer releases">v1.2.2+</span>
+  <span class="version-marker" data-version="1.1" title="Minimum patch on the 1.1 release line">v1.1.4</span>
+  <span class="version-marker" data-version="1.2" title="Minimum patch on the 1.2 release line; also available in newer releases">v1.2.2</span>
   On a regular background task, set this to
   `true` to dispatch jobs even when inputs are empty. The default is `false`;
   completed results are still collected on empty ticks. See
@@ -182,8 +182,7 @@ explicit without adding a dummy sink.
 
 ## Compile-time constants
 
-<span class="version-marker" data-version="1.1">v1.1+</span>
-
+<span class="version-marker" data-version="1.1">v1.1</span>
 Robot geometry and other values that define the compiled application can live in the
 top-level `constants` array. Numeric constants can select a Rust storage type or an SI
 quantity and unit:
