@@ -123,6 +123,11 @@ Beyond `id` and `type`, each task entry supports several optional fields:
   [Thread Pools, Affinity, and Real-Time Scheduling](./thread-pools.md) for declaring pools
   with custom sizing, CPU affinity, and real-time priority.
 
+- **`background_process_empty`** -- On a regular background task, set this to
+  `true` to dispatch jobs even when inputs are empty. The default is `false`;
+  completed results are still collected on empty ticks. See
+  [background pool behavior](./thread-pools.md#background) for an example.
+
 - **`logging`** -- Controls whether Copper's unified logger records the output messages of
   this task. Set `enabled: false` to reduce log size for high-frequency or uninteresting
   tasks.
