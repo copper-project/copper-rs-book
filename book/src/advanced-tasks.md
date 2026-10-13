@@ -316,7 +316,7 @@ important when you:
 - Want the same task to work across different boards without code changes
 - Want to swap real hardware for mocks in testing
 
-The `examples/cu_resources_test/` in the copper-rs repository is a complete working example
+The `tests/cu_resources_regression/` in the copper-rs repository is a complete regression fixture
 that demonstrates bundles, shared resources, owned resources, and mission-specific resource
 bindings.
 

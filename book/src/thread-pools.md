@@ -131,6 +131,22 @@ runtime: (
 ),
 ```
 
+Regular background tasks skip dispatch when inputs are empty, while still
+collecting completed results. If a task must run on empty ticks, set
+`background_process_empty: true` on its node (Copper 1.3.0-dev):
+
+```ron
+(
+    id: "telemetry",
+    type: "tasks::TelemetryUploader",
+    background: true,
+    background_process_empty: true,
+),
+```
+
+This option applies to regular background tasks. Background sources have no
+inputs to skip; anytime tasks use their own scheduling contract.
+
 A task can also opt into a **different** pool with the object form of `background`:
 
 ```ron
@@ -264,8 +280,8 @@ Why:
 | `policy` | OS scheduling policy/priority | `Fair` |
 | `on_error` | Behavior when affinity/policy cannot be applied | `Warn` |
 
-For complete working examples, see
+For a working example and regression coverage, see
 [`examples/cu_background_task`](https://github.com/copper-project/copper-rs/tree/master/examples/cu_background_task)
 (both `background` forms) and
-[`examples/cu_runtime_matrix`](https://github.com/copper-project/copper-rs/tree/master/examples/cu_runtime_matrix)
+[`tests/cu_runtime_regression`](https://github.com/copper-project/copper-rs/tree/master/tests/cu_runtime_regression)
 (`rt` and `background` pools).

@@ -444,8 +444,8 @@ After you finish this chapter, the cleanest examples to read are:
 
 | Example | Why read it |
 |---|---|
-| [`examples/cu_bridge_test`](https://github.com/copper-project/copper-rs/tree/master/examples/cu_bridge_test) | Shows bridge scheduling and graph wiring with small in-repo bridge implementations. Start here if you want to see Rx-to-task, task-to-Tx, loopback, and fanout shapes. |
-| [`examples/cu_resources_test/src/bridges.rs`](https://github.com/copper-project/copper-rs/blob/master/examples/cu_resources_test/src/bridges.rs) | Shows a compact custom bridge that receives injected resources. Read this after the resources chapter. |
+| [`tests/cu_bridge_regression`](https://github.com/copper-project/copper-rs/tree/master/tests/cu_bridge_regression) | Shows bridge scheduling and graph wiring with small in-repo bridge implementations. Start here if you want to see Rx-to-task, task-to-Tx, loopback, and fanout shapes. |
+| [`tests/cu_resources_regression/src/bridges.rs`](https://github.com/copper-project/copper-rs/blob/master/tests/cu_resources_regression/src/bridges.rs) | Shows a compact custom bridge that receives injected resources. Read this after the resources chapter. |
 | [`examples/cu_zenoh_bridge_demo`](https://github.com/copper-project/copper-rs/tree/master/examples/cu_zenoh_bridge_demo) | Shows a real middleware bridge used by two Copper apps. This is a good next step once the simple bridge API is familiar. |
 
 There are also protocol-specific bridges such as MSP, CRSF, DSHOT, ROS 2, and Iceoryx2.
