@@ -296,7 +296,7 @@ configuration, the same task code works on different platforms without changes.
 
 Resources can also be **shared**. A shared bus (like I2C) can be bound to multiple tasks.
 The resource manager handles the ownership semantics: exclusive resources are moved to a
-single task, shared resources are behind an `Arc` and can be borrowed by many.
+single task, shared resources are behind an `Arc` and each consumer receives a cloned handle.
 
 The same pattern applies to GPU services. With the `cu29/cuda` feature, a bundle can own a
 shared CUDA context and `CuCudaPool`, while tasks pass
@@ -319,6 +319,91 @@ important when you:
 The `examples/cu_resources_test/` in the copper-rs repository is a complete working example
 that demonstrates bundles, shared resources, owned resources, and mission-specific resource
 bindings.
+
+## Composing resource bundles
+
+A hardware handle sometimes needs several layers before a task can use it: a
+UART becomes a configured radio, and the radio becomes a framed telemetry
+transport. A resource bundle can consume another bundle's output, so each layer
+owns its startup and configuration while tasks receive the finished handle.
+This is available in Copper 1.3.0-dev.
+
+### Inspect a complete radio application
+
+The HC-12 component contains a complete example of this composition. From the
+root of a copper-rs 1.3.0-dev checkout, run its software checks:
+
+```sh
+cd components/res/cu_hc12
+just
+```
+
+The tests exercise radio startup with simulated serial, pin, and delay resources;
+no radio hardware is needed. For the application wiring, read
+[`examples/echo.ron`](https://github.com/copper-project/copper-rs/blob/master/components/res/cu_hc12/examples/echo.ron)
+and
+[`examples/echo.rs`](https://github.com/copper-project/copper-rs/blob/master/components/res/cu_hc12/examples/echo.rs)
+in this component. The RON configuration declares three bundles:
+
+- `board` exports a nonblocking UART and its adapter's RTS pin.
+- `timing` exports a startup delay.
+- `radio` consumes those three resources and exports the configured HC-12 serial
+  handle. The byte bridge takes that handle and echoes received bytes.
+
+In that existing `radio` declaration, the input bindings are:
+
+```ron
+resources: {
+    "serial": "board.serial0",
+    "set": "board.serial0_rts",
+    "delay": "timing.delay",
+},
+```
+
+The left side names an input required by the consuming provider; the right side
+names an output from another bundle. Copper constructs providers in dependency
+order. Cycles, missing providers, inactive mission providers, and unknown binding
+names fail compilation. Concrete resource types and exclusive ownership are
+checked at startup. Changing these input bindings requires a rebuild.
+
+### Run with two radios
+
+On Unix, connect two HC-12 radios through USB-to-TTL adapters whose compatible
+3.3 V active-low RTS# outputs connect to SET, with common grounds. Both UARTs
+must match their modules' saved baud rate (factory default: 9600, 8N1). The
+example enables the Linux resource provider's `serial-rts` feature. Its
+`serial0_rts: true` configuration exports the owned SET-pin handle and disables
+hardware flow control.
+
+From the same component directory, replace these device paths with the two
+adapters on your machine, then run:
+
+```sh
+just pair /dev/ttyUSB0 /dev/ttyUSB1
+```
+
+The program uses the baud rate and channel from `examples/echo.ron`, configures
+both radios, and verifies 1-, 31-, 128-, and 256-byte transfers in each direction.
+A mismatch or a five-second timeout fails the check. Run it while both radios
+are idle. To echo on just one end of a pair instead, edit the device and channel
+in `examples/echo.ron`, then run `just echo`.
+
+### Adapt the layers
+
+A composing provider declares its inputs with `resources!`, exposes their names
+through `ResourceBundle::INPUT_NAMES`, and retrieves them with
+`bundle.inputs::<Inputs>(manager)?` in its `build` method. Consume owned inputs
+or clone shared handles, then register the wrapped output. See
+[the HC-12 provider](https://github.com/copper-project/copper-rs/blob/master/components/res/cu_hc12/src/lib.rs)
+for a complete implementation.
+
+For telemetry, a `SerialLogStreamTxResources<Radio>` bundle can consume
+`radio.serial` and export `telemetry.tx` for a LogStream destination. This
+replaces the byte bridge as the radio's owner. Follow the component's
+[LogStream setup](https://github.com/copper-project/copper-rs/tree/master/components/res/cu_hc12#logstream)
+for concrete type aliases, feature setup, and a conservative link budget.
+Resource composition establishes startup dependencies; it does not add
+per-cycle task-message edges.
 
 ## Summary
 
