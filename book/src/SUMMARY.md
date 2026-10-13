@@ -27,6 +27,7 @@
 # Modify Our First Copper Project
 
 - [Controlling the Loop Frequency](./frequency.md)
+- [Shared Reference Time](./clock-sync.md)
 - [Adding the Console Monitor](./monitoring.md)
 - [Logging and Replaying Data](./logging-replay.md)
 - [Self-Describing Logs](./self-describing-logs.md)
