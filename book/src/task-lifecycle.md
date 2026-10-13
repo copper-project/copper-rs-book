@@ -156,6 +156,7 @@ keyframe at a low rate. During replay, the runtime jumps to the nearest keyframe
 minute 7, restores every task's state via `thaw()`, and replays from there -- no need to
 start from the beginning.
 
+<span class="version-marker" data-version="1.3">v1.3+</span>
 Tasks implementing `CuStatelessTask` do not need to implement `Freezable`.
 Their per-cycle callbacks receive `&self`, and the runtime records an empty
 keyframe component for them. Restoring a keyframe leaves these task instances

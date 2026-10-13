@@ -11,6 +11,8 @@ generate one and understand its layout.
 
 ## Generating a workspace
 
+<span class="version-marker" data-version="1.0">v1.0+</span>
+
 Use `cargo-cunew` with the workspace template:
 
 ```bash
@@ -76,7 +78,7 @@ cu29-export = { git = "https://github.com/copper-project/copper-rs", branch = "m
 serde = { version = "1.0", features = ["derive"] }
 ```
 
-This example selects the 1.3.0-dev code on `master`. Keep the same Copper source
+This example selects the checkout used in [Setting Up](./setup.md). Keep the same Copper source
 for all three crates; a generated workspace records the source you selected when
 scaffolding it. The codec is available through `cu29::bincode`, so application
 crates do not need a separate bincode dependency.

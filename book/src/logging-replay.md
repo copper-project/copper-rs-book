@@ -26,8 +26,17 @@ does this automatically as part of its execution loop -- no extra code needed.
 
 ## Typed logging codecs
 
+<span class="version-marker" data-version="1.0">v1.0+</span>
+
 A task's `logging.codec` or `logging.codecs` setting selects a typed codec for its
-recorded payloads. Copper places each present codec payload inside a frame with a
+recorded payloads, such as lossless PNG or FFV1 image compression. This lets the
+encoding follow the payload's structure while keeping codec selection in RON.
+
+### Codec frames
+
+<span class="version-marker" data-version="1.3">v1.3+</span>
+
+Copper places each present codec payload inside a frame with a
 fixed four-byte little-endian encoded length. The codec writes directly into log
 storage; Copper fills in the reserved length after encoding. This framing adds no
 payload buffer or additional encoding pass.
@@ -285,6 +294,10 @@ Copper's remote debug API. A debugger such as Time Traveler can then seek or ste
 the timeline, replay batches, inspect task state, query message schemas, and read
 structured logs from the same session.
 
+### Replay CLI and structured log queries
+
+<span class="version-marker" data-version="1.0">v1.0+</span>
+
 Replay targets use three standard arguments:
 
 ```text
@@ -320,6 +333,10 @@ Application replay binaries normally use `cu29::replay::ReplayCli`, or flatten
 - `schema.get_type` and `schema.get_outputs` for debugger-driven rendering
 - `logs.strings` and `logs.list` for structured logs
 
+### Session leases and deferred payloads
+
+<span class="version-marker" data-version="1.1">v1.1+</span>
+
 Each replay server grants one active debug-session lease. While the debugger is otherwise
 idle, it sends `health.ping` with the active `session_id` every second. Any session-scoped
 request also renews the lease. After 3 seconds without session activity, the server
@@ -341,6 +358,8 @@ queries describe enums, maps, and fixed-capacity `CuArrayVec` values, and
 `schema.get_outputs` supports paging output slots and their field catalogs separately.
 
 ### Linux shared-memory setup
+
+<span class="version-marker" data-version="1.1">v1.1+</span>
 
 On Linux, the default local remote-debug transport uses a 1 GiB Zenoh shared-memory pool
 and requires replies of 256 KiB or larger to use SHM. Both the Copper process and the
@@ -417,6 +436,10 @@ logging: (
 ),
 ```
 
+### Task-state keyframes
+
+<span class="version-marker" data-version="1.2">v1.2+</span>
+
 Task-state keyframes can be disabled independently of CopperList and structured logging:
 
 ```ron
@@ -431,6 +454,8 @@ still be active at a CopperList boundary. Replay then has message history but no
 snapshots to restore.
 
 ## Streaming to a ground station
+
+<span class="version-marker" data-version="1.2">v1.2+</span>
 
 To collect a native archive on another machine while the robot runs, continue to
 [Streaming Logs and Live Telemetry](./logstream-telemetry.md). The guide covers
@@ -480,13 +505,18 @@ go back and reproduce any moment of your robot's execution.
 
 ## Keep recordings across restarts and bound disk use
 
-The normal `.with_log_path(...)` setup creates a fresh recording. Use **append**
-when you want another run of the same application in that recording. Use
-**rollover** for a robot that must keep recording within a fixed storage budget,
+<span class="version-marker" data-version="1.3">v1.3+</span>
+
+The normal `.with_log_path(...)` setup creates a fresh recording.
+
+<span class="version-marker" data-version="1.2">v1.2+</span> Use **append**
+when you want another run of the same application in that recording.
+
+Use **rollover** for a robot that must keep recording within a fixed storage budget,
 retaining recent history as older sections are reclaimed.
 
 This exercise uses the single-crate project from
-[The Remaining Files and Running](./main-rs.md) with Copper 1.3.0-dev. Keep its
+[The Remaining Files and Running](./main-rs.md). Keep its
 `src/tasks.rs` and task graph, and remove any `rate_target_hz` setting for the
 longer rollover exercise below.
 

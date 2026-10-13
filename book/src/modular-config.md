@@ -32,6 +32,8 @@ parameters, and merges the resulting tasks and connections into the main configu
 
 ## Selecting graph fragments with Cargo features
 
+<span class="version-marker" data-version="1.1">v1.1+</span>
+
 Use `when` on an include when a Cargo feature also enables an optional component crate:
 
 ```ron
@@ -64,13 +66,13 @@ default = []
 jetson-mipi = ["dep:cu-gstreamer"]
 
 [build-dependencies]
-cu29-build = "1.0"
+cu29-build = "1.1"
 ```
 
 ```rust
 // build.rs
 fn main() {
-    cu29_build::emit_cargo_features();
+    cu29_build::setup();
 }
 ```
 

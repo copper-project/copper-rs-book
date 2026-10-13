@@ -1,5 +1,7 @@
 # Shared reference time
 
+<span class="version-marker" data-version="1.3">v1.3+</span>
+
 Two robots exchanging timestamped measurements need timestamps with the same
 meaning. A shared reference clock gives `ctx.now()` a named epoch and lets the
 runtime stop consuming measurements when its synchronization uncertainty exceeds
@@ -7,7 +9,8 @@ your chosen limit. Task code still uses ordinary Copper timestamps.
 
 ## See synchronization in the monitor
 
-Use the experimental Copper 1.3.0-dev feature from a copper-rs checkout. The
+Use this experimental feature from the copper-rs checkout named in the
+[edition notice](./introduction.md#reading-version-markers). The
 Linux demo needs Rust, `just`, `ptp4l`, `phc2sys`, `pmc`, `ethtool`, and `ip`, plus
 an active Ethernet interface exposing `/dev/ptp0` and read access to that device.
 Use a test network: the demo advertises a local PTP master on that interface.

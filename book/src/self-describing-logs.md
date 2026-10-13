@@ -1,5 +1,7 @@
 # Self-Describing Logs
 
+<span class="version-marker" data-version="1.3">v1.3+</span>
+
 Suppose you receive a robot's `.copper` recording and want to plot wheel speed.
 With an application-specific logreader, you need the Rust payload types used by
 that application. A self-describing log carries a **catalog** that tells an
@@ -8,8 +10,9 @@ units. You can inspect the recording with Copper's standalone tools and export
 the samples without building the robot's logreader.
 
 Use this feature when you share recordings with another team, keep logs for later
-analysis, or collect recordings from several applications. It is experimental
-in Copper 1.3.0-dev; use a checkout of that version for the examples below.
+analysis, or collect recordings from several applications. This feature is
+experimental; use the checkout named in the
+[edition notice](./introduction.md#reading-version-markers) for the examples below.
 
 ## 1. Try a complete recording
 

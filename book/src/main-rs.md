@@ -7,6 +7,10 @@ boilerplate that you write once and rarely touch. We'll come back to `logreader.
 
 ## main.rs -- the entry point
 
+<span class="version-marker" data-version="1.2">v1.2+</span>
+This entry point uses typed application handles: running consumes the initialized
+handle and returns a stopped handle.
+
 ```rust
 pub mod tasks;
 
@@ -75,6 +79,8 @@ default clock unless you override it with `.with_clock(...)`, which is mainly us
 tests or simulation.
 
 ## build.rs -- build-time setup
+
+<span class="version-marker" data-version="1.1">v1.1+</span>
 
 Keep the template's complete build script:
 

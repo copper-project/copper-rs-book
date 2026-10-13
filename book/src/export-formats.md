@@ -19,6 +19,8 @@ The following sections state the starting directory for each command.
 
 ## Inspecting a self-describing recording
 
+<span class="version-marker" data-version="1.3">v1.3+</span>
+
 Continue from the ten-cycle wheel recording in
 [Self-Describing Logs](./self-describing-logs.md#1-try-a-complete-recording).
 That chapter covers recording, payload descriptions, storage units, and your
@@ -65,6 +67,8 @@ Python access to the catalog and decoded dictionaries, follow
 [Catalog-Based Offline Analysis](./python.md#catalog-based-offline-analysis).
 
 ## Selecting a recorded run
+
+<span class="version-marker" data-version="1.3">v1.3+</span>
 
 A unified log can contain several runs, for example when you append a restart or
 construct another mission. Each run has its own CopperList sequence and clock.
@@ -203,6 +207,8 @@ time ranges within each section. It's invaluable for debugging corrupted logs --
 see exactly where the corruption starts.
 
 ### Deep validation and payload storage costs
+
+<span class="version-marker" data-version="1.3">v1.3+</span>
 
 For the wheel recording, return to `examples/cu_self_describing_logs` in the
 copper-rs checkout and run:
@@ -352,6 +358,8 @@ And make sure your existing `cu29-export` dependency enables the `"mcap"` featur
 > crates.io, keep that same source and Copper release and just add the `"mcap"` feature.
 
 ### Automatic payload schemas
+
+<span class="version-marker" data-version="1.2">v1.2+</span>
 
 `gen_cumsgs!` records the concrete payload type for every output slot. The MCAP exporter
 uses that generated metadata to build each JSON Schema automatically, including when one

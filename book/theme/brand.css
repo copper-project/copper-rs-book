@@ -23,3 +23,49 @@
     height: 14px;
   }
 }
+
+/* Catppuccin Mocha: permanent version labels, identical across book themes. */
+.version-marker {
+  --version-bg: #cdd6f4;
+  --version-fg: #1e1e2e;
+  display: inline-block;
+  padding: 0.15rem 0.65rem;
+  margin-right: 0.35rem;
+  border: 1px solid currentColor;
+  border-radius: 0.55rem;
+  background: var(--version-bg, var(--quote-bg));
+  color: var(--version-fg, var(--fg));
+  font-family: var(--mono-font);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.6;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+.version-marker[data-version="1.0"] {
+  /* Rosewater */
+  --version-bg: #f5e0dc;
+}
+
+.version-marker[data-version="1.1"] {
+  /* Pink */
+  --version-bg: #f5c2e7;
+}
+
+.version-marker[data-version="1.2"] {
+  /* Mauve */
+  --version-bg: #cba6f7;
+}
+
+.version-marker[data-version="1.3"] {
+  /* Lavender */
+  --version-bg: #b4befe;
+}
+
+@media print {
+  .version-marker {
+    background: transparent;
+    color: inherit;
+  }
+}

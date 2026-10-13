@@ -67,12 +67,15 @@ Each entry in the `tasks` array declares one task:
 
 - **`id`** -- A unique name for this task instance. Used to reference it in connections.
 - **`type`** -- The fully qualified path to the Rust struct (relative to your crate root).
-- **`kind`** -- Declares whether the Rust type implements `CuSrcTask`, `CuTask`, or
-  `CuSinkTask`. Use `source`, `task`, or `sink`. For a transform implementing
-  `CuStatelessTask`, use `kind: stateless_task`; see the
-  [working transform example](./advanced-tasks.md#a-transform-that-can-process-independent-cycles).
+- **`kind`** -- <span class="version-marker" data-version="1.0">v1.0+</span>
+  Declares whether the Rust type implements `CuSrcTask`, `CuTask`, or
+  `CuSinkTask`. Use `source`, `task`, or `sink`.
   Copper can still infer the ordinary roles for legacy
   configs when the graph shape is unambiguous, but explicit `kind` is the preferred form.
+
+  <span class="version-marker" data-version="1.3">v1.3+</span>
+  For a transform implementing `CuStatelessTask`, use `kind: stateless_task`; see the
+  [working transform example](./advanced-tasks.md#a-transform-that-can-process-independent-cycles).
 
 ### Optional task fields
 
@@ -105,7 +108,7 @@ Beyond `id` and `type`, each task entry supports several optional fields:
   ),
   ```
 
-- **`background`** -- When set to `true`, a source or compatible task runs on a
+- **`background`** -- When set to `true`, a compatible task runs on a
   **background thread** instead of the critical path. Useful for stages that do heavy or
   blocking work (network I/O, disk writes) that shouldn't affect the deterministic
   scheduling of other tasks.
@@ -118,12 +121,17 @@ Beyond `id` and `type`, each task entry supports several optional fields:
   ),
   ```
 
-  To run a task on a specific thread pool instead of the default `background` one, use the
+  <span class="version-marker" data-version="1.0">v1.0+</span>
+  Sources can also run in the background. To run a source or task on a specific
+  thread pool instead of the default `background` one, use the
   object form `background: (pool: "name")`. See
   [Thread Pools, Affinity, and Real-Time Scheduling](./thread-pools.md) for declaring pools
   with custom sizing, CPU affinity, and real-time priority.
 
-- **`background_process_empty`** -- On a regular background task, set this to
+- **`background_process_empty`** --
+  <span class="version-marker" data-version="1.1" title="Minimum patch on the 1.1 release line">v1.1.4+</span>
+  <span class="version-marker" data-version="1.2" title="Minimum patch on the 1.2 release line; also available in newer releases">v1.2.2+</span>
+  On a regular background task, set this to
   `true` to dispatch jobs even when inputs are empty. The default is `false`;
   completed results are still collected on empty ticks. See
   [background pool behavior](./thread-pools.md#background) for an example.
@@ -173,6 +181,8 @@ graph, point that connection at `dst: "__nc__"`. This keeps the output message t
 explicit without adding a dummy sink.
 
 ## Compile-time constants
+
+<span class="version-marker" data-version="1.1">v1.1+</span>
 
 Robot geometry and other values that define the compiled application can live in the
 top-level `constants` array. Numeric constants can select a Rust storage type or an SI
