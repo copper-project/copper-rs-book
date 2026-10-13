@@ -151,8 +151,8 @@ size, and size range. Use it to find the outputs consuming most of your storage
 before reducing capture. These sizes count encoded payload bytes, excluding
 CopperList metadata.
 
-The catalog's compressed size includes its integrity footer; the decompressed
-size is the encoded catalog body. This shows startup description overhead
+The catalog's compressed size includes its catalog headers, continuation
+framing, and integrity footer; the decompressed size is the encoded catalog body. This shows startup description overhead
 separately from the samples accumulated during the run.
 
 ### Use an existing application logreader

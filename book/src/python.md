@@ -43,10 +43,12 @@ API; `self-describing-logs` enables the catalog reader. The temporary
 You see the source wheel sample for each of the ten cycles. Inspect the catalog
 when you need field descriptions or storage units for plotting.
 
-For a multi-run recording, pass `run=1` to both functions to select the same
-zero-based run index you found with `list-runs`. A single-run log needs no
-`run` argument. The catalog describes all compiled missions; each CopperList
-uses the selected run's mission and output order.
+For a multi-run recording, pass `run=1` to
+`copperlist_value_iterator_unified` to select the zero-based run index you found
+with `list-runs`. A single-run log needs no `run` argument.
+`value_decode_catalog_unified` takes only the path: its shared catalog describes
+all compiled missions. Each CopperList uses the selected run's mission and output
+order.
 
 Each cycle dictionary has `id` and `msgs`, whose entries retain payload, time
 of validity, metadata, and capture status. Integers keep full precision. A
