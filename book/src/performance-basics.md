@@ -136,7 +136,8 @@ cargo run --features mmap-fsync
 
 ## Select a pipeline plan
 
-In Copper 1.3.0-dev, `parallel-rt` enables the concurrent executor. Your RON
+<span class="version-marker" data-version="1.3">v1.3</span>
+`parallel-rt` enables the concurrent executor. Your RON
 configuration chooses the plan. The default planner is `Serial`, so enabling
 only the Cargo feature keeps serial execution.
 
@@ -189,7 +190,7 @@ cargo run --features parallel-rt
 ```
 
 The source and sink still report `42` and `43`. Stop with Ctrl-C. With the
-1.3.0-dev template's viewer recipes, run:
+template's viewer recipes from [Setting Up](./setup.md), run:
 
 ```sh
 just sched
@@ -234,6 +235,7 @@ for you.
 This makes background stages easy to turn on, but it does not mean they are always the right
 choice. They work best when skipping or sampling intermediate cycles is acceptable.
 
+<span class="version-marker" data-version="1.0">v1.0</span>
 You can size the `background` pool, pin it to specific cores, or run a stage on a separate
 pool entirely. See [Thread Pools, Affinity, and Real-Time Scheduling](./thread-pools.md) for
 the `runtime.thread_pools` configuration.

@@ -4,7 +4,8 @@ Running a logreader or rendering a graph involves binary names, features, and
 paths. A `justfile` gives those commands short names so you can spend your time
 changing the robot instead of reconstructing command lines.
 
-This chapter uses the 1.3.0-dev templates and assumes `just` is available.
+This chapter uses the templates named in the
+[edition notice](./introduction.md#reading-version-markers) and assumes `just` is available.
 Start in the project directory from [Setting Up](./setup.md), or the workspace
 root from [From Project to Workspace](./workspace.md). Run `just --list` to see
 the recipes your generated project provides.
@@ -23,7 +24,9 @@ just cl
 For the first project, look for the source value `42` and processing value `43`.
 Both commands default to the application's normal log path.
 
-For a different recording in a single-crate project:
+<span class="version-marker" data-version="1.3">v1.3</span>
+The template recipes accept a different application or recording. For a different
+recording in a single-crate project:
 
 ```sh
 just cl logs/another-session.copper
@@ -41,11 +44,13 @@ path too; the default log path still names `cu_example_app`.
 
 ## See the graph and the execution schedule
 
+<span class="version-marker" data-version="1.1">v1.1</span>
 The graph answers “what connects to what?” The schedule answers “where and in
 what order will that work execute?” Both views help you check a RON edit before
 running hardware.
 
-From either template's root:
+<span class="version-marker" data-version="1.3">v1.3</span>
+The current templates use these viewer recipes. From either template's root:
 
 ```sh
 just graph
@@ -70,8 +75,12 @@ hardware ownership alongside the task graph.
 
 ### Add observed timing
 
+<span class="version-marker" data-version="1.1">v1.1</span>
 A schedule diagram explains placement and ordering; it does not establish how
-fast your app runs. Record a representative run, then add its measured timings:
+fast your app runs. Record a representative run, then add its measured timings.
+
+<span class="version-marker" data-version="1.3">v1.3</span>
+With the current templates, run:
 
 ```sh
 just graph-log
@@ -85,6 +94,7 @@ Look for an expensive stage or a large gap between stages, then use the
 
 ### Target another configuration
 
+<span class="version-marker" data-version="1.3">v1.3</span>
 In a single-crate project, render an alternate configuration without replacing
 your application config:
 

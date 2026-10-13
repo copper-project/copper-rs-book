@@ -1,5 +1,6 @@
 # Profile-Guided Scheduling
 
+<span class="version-marker" data-version="1.3">v1.3</span>
 Profile-Guided Scheduling (PGS) uses timings from a representative Copper run to propose
 execution schedules for your application. It is an offline workflow: the robot records its
 normal unified log, a host-side logreader generates candidates, and you rebuild and measure

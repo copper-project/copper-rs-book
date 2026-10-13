@@ -454,18 +454,19 @@ domain-specific protocol details on top of the bridge mechanics.
 
 ## Keep sensor data fresh with a Zenoh bridge
 
+<span class="version-marker" data-version="1.3">v1.3</span>
 A network publisher can send data faster than your robot processes it. If the
 receiver queues every sample, the control loop can keep receiving messages while
 quietly falling seconds behind. For a sensor such as odometry, you usually want
 the newest available reading. For a command stream, you may need every event.
 
-Copper 1.3.0-dev's `cu-zenoh-bridge` makes that choice per receive channel.
+`cu-zenoh-bridge` makes that choice per receive channel.
 It consumes at most one queued sample per `receive` call. The default is a
 one-entry ring: a new arrival replaces the queued older sample.
 
 ### Try two apps on one machine
 
-Start from the root of a copper-rs 1.3.0-dev checkout. Build both demo binaries
+Start from the root of the copper-rs checkout used for this book. Build both demo binaries
 before starting either process:
 
 ```sh

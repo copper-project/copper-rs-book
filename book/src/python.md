@@ -11,6 +11,7 @@ If you only remember one thing from this chapter, remember this:
 
 ## Catalog-Based Offline Analysis
 
+<span class="version-marker" data-version="1.3">v1.3</span>
 If you want to analyse a self-describing recording without rebuilding its
 application or registering Rust payload types, use Copper's catalog reader.
 It returns ordinary Python dictionaries for the recorded values.
@@ -18,7 +19,8 @@ It returns ordinary Python dictionaries for the recorded values.
 Reuse the wheel recording from
 [Self-Describing Logs](./self-describing-logs.md#1-try-a-complete-recording).
 On Linux, with Rust and Python 3 available, run this complete sequence from the
-copper-rs 1.3.0-dev repository root:
+copper-rs repository root, using the checkout named in the
+[edition notice](./introduction.md#reading-version-markers):
 
 ```sh
 cargo build -p cu29-export --lib --features python-extension-module,self-describing-logs
@@ -54,7 +56,7 @@ order.
 Each cycle dictionary has `id` and `msgs`, whose entries retain payload, time
 of validity, metadata, and capture status. Integers keep full precision. A
 corrupt record raises `IOError` and stops iteration. These APIs are experimental
-in 1.3.0-dev and run offline.
+and run offline.
 
 ## Application-Specific Offline Analysis
 

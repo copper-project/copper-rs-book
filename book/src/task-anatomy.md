@@ -135,6 +135,7 @@ let value = input.payload().unwrap();
 `output.set_payload(value)` writes your data into a buffer that was **pre-allocated at
 startup**.
 
+<span class="version-marker" data-version="1.0">v1.0</span>
 For values that should persist on the consumer side until explicitly replaced, Copper also
 has a generic latched-state pattern:
 
@@ -154,9 +155,14 @@ to Copper's monotonic `RobotClock`, so `ctx.now()` gives you the current Copper 
 it also carries runtime metadata such as `ctx.cl_id()`, `ctx.instance_id()`, and the
 currently executing task ID.
 
-`ctx.now()` returns a `CuTime` (a `u64` of nanoseconds since startup). There is no UTC or
-wall-clock in Copper; tasks should never call `std::time::SystemTime::now()` or
-`std::time::Instant::now()`.
+`ctx.now()` returns a `CuTime` measured in nanoseconds on the application's
+timeline. By default, that timeline starts when the clock is constructed. Tasks
+should use it rather than `std::time::SystemTime::now()` or
+`std::time::Instant::now()` so recorded runs can be replayed.
+
+<span class="version-marker" data-version="1.3">v1.3</span>
+With [shared reference time](./clock-sync.md), the timeline can instead use a
+shared reference epoch, such as TAI. Task code still reads `ctx.now()`.
 
 In our simple project we prefix the parameter with `_` because we don't use it. But on a
 real robot you'd use it like this:

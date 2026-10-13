@@ -17,6 +17,16 @@ The intended reaction is: “Ah, that is what this is for, and I can use it afte
 a few copy-pastes.” A reader should experience the feature before needing its
 implementation details.
 
+## Visual design
+
+- Use the official Catppuccin Mocha palette for custom book visuals.
+- The previous amber/green/cyan-blue/muddy-brown version-marker palette is
+  explicitly rejected. Do not restore it or introduce a similar palette.
+- Do not use cyan/teal accents or mustard/brown badge backgrounds in this project.
+- Version markers use Mocha Rosewater (1.0), Pink (1.1), Mauve (1.2), and
+  Lavender (1.3), with Mocha Base text. Keep these exact colors across themes.
+- Keep version text visible and verify text/background contrast when styling badges.
+
 ## Build a complete learning path
 
 - Getting-started chapters must work from a fresh environment once their named

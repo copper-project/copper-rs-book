@@ -23,7 +23,7 @@ pub struct MyPayload {
 
 ## Use Copper's codec
 
-In 1.3.0-dev, import the encoding derives from `cu29::bincode` and add
+Import the encoding derives from `cu29::bincode` and add
 `#[bincode(crate = "cu29::bincode")]` to each type deriving `Encode` or `Decode`.
 The attribute tells generated code where to find Copper's codec. This keeps your
 payloads, logreader, and runtime on the same encoding implementation, including
@@ -67,6 +67,7 @@ types with multiple fields.
 
 ## Latched state updates
 
+<span class="version-marker" data-version="1.0">v1.0</span>
 Not every payload is a fresh sample. Some values are low-rate state: camera calibration,
 static transforms, lookup tables, map metadata, and similar data that usually stays the
 same for many cycles.

@@ -1,7 +1,8 @@
 # Setting Up Your Environment
 
-This book follows Copper 1.3.0-dev on `master`. Before building a project, we
-need Rust 1.95 or newer and the Copper project bootstrap tool.
+Use the development checkout named in the
+[edition notice](./introduction.md#reading-version-markers). Before building a
+project, we need Rust 1.95 or newer and the Copper project bootstrap tool.
 
 ## Install Rust
 
@@ -20,6 +21,7 @@ rustc --version
 
 ## Install cargo-cunew
 
+<span class="version-marker" data-version="1.0">v1.0</span>
 `cargo-cunew` scaffolds a new Copper project from the official Copper templates:
 
 ```bash

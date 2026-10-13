@@ -1,5 +1,6 @@
 # LogStream Transport and Receiver Reference
 
+<span class="version-marker" data-version="1.2">v1.2</span>
 Start with [Streaming Logs and Live Telemetry](./logstream-telemetry.md) for the
 UDP walkthrough. This reference covers custom carriers, receiver ownership, and
 format details needed when sizing or extending an integration.
@@ -116,8 +117,8 @@ mechanism. Unified-log encapsulation version **1** describes the file and sectio
 layout, not the encoded application content.
 
 Serialized CopperLists contain `id` and `msgs`; lifecycle state stays in memory.
-The move to `cu-bincode` ULEB128 timestamp-delta and backreference helpers preserves
-the compressed metadata bytes. It does not change ordinary integer encoding.
+Timestamp-delta and backreference helpers preserve the compressed metadata bytes.
+Ordinary integers use the codec's standard integer encoding.
 
 Current packed header sizes are:
 

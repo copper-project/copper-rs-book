@@ -1,5 +1,6 @@
 # Streaming Logs and Live Telemetry
 
+<span class="version-marker" data-version="1.2">v1.2</span>
 LogStream sends your robot's execution log to a ground station while the robot
 runs. The ground station records a native `.copper` archive, displays typed task
 outputs and structured logs, and can run selected tasks locally to reconstruct
@@ -28,7 +29,8 @@ not retrieve expired history.
 
 ## 1. Try the UDP demo
 
-Use a Copper 1.3.0-dev source checkout.
+Use the source checkout named in the
+[edition notice](./introduction.md#reading-version-markers).
 The [demo](https://github.com/copper-project/copper-rs/tree/master/examples/cu_logstream_demo)
 requires the checkout's Rust toolchain, Just, and Python 3. From that checkout:
 
@@ -234,9 +236,10 @@ records and recovery objects. For other FEC geometry or custom routing, use the
 
 ### Size storage and receiver buffers
 
+<span class="version-marker" data-version="1.3">v1.3</span>
 Size the ground station's receiver for the largest serialized capture and for
 pauses in replay or UI consumption. This experimental builder API requires
-Copper `1.3.0-dev` with `cu29/logstream` enabled. In your ground station's existing
+`cu29/logstream`. In your ground station's existing
 `Ground::twin(rx)` setup, use named constants to make the storage and buffering
 choices explicit before starting the workers:
 
@@ -534,6 +537,7 @@ unobserved sender tail was complete.
 
 ### Share and retain a received archive
 
+<span class="version-marker" data-version="1.3">v1.3</span>
 To read the archive with the standalone tools from the
 [self-describing log exercise](./self-describing-logs.md#4-read-your-own-recording),
 enable `cu29/self-describing-logs` in the sender and generated twin. Build them

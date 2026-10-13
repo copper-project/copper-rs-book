@@ -46,6 +46,46 @@ filename, so there is nothing to renumber. To add a chapter:
 
 mdBook generates the chapter numbers automatically from the order in `SUMMARY.md`.
 
+## Version markers
+
+Use a permanent minimum-version marker for features or documented APIs introduced
+in 1.0 or later. Leave features that predate 1.0 unmarked. Put a section marker at
+the start of its first paragraph, with no blank line between the marker and the
+prose. It floats right and the text wraps around it. Markers inside list items
+stay inline. Labels omit `+`; `v1.2` means “available since 1.2”:
+
+When a section mixes versions, put each marker beside the paragraph introducing
+that feature. Do not attach the section's newest version to an older setup step.
+
+```html
+<span class="version-marker" data-version="1.2">v1.2</span>
+Paragraph describing the feature.
+```
+
+`data-version` selects an official
+[Catppuccin Mocha](https://catppuccin.com/palette/#mocha) background: Rosewater
+`#f5e0dc` (1.0), Pink `#f5c2e7` (1.1), Mauve `#cba6f7` (1.2), or Lavender
+`#b4befe` (1.3). Text uses Mocha Base `#1e1e2e` in every theme. The previous
+palette is banned by the project's visual-design rules in `AGENTS.md`.
+Keep the visible version text so color is never the only
+cue. For a patch-level minimum, keep the minor in `data-version` and write the
+full patch in the label. For backports, use paired labels with titles identifying
+their release lines; do not imply that 1.1.4 support includes unpatched 1.2.0.
+Wrap adjacent paragraph markers in `<span class="version-markers">` so they float
+as a group in release order. Keep the complete group on one line, followed by
+the paragraph text on the next line without a blank line.
+
+Markers describe availability, not release status, so they do not change when a
+release ships. Update the single edition/release notice in
+`book/src/introduction.md` instead. Keep experimental status, required Cargo
+features, tools, and checkout directories in the tutorial's prerequisites.
+
+Before adding or changing a marker, match the feature to the
+[wiki release notes](https://github.com/copper-project/copper-rs/wiki/Copper-Release-Notes), then verify the actual
+API in the corresponding copper-rs tag. A newer recipe or method can need a newer
+marker than the underlying feature. For unreleased features, compare the checkout
+against the latest release; do not guess from the version previously named in prose.
+
 ## How to contribute
 
 1. **Fork** this repository on GitHub.
