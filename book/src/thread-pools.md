@@ -131,6 +131,22 @@ runtime: (
 ),
 ```
 
+Regular background tasks skip dispatch when inputs are empty, while still
+collecting completed results. If a task must run on empty ticks, set
+`background_process_empty: true` on its node (Copper 1.3.0-dev):
+
+```ron
+(
+    id: "telemetry",
+    type: "tasks::TelemetryUploader",
+    background: true,
+    background_process_empty: true,
+),
+```
+
+This option applies to regular background tasks, including background anytime
+tasks wrapped as regular tasks. Background sources have no inputs to skip.
+
 A task can also opt into a **different** pool with the object form of `background`:
 
 ```ron
