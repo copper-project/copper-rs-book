@@ -157,7 +157,7 @@ demo's mock clock, impairment wrapper, and fixed iteration loop are test harness
 code and are not needed in your application.
 
 `network.tx` is a resource binding, not a task-graph edge. The
-[graph renderer](./justfile.md#just-dag--render-the-task-graph) shows it in
+[graph renderer](./justfile.md#see-the-graph-and-the-execution-schedule) shows it in
 the resource table as `system: logstream (ground)`.
 
 | Setting | How to choose it |
