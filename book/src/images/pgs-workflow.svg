@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1712" height="944" viewBox="0 0 1712 944" role="img" aria-labelledby="title description">
+<title id="title">Profile-Guided Scheduling workflow</title>
+<desc id="description">Build and run a reference, extract its profile, propose and select a plan, compile and run the candidate, then compare measured performance. Feedback loops select another candidate or generate new proposals. Colors identify compile time, runtime, offline analysis, and artifacts.</desc>
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#cdd6f4"/></marker>
+  <marker id="feedback" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#89b4fa"/></marker>
+  <marker id="reference" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#f5c2e7"/></marker>
+</defs>
+<style>
+  text { font-family: 'Noto Sans', sans-serif; fill: #cdd6f4; }
+  .title { font-size: 34px; font-weight: 700; }
+  .legend { font-size: 21px; }
+  .phase { font-size: 16px; font-weight: 700; letter-spacing: 1px; fill: #1e1e2e; }
+  .step { font-size: 29px; font-weight: 700; fill: #1e1e2e; }
+  .detail { font-size: 22px; fill: #1e1e2e; }
+  .number { font-size: 18px; font-weight: 700; fill: #1e1e2e; }
+  .artifact { font-size: 20px; fill: #f5c2e7; }
+  .loop-label { font-size: 22px; font-weight: 600; }
+  .flow { fill: none; stroke: #cdd6f4; stroke-width: 3; marker-end: url(#arrow); }
+  .feedback { fill: none; stroke: #89b4fa; stroke-width: 3; marker-end: url(#feedback); }
+  .reference { fill: none; stroke: #f5c2e7; stroke-width: 2.5; stroke-dasharray: 7 7; marker-end: url(#reference); }
+</style>
+<rect width="100%" height="100%" fill="#000000"/>
+<text class="title" x="48" y="66">Profile-Guided Scheduling</text>
+
+<circle cx="738" cy="57" r="8" fill="#b4befe"/><text class="legend" x="758" y="65">Compile Time</text>
+<circle cx="977" cy="57" r="8" fill="#a6e3a1"/><text class="legend" x="997" y="65">Runtime</text>
+<circle cx="1155" cy="57" r="8" fill="#89b4fa"/><text class="legend" x="1175" y="65">Offline</text>
+<circle cx="1322" cy="57" r="8" fill="#f5c2e7"/><text class="legend" x="1342" y="65">Artifacts</text>
+<rect x="48" y="120" width="354" height="48" rx="10" fill="#000000" stroke="#f5c2e7" stroke-width="2"/><text class="artifact" x="225" y="151" text-anchor="middle">Application Graph</text><path class="reference" d="M 225 169 V 202"/>
+<rect x="1278" y="120" width="354" height="48" rx="10" fill="#000000" stroke="#f5c2e7" stroke-width="2"/><text class="artifact" x="1455" y="151" text-anchor="middle">Scheduling Contract</text><path class="reference" d="M 1455 169 V 202"/>
+<path class="flow" d="M 404 282 H 450"/>
+<path class="flow" d="M 814 282 H 860"/>
+<path class="flow" d="M 1224 282 H 1270"/>
+<path class="flow" d="M 1634 282 H 1672 Q 1684 282 1684 294 V 668 Q 1684 680 1672 680 H 1634"/>
+<path class="flow" d="M 1276 680 H 1230"/>
+<path class="flow" d="M 866 680 H 820"/>
+<path class="flow" d="M 456 680 H 410"/>
+<path class="reference" d="M 1045 410 V 438 Q 1045 450 1033 450 H 166 Q 154 450 154 462 V 600"/>
+<text class="loop-label" x="572" y="437" style="fill:#f5c2e7">Reference KPIs</text>
+<path class="feedback" d="M 225 606 V 504 Q 225 492 237 492 H 1443 Q 1455 492 1455 480 V 416"/>
+<text class="loop-label" x="796" y="480" style="fill:#89b4fa">Replan</text>
+<path class="feedback" d="M 286 606 V 560 Q 286 548 298 548 H 1504 Q 1516 548 1516 560 V 600"/>
+<text class="loop-label" x="758" y="536" style="fill:#89b4fa">Next Candidate</text>
+<path class="reference" d="M 225 808 V 850"/>
+<rect x="48" y="858" width="354" height="48" rx="10" fill="#000000" stroke="#f5c2e7" stroke-width="2"/><text class="artifact" x="225" y="889" text-anchor="middle">Best Plan</text>
+<g id="step-1"><rect x="48" y="210" width="354" height="198" rx="14" fill="#000000" stroke="#b4befe" stroke-width="2"/>
+<path d="M 62 210 H 388 Q 402 210 402 224 V 354 H 48 V 224 Q 48 210 62 210 Z" fill="#b4befe"/>
+<text class="phase" x="68" y="240">COMPILE TIME</text><circle cx="368" cy="235" r="14" fill="#000000" fill-opacity="0.1"/><text class="number" x="368" y="242" text-anchor="middle">1</text>
+<text class="step" x="68" y="287">Build Reference</text><text class="detail" x="68" y="327">Graph → Executable</text>
+<text class="artifact" x="68" y="388">Reference Executable</text>
+</g>
+<g id="step-2"><rect x="458" y="210" width="354" height="198" rx="14" fill="#000000" stroke="#a6e3a1" stroke-width="2"/>
+<path d="M 472 210 H 798 Q 812 210 812 224 V 354 H 458 V 224 Q 458 210 472 210 Z" fill="#a6e3a1"/>
+<text class="phase" x="478" y="240">RUNTIME</text><circle cx="778" cy="235" r="14" fill="#000000" fill-opacity="0.1"/><text class="number" x="778" y="242" text-anchor="middle">2</text>
+<text class="step" x="478" y="287">Run Reference</text><text class="detail" x="478" y="327">Representative Workload</text>
+<text class="artifact" x="478" y="388">Reference Log · .copper</text>
+</g>
+<g id="step-3"><rect x="868" y="210" width="354" height="198" rx="14" fill="#000000" stroke="#89b4fa" stroke-width="2"/>
+<path d="M 882 210 H 1208 Q 1222 210 1222 224 V 354 H 868 V 224 Q 868 210 882 210 Z" fill="#89b4fa"/>
+<text class="phase" x="888" y="240">OFFLINE</text><circle cx="1188" cy="235" r="14" fill="#000000" fill-opacity="0.1"/><text class="number" x="1188" y="242" text-anchor="middle">3</text>
+<text class="step" x="888" y="287">Extract Profile</text><text class="detail" x="888" y="327">Latency · Rate · Load</text>
+<text class="artifact" x="888" y="388">Profile + Reference KPIs</text>
+</g>
+<g id="step-4"><rect x="1278" y="210" width="354" height="198" rx="14" fill="#000000" stroke="#89b4fa" stroke-width="2"/>
+<path d="M 1292 210 H 1618 Q 1632 210 1632 224 V 354 H 1278 V 224 Q 1278 210 1292 210 Z" fill="#89b4fa"/>
+<text class="phase" x="1298" y="240">OFFLINE</text><circle cx="1598" cy="235" r="14" fill="#000000" fill-opacity="0.1"/><text class="number" x="1598" y="242" text-anchor="middle">4</text>
+<text class="step" x="1298" y="287">Propose Plans</text><text class="detail" x="1298" y="327">Rank Predictions</text>
+<text class="artifact" x="1298" y="375">Plans + Predictions</text>
+<text class="artifact" x="1298" y="399">Graph + Schedule SVGs</text>
+</g>
+<g id="step-5"><rect x="1278" y="608" width="354" height="198" rx="14" fill="#000000" stroke="#89b4fa" stroke-width="2"/>
+<path d="M 1292 608 H 1618 Q 1632 608 1632 622 V 752 H 1278 V 622 Q 1278 608 1292 608 Z" fill="#89b4fa"/>
+<text class="phase" x="1298" y="638">OFFLINE</text><circle cx="1598" cy="633" r="14" fill="#000000" fill-opacity="0.1"/><text class="number" x="1598" y="640" text-anchor="middle">5</text>
+<text class="step" x="1298" y="685">Select Plan</text><text class="detail" x="1298" y="725">Choose Candidate</text>
+<text class="artifact" x="1298" y="786">Selected Plan + Config</text>
+</g>
+<g id="step-6"><rect x="868" y="608" width="354" height="198" rx="14" fill="#000000" stroke="#b4befe" stroke-width="2"/>
+<path d="M 882 608 H 1208 Q 1222 608 1222 622 V 752 H 868 V 622 Q 868 608 882 608 Z" fill="#b4befe"/>
+<text class="phase" x="888" y="638">COMPILE TIME</text><circle cx="1188" cy="633" r="14" fill="#000000" fill-opacity="0.1"/><text class="number" x="1188" y="640" text-anchor="middle">6</text>
+<text class="step" x="888" y="685">Build Plan</text><text class="detail" x="888" y="725">Config → Executable</text>
+<text class="artifact" x="888" y="786">Candidate Executable</text>
+</g>
+<g id="step-7"><rect x="458" y="608" width="354" height="198" rx="14" fill="#000000" stroke="#a6e3a1" stroke-width="2"/>
+<path d="M 472 608 H 798 Q 812 608 812 622 V 752 H 458 V 622 Q 458 608 472 608 Z" fill="#a6e3a1"/>
+<text class="phase" x="478" y="638">RUNTIME</text><circle cx="778" cy="633" r="14" fill="#000000" fill-opacity="0.1"/><text class="number" x="778" y="640" text-anchor="middle">7</text>
+<text class="step" x="478" y="685">Run Plan</text><text class="detail" x="478" y="725">Same Workload</text>
+<text class="artifact" x="478" y="786">Candidate Log · .copper</text>
+</g>
+<g id="step-8"><rect x="48" y="608" width="354" height="198" rx="14" fill="#000000" stroke="#89b4fa" stroke-width="2"/>
+<path d="M 62 608 H 388 Q 402 608 402 622 V 752 H 48 V 622 Q 48 608 62 608 Z" fill="#89b4fa"/>
+<text class="phase" x="68" y="638">OFFLINE</text><circle cx="368" cy="633" r="14" fill="#000000" fill-opacity="0.1"/><text class="number" x="368" y="640" text-anchor="middle">8</text>
+<text class="step" x="68" y="685">Measure + Compare</text><text class="detail" x="68" y="725">Baseline vs Candidate</text>
+<text class="artifact" x="68" y="786">Measured KPIs + Ranking</text>
+</g>
+</svg>

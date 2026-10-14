@@ -6,15 +6,17 @@ execution schedules for your application. It is an offline workflow: the robot r
 normal unified log, a host-side logreader generates candidates, and you rebuild and measure
 those candidates before selecting one.
 
+## Workflow
+
+Start with a reference run and its measured performance. Generate candidate plans,
+select one, then compile and run it under the same workload. Compare the measured
+results with the reference, test another candidate or replan, and keep the best plan.
+
+[![PGS workflow: compile and run a reference, extract a profile, propose and select plans, compile and run candidates, and compare measured performance.](./images/pgs-workflow.svg)](./images/pgs-workflow.svg)
+
 The important rule is: **a prediction is a candidate to test, not a result to deploy**.
 Task costs change when work is moved between CPUs, caches, and scheduling policies. The
 measured ranking can select the original schedule, and that is a valid outcome.
-
-The complete loop is:
-
-```text
-representative baseline -> contract -> predicted candidates -> candidate runs -> measured selection
-```
 
 PGS changes the execution plan: which worker runs each operation, the order on each worker,
 CPU placement, and how many CopperLists may be in flight. It does not change the task graph
