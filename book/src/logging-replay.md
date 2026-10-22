@@ -434,6 +434,13 @@ code when it is disabled, which is useful for applications whose background work
 still be active at a CopperList boundary. Replay then has message history but no task-state
 snapshots to restore.
 
+In `1.4.0-dev`, `async-cl-io` writes each completed CopperList and its associated
+keyframe through one worker. The keyframe precedes its CopperList. Serial capture
+has two spare buffers; if both remain in flight, Copper skips freezing the next
+scheduled keyframe and rejects its CopperList too. The dropped counters advance
+and the recording retains an observable gap in CopperList IDs. Explicit shutdown
+drains accepted output and reports flush failures.
+
 ## Streaming to a ground station
 
 <span class="version-marker" data-version="1.2">v1.2</span>
