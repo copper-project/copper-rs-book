@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" width="1440" height="1590" viewBox="0 0 1440 1590" version="1.1" id="svg56" sodipodi:docname="copper-output-layers.svg" inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)">
+  <sodipodi:namedview id="namedview56" pagecolor="#ffffff" bordercolor="#000000" borderopacity="0.25" inkscape:showpageshadow="2" inkscape:pageopacity="0.0" inkscape:pagecheckerboard="0" inkscape:deskcolor="#d1d1d1" inkscape:zoom="0.89811321" inkscape:cx="720.39916" inkscape:cy="695.90336" inkscape:window-width="3072" inkscape:window-height="1646" inkscape:window-x="0" inkscape:window-y="0" inkscape:window-maximized="1" inkscape:current-layer="svg56" />
+  <defs id="defs1">
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0 0L8 4L0 8" fill="#8394ac" id="path1" />
+    </marker>
+  </defs>
+  <style id="style1">text{font-family:Inter,Arial,sans-serif} .title{font-size:20px;font-weight:600;fill:#f1f5f9}.sub{font-size:15px;fill:#b9c5d6}.line{fill:none;stroke:#8394ac;stroke-width:2;marker-end:url(#arrow)}</style>
+  <rect width="1440" height="1590" fill="#0c1422" id="rect1" sodipodi:insensitive="true" x="0" y="0" />
+  <rect x="48" y="113" width="14" height="14" rx="3" fill="#60a5fa" id="rect2" />
+  <text x="71" y="126" class="sub" id="text3">Public API / record</text>
+  <rect x="220" y="113" width="14" height="14" rx="3" fill="#5eead4" id="rect3" />
+  <text x="243" y="126" class="sub" id="text4">Implement in your code</text>
+  <rect x="428" y="113" width="14" height="14" rx="3" fill="#c4a0ff" id="rect4" />
+  <text x="451" y="126" class="sub" id="text5">Type selected in RON</text>
+  <rect x="632" y="113" width="14" height="14" rx="3" fill="#aaa6b3" id="rect5" />
+  <text x="655" y="126" class="sub" id="text6">Internal / core change</text>
+  <rect x="70" y="195" width="610" height="70" rx="10" fill="#352953" stroke="#c4a0ff" stroke-width="1.4" id="rect7" />
+  <text x="87" y="223" class="title" id="text8">MESSAGE • CuTask / CuSrcTask::process</text>
+  <text x="87" y="247" class="sub" id="text9">[RON] tasks[].type</text>
+  <rect x="760" y="195" width="610" height="70" rx="10" fill="#103c36" stroke="#5eead4" stroke-width="1.4" id="rect9" />
+  <text x="777" y="223" class="title" id="text10">STATE • Freezable::freeze / thaw</text>
+  <text x="777" y="247" class="sub" id="text11">[Rust] impl Freezable for YourTask</text>
+  <path d="M375 265 L375 285" class="line" id="path13" />
+  <rect x="760" y="285" width="610" height="70" rx="10" fill="#302f35" stroke="#aaa6b3" stroke-width="1.4" id="rect13" />
+  <text x="777" y="313" class="title" id="text14">Generated capture + KeyFramesManager</text>
+  <text x="777" y="337" class="sub" id="text15">Snapshot framing, scheduling and component order.</text>
+  <path d="M1065 265 L1065 285" class="line" id="path15" />
+  <path d="M375 355 L375 375" class="line" id="path17" />
+  <rect x="760" y="375" width="610" height="70" rx="10" fill="#132e4a" stroke="#60a5fa" stroke-width="1.4" id="rect17" />
+  <text x="777" y="403" class="title" id="text18">KeyFrame</text>
+  <text x="777" y="427" class="sub" id="text19">Public replay record containing component snapshots.</text>
+  <path d="M1065 355 L1065 375" class="line" id="path19" />
+  <path d="M375 445 L550 485" class="line" id="path20" />
+  <path d="M1065 445 L890 485" class="line" id="path21" />
+  <rect x="330" y="485" width="780" height="70" rx="10" fill="#302f35" stroke="#aaa6b3" stroke-width="1.4" id="rect21" />
+  <text x="347" y="513" class="title" id="text22">Runtime completion + output ownership</text>
+  <text x="347" y="537" class="sub" id="text23">Inline or async output pass; keyframe precedes its CopperList.</text>
+  <path d="M720 555 L720 575" class="line" id="path23" />
+  <rect x="330" y="575" width="780" height="70" rx="10" fill="#103c36" stroke="#5eead4" stroke-width="1.4" id="rect23" />
+  <text x="347" y="603" class="title" id="text24">WriteStream&lt;Record&gt;::log(&amp;record)</text>
+  <text x="347" y="627" class="sub" id="text25">[Rust] impl WriteStream&lt;Record&gt; • runtime attachment: core wiring</text>
+  <path d="M720 645 L720 665" class="line" id="path25" />
+  <rect x="330" y="665" width="780" height="70" rx="10" fill="#302f35" stroke="#aaa6b3" stroke-width="1.4" id="rect25" />
+  <text x="347" y="693" class="title" id="text26">Generated OptionalWriteStream / StaticFanoutSink</text>
+  <text x="347" y="717" class="sub" id="text27">Local and streaming branches consume semantic records independently.</text>
+  <path d="M550 735 L375 785" class="line" id="path27" />
+  <path d="M890 735 L1065 785" class="line" id="path28" />
+  <text x="70" y="775" class="title" id="text28">LOCAL STORAGE</text>
+  <text x="760" y="775" class="title" id="text29">LOGSTREAM</text>
+  <rect x="70" y="795" width="610" height="70" rx="10" fill="#132e4a" stroke="#60a5fa" stroke-width="1.4" id="rect29" />
+  <text x="87" y="823" class="title" id="text30">LogStream&lt;S, L&gt;</text>
+  <text x="87" y="847" class="sub" id="text31">[Core wiring] concrete stream over injected logger/storage</text>
+  <path d="M375 865 L375 889" class="line" id="path31" />
+  <rect x="70" y="889" width="610" height="70" rx="10" fill="#103c36" stroke="#5eead4" stroke-width="1.4" id="rect31" />
+  <text x="87" y="917" class="title" id="text32">SectionStorage → ByteSection&lt;Region&gt;</text>
+  <text x="87" y="941" class="sub" id="text33">[Builder] with_logger::&lt;YourSection, YourLogger&gt;(...)</text>
+  <path d="M375 959 L375 983" class="line" id="path33" />
+  <path d="M375 1053 L375 1077" class="line" id="path35" />
+  <path d="M375 1147 L375 1171" class="line" id="path37" />
+  <rect x="70" y="1171" width="610" height="70" rx="10" fill="#41351d" stroke="#facc70" stroke-width="1.4" id="rect37" />
+  <text x="87" y="1199" class="title" id="text38">MmapRegion → mapped pages → OS → disk</text>
+  <text x="87" y="1223" class="sub" id="text39">Native section headers + encoded records in slab files.</text>
+  <rect x="760" y="795" width="610" height="70" rx="10" fill="#132e4a" stroke="#60a5fa" stroke-width="1.4" id="rect39" />
+  <text x="777" y="823" class="title" id="text40">ScheduledCopperListSink / ScheduledKeyFrameSink</text>
+  <text x="777" y="847" class="sub" id="text41">Encode bincode records or generated reconstruction capture.</text>
+  <path d="M1065 865 L1065 889" class="line" id="path41" />
+  <rect x="760" y="889" width="610" height="70" rx="10" fill="#302f35" stroke="#aaa6b3" stroke-width="1.4" id="rect41" />
+  <text x="777" y="917" class="title" id="text42">Record header + bounded buffers / queue</text>
+  <text x="777" y="941" class="sub" id="text43">Ownership, backpressure and handoff to sender worker.</text>
+  <path d="M1065 959 L1065 983" class="line" id="path43" />
+  <rect x="760" y="983" width="610" height="70" rx="10" fill="#302f35" stroke="#aaa6b3" stroke-width="1.4" id="rect43" />
+  <text x="777" y="1011" class="title" id="text44">Sender: framing + FEC + pacing + recovery</text>
+  <text x="777" y="1035" class="sub" id="text45">[RON] link / fec / recovery_interval tune values; no type replacement</text>
+  <path d="M1065 1053 L1065 1077" class="line" id="path45" />
+  <rect x="760" y="1077" width="610" height="70" rx="10" fill="#352953" stroke="#c4a0ff" stroke-width="1.4" id="rect45" />
+  <text x="777" y="1105" class="title" id="text46">CuStreamTx → transport adapter</text>
+  <text x="777" y="1129" class="sub" id="text47">[T] RON transport type + resource • or builder.with_logstream(...)</text>
+  <path d="M1065 1147 L1065 1171" class="line" id="path47" />
+  <rect x="760" y="1171" width="610" height="70" rx="10" fill="#41351d" stroke="#facc70" stroke-width="1.4" id="rect47" />
+  <text x="777" y="1199" class="title" id="text48">Packet bytes on the link</text>
+  <text x="777" y="1223" class="sub" id="text49">Independent of .copper file/slab framing.</text>
+  <rect x="820" y="113" width="14" height="14" rx="3" fill="#aaa6b3" id="rect56" style="fill:#facc70;fill-opacity:1" />
+  <text x="843" y="126" class="sub" id="text56">Raw Bytes</text>
+<rect x="70.0" y="285.0" width="300.0" height="70" rx="10" fill="#132e4a" stroke="#60a5fa" stroke-width="1.4" /><text x="82.0" y="312.0" class="title" style="font-size:17px">CuMsg&lt;Payload&gt;</text><text x="82.0" y="336.0" class="sub" style="font-size:13px">Public envelope • fixed type</text><rect x="380.0" y="285.0" width="300.0" height="70" rx="10" fill="#352953" stroke="#c4a0ff" stroke-width="1.4" /><text x="392.0" y="312.0" class="title" style="font-size:17px">Payload</text><text x="392.0" y="336.0" class="sub" style="font-size:13px">[RON] cnx[].msg</text><rect x="70.0" y="375.0" width="300.0" height="70" rx="10" fill="#302f35" stroke="#aaa6b3" stroke-width="1.4" /><text x="82.0" y="402.0" class="title" style="font-size:17px">CuStampedDataSet</text><text x="82.0" y="426.0" class="sub" style="font-size:13px">[Generated] typed message slots</text><rect x="380.0" y="375.0" width="300.0" height="70" rx="10" fill="#132e4a" stroke="#60a5fa" stroke-width="1.4" /><text x="392.0" y="402.0" class="title" style="font-size:17px">CopperList&lt;P&gt;</text><text x="392.0" y="426.0" class="sub" style="font-size:13px">Public record • id + messages</text><rect x="70.0" y="983.0" width="300.0" height="70" rx="10" fill="#302f35" stroke="#aaa6b3" stroke-width="1.4" /><text x="82.0" y="1010.0" class="title" style="font-size:17px">bincode Encode</text><text x="82.0" y="1034.0" class="sub" style="font-size:13px">Fixed serialization framework</text><rect x="380.0" y="983.0" width="300.0" height="70" rx="10" fill="#352953" stroke="#c4a0ff" stroke-width="1.4" /><text x="392.0" y="1010.0" class="title" style="font-size:17px">CuLogCodec&lt;Payload&gt;</text><text x="392.0" y="1034.0" class="sub" style="font-size:13px">[C] codec type + binding</text><rect x="70.0" y="1077.0" width="300.0" height="70" rx="10" fill="#302f35" stroke="#aaa6b3" stroke-width="1.4" /><text x="82.0" y="1104.0" class="title" style="font-size:17px">RegionWriter</text><text x="82.0" y="1128.0" class="sub" style="font-size:13px">Private encoder writer</text><rect x="380.0" y="1077.0" width="300.0" height="70" rx="10" fill="#103c36" stroke="#5eead4" stroke-width="1.4" /><text x="392.0" y="1104.0" class="title" style="font-size:17px">ByteRegion::write</text><text x="392.0" y="1128.0" class="sub" style="font-size:13px">[Rust] backend region impl</text><rect x="70.0" y="1290.0" width="426.6666666666667" height="70" rx="10" fill="#103c36" stroke="#5eead4" stroke-width="1.4" /><text x="82.0" y="1317.0" class="title" style="font-size:17px">UnifiedLogWrite&lt;S&gt;</text><text x="82.0" y="1341.0" class="sub" style="font-size:13px">[Builder] with_logger::&lt;S, L&gt;(logger)</text><rect x="506.6666666666667" y="1290.0" width="426.6666666666667" height="70" rx="10" fill="#132e4a" stroke="#60a5fa" stroke-width="1.4" /><text x="518.6666666666667" y="1317.0" class="title" style="font-size:17px">ByteLogger&lt;B&gt;</text><text x="518.6666666666667" y="1341.0" class="sub" style="font-size:13px">Fixed allocator / layout / retention logic</text><rect x="943.3333333333334" y="1290.0" width="426.6666666666667" height="70" rx="10" fill="#103c36" stroke="#5eead4" stroke-width="1.4" /><text x="955.3333333333334" y="1317.0" class="title" style="font-size:17px">ByteStorage / ByteRegion</text><text x="955.3333333333334" y="1341.0" class="sub" style="font-size:13px">[Rust] backend impl → ByteLogger → builder</text><text x="70" y="1412" class="sub">[C] logging.codecs[].type → tasks[].logging.codec / codecs</text><text x="70" y="1440" class="sub">[T] log_streaming.destinations[].transport.{type, resource} → resources[].{id, provider}</text></svg>
