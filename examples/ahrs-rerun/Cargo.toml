@@ -1,0 +1,10 @@
+[package]
+name = "book-ahrs-rerun"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+cu-ahrs = { path = "../../../copper-rs/components/tasks/cu_ahrs", features = ["rerun"] }
+cu-rerun = { path = "../../../copper-rs/components/libs/cu_rerun" }
+cu29 = { path = "../../../copper-rs/core/cu29", default-features = false, features = ["std", "units"] }
