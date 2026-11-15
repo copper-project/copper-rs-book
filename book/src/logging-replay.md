@@ -387,6 +387,41 @@ Copper's logger is designed for **zero-impact logging** on the critical path. He
 This means logging in Copper is almost free on the hot path. You can log everything
 without worrying about performance -- which is exactly why it logs everything by default.
 
+## Logging and logstream extensibility
+
+To use a custom payload, codec, storage backend, or packet transport, choose the
+extension point below. This map follows task messages and state snapshots through
+the APIs in this edition's **1.3.0-dev** checkout.
+
+[![Task messages and state flowing through logging and logstream extension points](./images/copper-output-layers.svg)](./images/copper-output-layers.svg)
+
+Purple means a **Rust type selected in RON**: you can name your own implementation.
+Teal means an implementation supplied in Rust. Blue marks public APIs or records;
+gray marks core machinery. A setting that only tunes an algorithm does not make
+that algorithm replaceable.
+
+| Replace or extend | Where to connect your implementation |
+| --- | --- |
+| Task | `tasks[].type` in `copperconfig.ron`: name your `CuTask` or `CuSrcTask` implementation. |
+| Message payload | `cnx[].msg`: name your payload type. The `CuMsg` envelope stays the same. |
+| State snapshot | Implement `Freezable::freeze` and `thaw` on your task. Generated capture calls these methods. |
+| Payload codec | Define a `CuLogCodec<Payload>` type in `logging.codecs[].type`, give it an `id`, then select that id with `tasks[].logging.codec` or the per-message `logging.codecs` map on the task. |
+| Logger and section storage | Supply your `UnifiedLogWrite<S>` and `SectionStorage` implementations through the generated app's `builder.with_logger::<S, L>(logger)`. |
+| Byte storage backend | Implement `ByteStorage` and `ByteRegion`, construct `ByteLogger` with that backend, and inject it through `with_logger`. |
+| Packet transport | Implement `CuStreamTx`; select its type and resource through `log_streaming.destinations[].transport.{type, resource}`. The resource comes from a bundle declared under `resources`. Rust construction can instead inject the transport with `builder.with_logstream(transport, config)`. |
+| Semantic record sink | Implement `WriteStream<Record>`. Attaching an arbitrary sink to generated app output requires changing the output wiring; there is no RON sink-type slot. |
+
+The payload codec changes payload encoding inside the record; **bincode remains
+the serialization framework**. Likewise, logstream's `link`, `fec`, and
+`recovery_interval` settings tune the built-in sender rather than select a custom
+sender algorithm. Replacing those mechanisms requires a core change.
+
+The runtime owns message slots, snapshot order, output handoff, and buffer reuse.
+Local storage and logstream branch from completed records, so a streaming transport
+does not need to read the robot's slab files. For transport wiring and sender
+settings, continue with [Streaming Logs and Live Telemetry](./logstream-telemetry.md)
+and its [reference](./logstream-reference.md).
+
 ## Controlling what gets logged
 
 Sometimes you don't want to log everything. A high-frequency sensor producing megabytes

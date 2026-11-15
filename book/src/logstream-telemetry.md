@@ -27,6 +27,9 @@ saves task state; a **recovery point** binds that keyframe to the stream manifes
 and a CopperList boundary so the receiver can resume safely. Starting late does
 not retrieve expired history.
 
+For custom transports, codecs, and storage backends, see the
+[logging and logstream extensibility map](./logging-replay.md#logging-and-logstream-extensibility).
+
 ## 1. Try the UDP demo
 
 Use the source checkout named in the
