@@ -96,8 +96,13 @@ Use this when the **task path is fine**, but the **end of the CopperList is too 
 What it does:
 
 - keeps the DAG execution on the main loop
-- queues the completed CopperList to a dedicated serializer thread
+- queues the completed CopperList and its associated keyframe to one output worker
 - recycles the slot later when serialization finishes
+
+In `1.4.0-dev`, both records share one bounded handoff. If that handoff or the
+serial keyframe buffer pool is full, Copper drops the newest pair and reports
+both losses in `CopperListIoStats`. Missing CopperList IDs identify the gap.
+Stopping drains accepted output; explicit shutdown also reports flush errors.
 
 Minimal feature forwarding:
 

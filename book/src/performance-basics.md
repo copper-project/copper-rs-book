@@ -106,7 +106,7 @@ This is the fast path for readers who already know what kind of bottleneck they 
 
 | Knob | What it changes | Typical symptom |
 |---|---|---|
-| `async-cl-io` | Moves CopperList serialization and logging to a dedicated thread | Task latencies are fine, but end-of-CL overhead is too high |
+| `async-cl-io` | Moves CopperList and associated keyframe output to one worker | Task latencies are fine, but end-of-CL overhead is too high |
 | `parallel-rt` + `runtime.planner` | Enables an explicitly selected concurrent execution plan | Several CPU-bound stages are back to back and the global rate is too low |
 | `mmap-fsync` | Forces file `sync_all()` on section flush | The system runs fine for a while, then collapses under dirty-page / writeback pressure |
 | `background: true` | Runs one compatible source or task on the `background` thread pool and returns `None` while it is still busy | One isolated stage is too slow, but it does not need to block every cycle |
