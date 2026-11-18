@@ -30,6 +30,7 @@
 - [Shared Reference Time](./clock-sync.md)
 - [Adding the Console Monitor](./monitoring.md)
 - [Logging and Replaying Data](./logging-replay.md)
+- [Visualizing Payloads with Rerun](./rerun-representations.md)
 - [Self-Describing Logs](./self-describing-logs.md)
 - [Exporting Data to Other Formats](./export-formats.md)
 - [Streaming Logs and Live Telemetry](./logstream-telemetry.md)
