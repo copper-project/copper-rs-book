@@ -353,4 +353,6 @@ Key differences:
 | **Switching** | Launch arguments | Builder selection in `main.rs` |
 | **All variants visible** | Spread across files and conditionals | One file, all missions visible |
 
+To switch missions while the process is running, see [Choosing an Application Lifecycle](./app-lifecycle.md).
+
 The main advantage: one file shows every mission and which tasks run in each.

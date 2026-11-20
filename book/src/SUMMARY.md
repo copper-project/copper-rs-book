@@ -35,6 +35,7 @@
 - [Streaming Logs and Live Telemetry](./logstream-telemetry.md)
   - [Transport and Receiver Reference](./logstream-reference.md)
 - [Using Missions](./missions.md)
+- [Choosing an Application Lifecycle](./app-lifecycle.md)
 
 ---
 
