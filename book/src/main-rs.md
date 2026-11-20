@@ -78,6 +78,10 @@ It consumes the initialized handle and returns a stopped handle, so the code use
 default clock unless you override it with `.with_clock(...)`, which is mainly useful in
 tests or simulation.
 
+Keep this lifecycle for a single graph that should run until shutdown. For a timed
+capture, a host UI, or an app that switches graphs while running, see
+[Choosing an Application Lifecycle](./app-lifecycle.md).
+
 ## build.rs -- build-time setup
 
 <span class="version-marker" data-version="1.1">v1.1</span>
